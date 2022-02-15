@@ -1,11 +1,3 @@
-/* NOTES SECTION
- * 
- * need to figure out how to get dictionary to work instead of enum
- *
- * 
- * 
-*/
-
 using UnityEngine;
 using System;
 using FEN;
@@ -21,23 +13,33 @@ public class Board : MonoBehaviour {
     [SerializeField] private GameObject[] prefabs;
     [SerializeField] private Color[] teamColors;
 
-    
+    [Header("Sounds")]
 
-    // Game Logic
-    private ChessPiece[,] chessPieces;
+    //Board
     private const int TILE_COUNT_X = 8;
     private const int TILE_COUNT_Y = 8;
     private const float TILE_OFFSET_X = -0.5f;
     private const float TILE_OFFSET_Y = -0.525f;
-    private string DEFAULT_FEN = "r1b1kbnr/pppp1ppp/2n5/4p1B1/3P4/3Q1N2/PPP1PPPP/RN2KB1R b KQkq - 1 2";
+    private GameObject[,] tiles = new GameObject[TILE_COUNT_Y, TILE_COUNT_X];
+    private ChessPiece[,] chessPieces = new ChessPiece[TILE_COUNT_Y, TILE_COUNT_X];
+    private string DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    private char[,] board_state;
 
-    private GameObject[,] tiles;
+    //Piece Movement
+    private ChessPiece selectedPiece = null;
+
+    //Unity
     private Camera currentCamera;
-    private Vector2Int currentHover;
 
 
     // On Startup
     private void Awake() {
+
+        chessPieces = new ChessPiece[TILE_COUNT_X, TILE_COUNT_Y];
+        FENHandler FENObject = new FENHandler(DEFAULT_FEN);
+
+        board_state = FENObject.getArray();
+
         DrawTiles(1, TILE_COUNT_X, TILE_COUNT_Y);
         DrawPieces();
     }
@@ -45,6 +47,8 @@ public class Board : MonoBehaviour {
     //Every frame
     private void Update()
     {
+
+   
         if (!currentCamera)
         {
             currentCamera = Camera.main;
@@ -53,34 +57,29 @@ public class Board : MonoBehaviour {
 
         RaycastHit info;
         Ray ray = currentCamera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out info, 100, LayerMask.GetMask("Tile")))
+        if (Physics.Raycast(ray, out info, 100, LayerMask.GetMask("Tile")) && Input.GetMouseButtonDown(0))
         {
             // Get the indexes of the tile i've hit
             Vector2Int hitPosition = GetTileIndex(info.transform.gameObject);
+            hitPosition.y = 7 - hitPosition.y;
 
-            // If we're hovering a tile after not hovering any tiles
-            if (currentHover == -Vector2Int.one)
+            //if we click a tile that has a piece
+            if (chessPieces[hitPosition.y, hitPosition.x])
             {
-                currentHover = hitPosition;
-                tiles[hitPosition.x, hitPosition.y].layer = LayerMask.NameToLayer("Hover");
+                selectedPiece = chessPieces[hitPosition.y, hitPosition.x];
+                Debug.Log(selectedPiece);
+                
+            }
+            //If we have selected a piece and we are then selecting an empty tile 
+            if (chessPieces[hitPosition.y, hitPosition.x] == null && selectedPiece != null)
+            {
+                MovePiece(selectedPiece, hitPosition);
+                DrawPieces();
+                selectedPiece = null;
             }
 
-            // If we were already hovering a tile, change the previous one
-            if (currentHover != hitPosition)
-            {
-                tiles[currentHover.x, currentHover.y].layer = LayerMask.NameToLayer("Tile");
-                currentHover = hitPosition;
-                tiles[hitPosition.x, hitPosition.y].layer = LayerMask.NameToLayer("Hover");
-            }
-            else
-            {
-                if (currentHover != -Vector2Int.one)
-                {
-                    tiles[currentHover.x, currentHover.y].layer = LayerMask.NameToLayer("Tile");
-                    currentHover = -Vector2Int.one;
-                }
-            }
         }
+        
     }
 
     // Draw Tiles
@@ -88,7 +87,7 @@ public class Board : MonoBehaviour {
         tiles = new GameObject[tileCountX, tileCountY];
         bool colored = true;
         for (int i = 0; i < tileCountX; i++) {
-            for (int j = 0; j < tileCountY; j++) {
+            for (int j = tileCountY-1; j >= 0; j--) {
                 tiles[i, j] = DrawSingleTile(tileSize, i, j, colored);
                 colored = !colored;
             }
@@ -134,17 +133,7 @@ public class Board : MonoBehaviour {
 
     //Draw All Pieces
     private void DrawPieces()
-    {
-
-        chessPieces = new ChessPiece[TILE_COUNT_X, TILE_COUNT_Y];
-        FENHandler FENObject = new FENHandler(DEFAULT_FEN);
-
-        char[,] board_state = FENObject.getArray();
-
-        int whiteTeam = 0;
-        int blackTeam = 1;
-
-        
+    {   
         for (int i = 0; i < TILE_COUNT_X; i++)
         {
             for (int j = 0; j < TILE_COUNT_Y; j++)
@@ -157,19 +146,6 @@ public class Board : MonoBehaviour {
                 }
             }
         }
-
-        //White team
-        /*
-        chessPieces[0, 0] = DrawSinglePiece(2, whiteTeam);
-        chessPieces[0, 0].col = 0;
-        chessPieces[0, 0].row = 0;
-        chessPieces[0, 0].transform.position = new Vector3(5-TILE_OFFSET_X, 5-TILE_OFFSET_Y, 0);
-
-        chessPieces[1, 0] = DrawSinglePiece(3, whiteTeam);
-        chessPieces[1, 0].col = 1;
-        chessPieces[1, 0].row = 0;
-        chessPieces[1, 0].transform.position = new Vector3(chessPieces[1, 0].col - TILE_OFFSET_X, chessPieces[1, 0].row - TILE_OFFSET_Y, 0);
-        */
     }
 
     //Draw Single Piece
@@ -205,6 +181,13 @@ public class Board : MonoBehaviour {
             }
         }
         return -Vector2Int.one;
+    }
+
+    private void MovePiece(ChessPiece piece, Vector2Int square)
+    {
+        char temp = board_state[piece.row,piece.col];
+        board_state[piece.row,piece.col] = '-';
+        board_state[square.y, square.x] = temp;
     }
 
 }
