@@ -61,7 +61,8 @@ public class Board : MonoBehaviour {
         {
             // Get the indexes of the tile i've hit
             Vector2Int hitPosition = GetTileIndex(info.transform.gameObject);
-            hitPosition.y = 7 - hitPosition.y;
+
+            Debug.Log(hitPosition);
 
             //if we click a tile that has a piece
             if (chessPieces[hitPosition.y, hitPosition.x])
@@ -85,9 +86,9 @@ public class Board : MonoBehaviour {
     // Draw Tiles
     private void DrawTiles(float tileSize, int tileCountX, int tileCountY) {
         tiles = new GameObject[tileCountX, tileCountY];
-        bool colored = true;
-        for (int i = 0; i < tileCountX; i++) {
-            for (int j = tileCountY-1; j >= 0; j--) {
+        bool colored = false;
+        for (int i = 0; i < tileCountY; i++) {
+            for (int j = 0; j < tileCountX; j++) {
                 tiles[i, j] = DrawSingleTile(tileSize, i, j, colored);
                 colored = !colored;
             }
@@ -97,7 +98,7 @@ public class Board : MonoBehaviour {
 
     // Draw Single Tile
     private GameObject DrawSingleTile(float tileSize, int i, int j, bool colored) {
-        GameObject tileObject = new GameObject(string.Format("X:{0}, Y:{1}", i, j));
+        GameObject tileObject = new GameObject(string.Format("Y:{0}, X:{1}", i, j));
         tileObject.transform.parent = transform;
 
         Mesh mesh = new Mesh();
@@ -113,12 +114,12 @@ public class Board : MonoBehaviour {
         }
 
         Vector3[] vertices = new Vector3[4];
-        vertices[0] = new Vector3(i * tileSize, j * tileSize); //topleft
-        vertices[1] = new Vector3(i * tileSize, (j + 1) * tileSize); //topright
-        vertices[2] = new Vector3((i + 1) * tileSize, j * tileSize); //bottomleft
-        vertices[3] = new Vector3((i + 1) * tileSize, (j + 1) * tileSize); //bottomright
+        vertices[0] = new Vector3(j * tileSize,TILE_COUNT_X - i * tileSize); //topleft
+        vertices[1] = new Vector3((j + 1) * tileSize, TILE_COUNT_X - i * tileSize); //topright
+        vertices[2] = new Vector3(j * tileSize, TILE_COUNT_Y - (i + 1) * tileSize); //bottomleft
+        vertices[3] = new Vector3((j + 1) * tileSize, TILE_COUNT_Y - (i + 1) * tileSize); //bottomright
 
-        int[] tris = new int[] { 0, 1, 2, 1, 3, 2};
+        int[] tris = new int[] { 0 , 1, 2, 1, 3, 2 };
 
         mesh.vertices = vertices;
         mesh.triangles = tris;
