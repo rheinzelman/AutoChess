@@ -29,7 +29,7 @@ public class Board : MonoBehaviour {
     private const int TILE_COUNT_Y = 8;
     private const float TILE_OFFSET_X = -0.5f;
     private const float TILE_OFFSET_Y = -0.525f;
-    private string DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    private string DEFAULT_FEN = "r1b1kbnr/pppp1ppp/2n5/4p1B1/3P4/3Q1N2/PPP1PPPP/RN2KB1R b KQkq - 1 2";
 
     private GameObject[,] tiles;
     private Camera currentCamera;
@@ -149,11 +149,11 @@ public class Board : MonoBehaviour {
         {
             for (int j = 0; j < TILE_COUNT_Y; j++)
             {
-                if(board_state[i,j] != '-')
+                if(board_state[7-i,j] != '-')
                 {
-                    char temp = board_state[i, j];
-                    chessPieces[i,j] = DrawSinglePiece((ChessPieceType)(int)Enum.Parse(typeof(ChessPieceType), Char.ToString(Char.ToLower(temp))), temp);
-                    chessPieces[i,j].transform.position = new Vector3(j - TILE_OFFSET_X, i - TILE_OFFSET_Y, 0);
+                    char temp = board_state[7-i, j];
+                    chessPieces[7-i,j] = DrawSinglePiece((ChessPieceType)(int)Enum.Parse(typeof(ChessPieceType), Char.ToString(Char.ToLower(temp))), temp);
+                    chessPieces[7-i,j].transform.position = new Vector3(j - TILE_OFFSET_X, i - TILE_OFFSET_Y, 0);
                 }
             }
         }
