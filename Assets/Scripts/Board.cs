@@ -62,18 +62,16 @@ public class Board : MonoBehaviour {
             // Get the indexes of the tile i've hit
             Vector2Int hitPosition = GetTileIndex(info.transform.gameObject);
 
-            Debug.Log(hitPosition);
-
             //if we click a tile that has a piece
-            if (chessPieces[hitPosition.y, hitPosition.x])
+            if (chessPieces[hitPosition.x, hitPosition.y])
             {
-                selectedPiece = chessPieces[hitPosition.y, hitPosition.x];
-                Debug.Log(selectedPiece);
+                selectedPiece = chessPieces[hitPosition.x, hitPosition.y];
                 
             }
             //If we have selected a piece and we are then selecting an empty tile 
-            if (chessPieces[hitPosition.y, hitPosition.x] == null && selectedPiece != null)
+            if (chessPieces[hitPosition.x, hitPosition.y] == null && selectedPiece != null)
             {
+                Debug.Log("Row: " + selectedPiece.row + " Col: " + selectedPiece.col);
                 MovePiece(selectedPiece, hitPosition);
                 DrawPieces();
                 selectedPiece = null;
@@ -139,11 +137,13 @@ public class Board : MonoBehaviour {
         {
             for (int j = 0; j < TILE_COUNT_Y; j++)
             {
-                if(board_state[7-i,j] != '-')
+                if(board_state[i,j] != '-')
                 {
-                    char temp = board_state[7-i, j];
-                    chessPieces[7-i,j] = DrawSinglePiece((ChessPieceType)(int)Enum.Parse(typeof(ChessPieceType), Char.ToString(Char.ToLower(temp))), temp);
-                    chessPieces[7-i,j].transform.position = new Vector3(j - TILE_OFFSET_X, i - TILE_OFFSET_Y, 0);
+                    char temp = board_state[i, j];
+                    chessPieces[i,j] = DrawSinglePiece((ChessPieceType)(int)Enum.Parse(typeof(ChessPieceType), Char.ToString(Char.ToLower(temp))), temp);
+                    chessPieces[i,j].transform.position = new Vector3(j - TILE_OFFSET_X ,7-i-TILE_OFFSET_Y, 0);
+                    chessPieces[i,j].row = i;
+                    chessPieces[i,j].col = j;
                 }
             }
         }
@@ -186,9 +186,22 @@ public class Board : MonoBehaviour {
 
     private void MovePiece(ChessPiece piece, Vector2Int square)
     {
+        //Debug.Log("Row: " + piece.row + "Col: " + piece.col);
+        //Debug.Log("Row: " + square.x + "Col: " + square.y);
+
         char temp = board_state[piece.row,piece.col];
         board_state[piece.row,piece.col] = '-';
-        board_state[square.y, square.x] = temp;
+        board_state[square.x, square.y] = temp;
     }
 
 }
+
+/*
+ for(int i = 0; i < 8; i++)
+        {
+            for(int j=0; j < 8; j++)
+            {
+                Debug.Log(string.Format("{0},{1}", i,j) + board_state[i,j]);
+            }
+        }
+ */
