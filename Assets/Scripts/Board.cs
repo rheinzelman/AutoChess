@@ -1,3 +1,9 @@
+/*
+ * 
+ * Problems arising from GetMouseButton() I think. 
+ * 
+ */
+
 using UnityEngine;
 using System;
 using FEN;
@@ -57,28 +63,32 @@ public class Board : MonoBehaviour {
 
         RaycastHit info;
         Ray ray = currentCamera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out info, 100, LayerMask.GetMask("Tile")) && Input.GetMouseButtonDown(0))
+        if (Physics.Raycast(ray, out info, 100, LayerMask.GetMask("Tile")) && Input.GetMouseButtonUp(0))
         {
+
+
             // Get the indexes of the tile i've hit
             Vector2Int hitPosition = GetTileIndex(info.transform.gameObject);
 
             //if we click a tile that has a piece
-            if (chessPieces[hitPosition.x, hitPosition.y])
+            if (chessPieces[hitPosition.x, hitPosition.y] && selectedPiece == null)
             {
                 selectedPiece = chessPieces[hitPosition.x, hitPosition.y];
                 
-            }
-            //If we have selected a piece and we are then selecting an empty tile 
-            if (chessPieces[hitPosition.x, hitPosition.y] == null && selectedPiece != null)
+            } else if (chessPieces[hitPosition.x, hitPosition.y] == selectedPiece)
             {
-                Debug.Log("Row: " + selectedPiece.row + " Col: " + selectedPiece.col);
-                MovePiece(selectedPiece, hitPosition);
-                DrawPieces();
                 selectedPiece = null;
             }
+            //If we have selected a piece and we are then selecting an empty tile 
+            if (selectedPiece != null && chessPieces[hitPosition.x, hitPosition.y] == null)
+            {
+                Debug.Log(selectedPiece);
+                MovePiece(selectedPiece, hitPosition);
+                selectedPiece = null;
 
+            //If player selects the selected piece again, deselect it
+            } 
         }
-        
     }
 
     // Draw Tiles
@@ -144,7 +154,7 @@ public class Board : MonoBehaviour {
                     chessPieces[i,j].transform.position = new Vector3(j - TILE_OFFSET_X ,7-i-TILE_OFFSET_Y, 0);
                     chessPieces[i,j].row = i;
                     chessPieces[i,j].col = j;
-                }
+                } 
             }
         }
     }
@@ -186,14 +196,12 @@ public class Board : MonoBehaviour {
 
     private void MovePiece(ChessPiece piece, Vector2Int square)
     {
-        //Debug.Log("Row: " + piece.row + "Col: " + piece.col);
-        //Debug.Log("Row: " + square.x + "Col: " + square.y);
-
+        Debug.Log(square.x + ", " + square.y);
+        chessPieces[piece.row, piece.col].transform.position = new Vector3(square.y - TILE_OFFSET_X, 7 - square.x - TILE_OFFSET_Y, 0);
         char temp = board_state[piece.row,piece.col];
         board_state[piece.row,piece.col] = '-';
         board_state[square.x, square.y] = temp;
     }
-
 }
 
 /*

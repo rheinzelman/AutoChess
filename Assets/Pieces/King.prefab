@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3929886795958966227}
   - component: {fileID: -7793314276919314281}
-  - component: {fileID: -3641523707852176388}
+  - component: {fileID: 1577674995848751378}
   m_Layer: 0
   m_Name: King
   m_TagString: Untagged
@@ -83,7 +83,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &-3641523707852176388
+--- !u!114 &1577674995848751378
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -92,7 +92,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7088871415418846273}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 415aa845f5666fa4489709dfd7377eeb, type: 3}
+  m_Script: {fileID: 11500000, guid: 3d14c0d3cfaee684dab9f9bc2551e334, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   team: 0

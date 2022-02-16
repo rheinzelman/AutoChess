@@ -2,18 +2,6 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-/*
-Dictionary<char, int> ChessPieceType = new Dictionary<char, int>();
-
-ChessPieceType.Add('p', 1);
-ChessPieceType.Add('r', 2);
-ChessPieceType.Add('k', 3);
-ChessPieceType.Add('b', 4);
-ChessPieceType.Add('q', 5);
-ChessPieceType.Add('k', 6);
-
-*/
-
 public enum ChessPieceType
 {
     p = 1,
@@ -32,5 +20,12 @@ public class ChessPiece : MonoBehaviour
     public int col;
     public int row;
     public ChessPieceType type;
+
+    public void DestroyChessPiece(ChessPiece piece)
+    {
+        Debug.Log("one: " + this.gameObject);
+        Destroy(this.gameObject);
+        Debug.Log("two: " + this.gameObject);
+    }
 
 }
