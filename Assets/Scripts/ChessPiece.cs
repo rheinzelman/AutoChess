@@ -21,7 +21,7 @@ public class ChessPiece : MonoBehaviour
     public int row;
     public ChessPieceType type;
 
-    public void DestroyChessPiece(ChessPiece piece)
+    public void DestroyChessPiece()
     {
         Debug.Log("one: " + this.gameObject);
         Destroy(this.gameObject);

@@ -75,19 +75,26 @@ public class Board : MonoBehaviour {
             {
                 selectedPiece = chessPieces[hitPosition.x, hitPosition.y];
                 
-            } else if (chessPieces[hitPosition.x, hitPosition.y] == selectedPiece)
+            } 
+            //else if we select the same piece again, deselect
+            else if (chessPieces[hitPosition.x, hitPosition.y] == selectedPiece)
             {
                 selectedPiece = null;
             }
             //If we have selected a piece and we are then selecting an empty tile 
             if (selectedPiece != null && chessPieces[hitPosition.x, hitPosition.y] == null)
             {
-                Debug.Log(selectedPiece);
                 MovePiece(selectedPiece, hitPosition);
                 selectedPiece = null;
 
-            //If player selects the selected piece again, deselect it
             } 
+            //else if we select a piece with the opposite team, destroy opponent piece
+            else if (chessPieces[hitPosition.x, hitPosition.y].team != selectedPiece.team)
+            {
+                Debug.Log("take");
+                chessPieces[hitPosition.x, hitPosition.y].DestroyChessPiece();
+                MovePiece(selectedPiece, hitPosition);
+            }
         }
     }
 
@@ -196,11 +203,32 @@ public class Board : MonoBehaviour {
 
     private void MovePiece(ChessPiece piece, Vector2Int square)
     {
-        Debug.Log(square.x + ", " + square.y);
         chessPieces[piece.row, piece.col].transform.position = new Vector3(square.y - TILE_OFFSET_X, 7 - square.x - TILE_OFFSET_Y, 0);
+        chessPieces[square.x, square.y] = chessPieces[piece.row, piece.col];
         char temp = board_state[piece.row,piece.col];
         board_state[piece.row,piece.col] = '-';
         board_state[square.x, square.y] = temp;
+
+        /*
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                Debug.Log(string.Format("BS: {0},{1}", i, j) + board_state[i, j]);
+            }
+        }
+
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (chessPieces[i,j] != null)
+                {
+                    Debug.Log(string.Format("CP: {0},{1}", i, j) + chessPieces[i, j].type);
+                }
+            }
+        }
+        */
     }
 }
 
