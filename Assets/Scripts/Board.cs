@@ -94,6 +94,7 @@ public class Board : MonoBehaviour {
                 Debug.Log("take");
                 chessPieces[hitPosition.x, hitPosition.y].DestroyChessPiece();
                 MovePiece(selectedPiece, hitPosition);
+                selectedPiece = null;
             }
         }
     }
@@ -167,7 +168,7 @@ public class Board : MonoBehaviour {
     }
 
     //Draw Single Piece
-    private ChessPiece DrawSinglePiece(ChessPieceType type, char team)
+    private ChessPiece  DrawSinglePiece(ChessPieceType type, char team)
     {
 
         ChessPiece cp = Instantiate(prefabs[(int)type-1], transform).GetComponent<ChessPiece>();
@@ -201,34 +202,21 @@ public class Board : MonoBehaviour {
         return -Vector2Int.one;
     }
 
-    private void MovePiece(ChessPiece piece, Vector2Int square)
+    private string MovePiece(ChessPiece piece, Vector2Int square)
     {
+
+        string UCIReturnValue = "";
+
+        UCIReturnValue += string.Format("{0}{1} {2}{3}", piece.row, piece.col, square.x, square.y);
+
         chessPieces[piece.row, piece.col].transform.position = new Vector3(square.y - TILE_OFFSET_X, 7 - square.x - TILE_OFFSET_Y, 0);
         chessPieces[square.x, square.y] = chessPieces[piece.row, piece.col];
         char temp = board_state[piece.row,piece.col];
         board_state[piece.row,piece.col] = '-';
         board_state[square.x, square.y] = temp;
 
-        /*
-        for (int i = 0; i < 8; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
-                Debug.Log(string.Format("BS: {0},{1}", i, j) + board_state[i, j]);
-            }
-        }
+        return UCIReturnValue;
 
-        for (int i = 0; i < 8; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
-                if (chessPieces[i,j] != null)
-                {
-                    Debug.Log(string.Format("CP: {0},{1}", i, j) + chessPieces[i, j].type);
-                }
-            }
-        }
-        */
     }
 }
 

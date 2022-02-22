@@ -39,7 +39,7 @@ namespace FEN
 
             //iterate through the entire board_state_str
             for (int i = 0; i < board_state.Length; i++)
-            {
+            {   
                 //convert our position in the board_state_str into an 8x8 array readable form
                 int arrayRow = arrayIndex % 8;
                 int arrayCol = (int)Math.Floor((double)(arrayIndex / 8));
