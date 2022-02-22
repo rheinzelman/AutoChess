@@ -84,14 +84,13 @@ public class Board : MonoBehaviour {
             //If we have selected a piece and we are then selecting an empty tile 
             if (selectedPiece != null && chessPieces[hitPosition.x, hitPosition.y] == null)
             {
-                MovePiece(selectedPiece, hitPosition);
+                Debug.Log(MovePiece(selectedPiece, hitPosition));
                 selectedPiece = null;
 
             } 
             //else if we select a piece with the opposite team, destroy opponent piece
             else if (chessPieces[hitPosition.x, hitPosition.y].team != selectedPiece.team)
             {
-                Debug.Log("take");
                 chessPieces[hitPosition.x, hitPosition.y].DestroyChessPiece();
                 MovePiece(selectedPiece, hitPosition);
                 selectedPiece = null;
@@ -202,12 +201,31 @@ public class Board : MonoBehaviour {
         return -Vector2Int.one;
     }
 
+    private string ConvertToUCI(string unconverted_string)
+    {
+
+        string returnValue = "";
+        string letters = "abcdefg";
+
+        for(int i = 0; i < unconverted_string.Length; i++)
+        {
+            if(i % 2 != 0)
+            {
+                returnValue += '8'-unconverted_string[i];
+            }
+            else
+            {
+                returnValue += letters[unconverted_string[i] - '0'];
+            }
+        }
+
+        return returnValue;
+    }
+
     private string MovePiece(ChessPiece piece, Vector2Int square)
     {
 
-        string UCIReturnValue = "";
-
-        UCIReturnValue += string.Format("{0}{1} {2}{3}", piece.row, piece.col, square.x, square.y);
+        string UCIReturnValue = string.Format("{0}{1}{2}{3}", piece.col, piece.row, square.y, square.x);
 
         chessPieces[piece.row, piece.col].transform.position = new Vector3(square.y - TILE_OFFSET_X, 7 - square.x - TILE_OFFSET_Y, 0);
         chessPieces[square.x, square.y] = chessPieces[piece.row, piece.col];
@@ -215,7 +233,7 @@ public class Board : MonoBehaviour {
         board_state[piece.row,piece.col] = '-';
         board_state[square.x, square.y] = temp;
 
-        return UCIReturnValue;
+        return ConvertToUCI(UCIReturnValue); ;
 
     }
 }
