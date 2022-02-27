@@ -66,6 +66,7 @@
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\Board.cs" />
     <Compile Include="Assets\Scripts\Queen.cs" />
+    <Compile Include="Assets\Scripts\IODriver.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

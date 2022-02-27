@@ -7,6 +7,7 @@
 using UnityEngine;
 using System;
 using FEN;
+using IODriverNamespace;
 
 public class Board : MonoBehaviour {
 
@@ -39,7 +40,8 @@ public class Board : MonoBehaviour {
 
 
     // On Startup
-    private void Awake() {
+    private void Awake()
+    {
 
         chessPieces = new ChessPiece[TILE_COUNT_X, TILE_COUNT_Y];
         FENHandler FENObject = new FENHandler(DEFAULT_FEN);
@@ -48,6 +50,14 @@ public class Board : MonoBehaviour {
 
         DrawTiles(1, TILE_COUNT_X, TILE_COUNT_Y);
         DrawPieces();
+
+        string init = "1111111111111111000000000000000000000000000000001111111111111111";
+        string current = "1111111111111111000000000000000000000000000000001111111111111111";
+        string testInput = "1111111100000000000000001111111111111111000000000000000011111111";
+        IODriver testDriver = new IODriver(init, current);
+        testDriver.boardToArray(testInput);
+
+        char[,] testArray = FENObject.BoolToChar(init);
     }
 
     //Every frame
