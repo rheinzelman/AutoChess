@@ -18,18 +18,6 @@ namespace IODriverNamespace
 
         private int[,] keyArray = new int[,]
         {
-            { 7, 6, 5, 4, 63, 62, 61, 60 },
-            { 0, 1, 2, 3, 56, 57, 58, 59 },
-            { 15, 14, 13, 12, 55, 54, 53, 52},
-            { 8, 9, 10, 11, 48, 49, 50, 51 },
-            { 23, 22, 21, 20, 47, 46, 45, 44 },
-            { 16, 17, 18, 19, 40, 41, 42 ,43 },
-            { 31, 30, 29, 28, 39, 38, 37, 36 },
-            { 24, 25, 26, 27, 32, 33, 34 ,35 },
-        };
-
-        private int[,] keyArray2 = new int[,]
-        {
             { 1, 9, 17, 25, 24, 16, 8, 0 },
             { 3, 11, 19, 27, 26, 18, 10, 2 },
             { 5, 13, 21, 29, 28, 20, 12, 4 },
@@ -49,31 +37,17 @@ namespace IODriverNamespace
         public int[,] boardToArray(string board_state)
         {
             int[,] returnArray = new int[8, 8];
-            int[,] tempArray = new int[8, 8];
 
             int arrayIndex = 0;
-
-            for(int i = 0; i < returnArray.GetLength(0); i++)
-            {
-                for(int j = 0; j < returnArray.GetLength(1); j++)
-                {
-                    tempArray[i, j] = board_state[arrayIndex] - '0'; 
-                    arrayIndex++;
-                }
-            }
-
-            arrayIndex = 0;
 
             for (int i = 0; i < returnArray.GetLength(0); i++)
             {
                 for (int j = 0; j < returnArray.GetLength(1); j++)
                 {
-                    int arrayRow = keyArray2[i,j] % 8;
-                    int arrayCol = (int)Math.Floor((double)(keyArray2[i,j] / 8));
-
-                    //Debug.Log(arrayRow + "," + arrayCol);
+                    int arrayRow = keyArray[i,j] % 8;
+                    int arrayCol = (int)Math.Floor((double)(keyArray[i,j] / 8));
                   
-                    returnArray[arrayRow, arrayCol] = tempArray[i,j];
+                    returnArray[arrayRow, arrayCol] = board_state[arrayIndex] - '0';
                     arrayIndex++;
                 }
             }

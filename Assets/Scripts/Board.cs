@@ -40,8 +40,7 @@ public class Board : MonoBehaviour {
 
 
     // On Startup
-    private void Awake()
-    {
+    private void Awake() {
 
         chessPieces = new ChessPiece[TILE_COUNT_X, TILE_COUNT_Y];
         FENHandler FENObject = new FENHandler(DEFAULT_FEN);
@@ -58,7 +57,7 @@ public class Board : MonoBehaviour {
         testDriver.boardToArray(testInput);
 
         char[,] testArray = FENObject.BoolToChar(init);
-    }
+}
 
     //Every frame
     private void Update()
