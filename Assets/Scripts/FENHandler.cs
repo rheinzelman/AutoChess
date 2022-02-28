@@ -39,7 +39,7 @@ namespace FEN
 
             //iterate through the entire board_state_str
             for (int i = 0; i < board_state.Length; i++)
-            {
+            {   
                 //convert our position in the board_state_str into an 8x8 array readable form
                 int arrayRow = arrayIndex % 8;
                 int arrayCol = (int)Math.Floor((double)(arrayIndex / 8));
@@ -71,6 +71,25 @@ namespace FEN
 
             return result;
 
+        }
+
+        public char[,] BoolToChar(string bool_string)
+        {
+
+            char[,] result = new char[8, 8];
+            int arrayIndex = 0;
+
+            for (int i = 0; i < bool_string.Length; i++)
+            {
+                //convert our position in the board_state_str into an 8x8 array readable form
+                int arrayRow = arrayIndex % 8;
+                int arrayCol = (int)Math.Floor((double)(arrayIndex / 8));
+
+                result[arrayCol, arrayRow] = bool_string[i];
+                arrayIndex++;
+            }
+
+            return result;
         }
 
         public string getTurn()

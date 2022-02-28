@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6495447307519645556}
   - component: {fileID: 6357153837784940344}
-  - component: {fileID: -7697355851048659804}
+  - component: {fileID: -3859777760342408382}
   m_Layer: 0
   m_Name: Pawn
   m_TagString: Untagged
@@ -83,7 +83,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &-7697355851048659804
+--- !u!114 &-3859777760342408382
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -92,7 +92,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1869276740851470354}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd4d01b597607a543bb83dfe2cf28c8d, type: 3}
+  m_Script: {fileID: 11500000, guid: 3d14c0d3cfaee684dab9f9bc2551e334, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   team: 0
