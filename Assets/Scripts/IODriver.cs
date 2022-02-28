@@ -28,10 +28,10 @@ namespace IODriverNamespace
             { 33, 41, 49, 57, 56, 48, 40, 32 }
         };
 
-        public IODriver(string initial, string current)
+        public IODriver()
         {
-            this.initial_state = initial;
-            this.current_state = current;
+            this.initial_state = null;
+            this.current_state = null;
         }
 
         public int[,] boardToArray(string board_state)

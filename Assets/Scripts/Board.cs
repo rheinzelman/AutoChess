@@ -22,6 +22,10 @@ public class Board : MonoBehaviour {
 
     [Header("Sounds")]
 
+    //IO
+    IODriver testDriver = new IODriver();
+    
+
     //Board
     private const int TILE_COUNT_X = 8;
     private const int TILE_COUNT_Y = 8;
@@ -50,13 +54,8 @@ public class Board : MonoBehaviour {
         DrawTiles(1, TILE_COUNT_X, TILE_COUNT_Y);
         DrawPieces();
 
-        string init = "1111111111111111000000000000000000000000000000001111111111111111";
-        string current = "1111111111111111000000000000000000000000000000001111111111111111";
-        string testInput = "1111111100000000000000001111111111111111000000000000000011111111";
-        IODriver testDriver = new IODriver(init, current);
-        testDriver.boardToArray(testInput);
+        
 
-        char[,] testArray = FENObject.BoolToChar(init);
 }
 
     //Every frame
@@ -105,6 +104,9 @@ public class Board : MonoBehaviour {
                 selectedPiece = null;
             }
         }
+
+
+
     }
 
     // Draw Tiles
@@ -245,6 +247,15 @@ public class Board : MonoBehaviour {
         return ConvertToUCI(UCIReturnValue); ;
 
     }
+
+    private GameObject HighlightTile(Vector2Int tile)
+    {
+        // tileObject.AddComponent<MeshRenderer>().material = darkMat;
+
+        tiles[tile.x, tile.y].GetComponent<MeshRenderer>().material = hoverMat;
+        return tiles[tile.x, tile.y];
+    }
+
 }
 
 /*
