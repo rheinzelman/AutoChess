@@ -6,12 +6,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.IO.Ports;
+using System.Threading;
 
 namespace IODriverNamespace
 {
-
     public class IODriver : MonoBehaviour
     {
+
+        public static SerialPort sp = new SerialPort("COM7", 115200);
 
         private string initial_state;
         private string current_state;
@@ -30,12 +33,14 @@ namespace IODriverNamespace
 
         public IODriver()
         {
-            this.initial_state = null;
-            this.current_state = null;
+            //OpenConnection();
         }
 
-        public int[,] boardToArray(string board_state)
+        public int[,] boardToArray()
         {
+
+            string board_state = ReadArray();
+
             int[,] returnArray = new int[8, 8];
 
             int arrayIndex = 0;
@@ -52,29 +57,49 @@ namespace IODriverNamespace
                 }
             }
 
-            for (int i = 0; i < 8; i++)
+            
+            
+ 
+
+            return returnArray;
+        }
+
+        public void OpenConnection()
+        {
+            if (sp != null)
             {
-                for (int j = 0; j < 8; j++)
+                if (sp.IsOpen)
                 {
-                    Debug.Log(string.Format("{0},{1}: ", i, j) + returnArray[i,j]);
+                    sp.Close();
+                    print("closing Port, Port was already open");
+                }
+                else
+                {
+                    sp.Open();
+                    sp.WriteTimeout = 100;
+                    sp.ReadTimeout = 100;
                 }
             }
-
-            return null;
+            else
+            {
+                if (sp.IsOpen)
+                {
+                    print("Port Is already Open");
+                }
+                else
+                {
+                    print("Port == null");
+                }
+            }
         }
-
-        public string GetUCIMove()
+            
+        public static string ReadArray()
         {
+            sp.Open();
+            string Sensor = sp.ReadLine();
+            sp.Close();
 
-
-
-            return null;
-
-        }
-
-        public string getInit()
-        {
-            return this.initial_state;
+            return Sensor;
         }
 
     }

@@ -62,7 +62,22 @@ public class Board : MonoBehaviour {
     private void Update()
     {
 
-   
+        int [,] test_bs = testDriver.boardToArray();
+
+        
+         for(int i = 0; i < 8; i++)
+        {
+            for(int j=0; j < 8; j++)
+            {
+                if(test_bs[i,j] == 1)
+                {
+                    Vector2Int input = new Vector2Int(i, j);
+                    HighlightTile(input);
+                }    
+            }
+        }
+ 
+
         if (!currentCamera)
         {
             currentCamera = Camera.main;
