@@ -1,11 +1,6 @@
-/*
- * 
- * Problems arising from GetMouseButton() I think. 
- * 
- */
-
 using UnityEngine;
 using System;
+using System.Threading;
 using FEN;
 using IODriverNamespace;
 
@@ -53,16 +48,13 @@ public class Board : MonoBehaviour {
 
         DrawTiles(1, TILE_COUNT_X, TILE_COUNT_Y);
         DrawPieces();
-
-        
-
-}
+    }
 
     //Every frame
     private void Update()
     {
 
-        int [,] test_bs = testDriver.boardToArray();
+        /*int [,] test_bs = testDriver.boardToArray();
 
         
          for(int i = 0; i < 8; i++)
@@ -80,7 +72,7 @@ public class Board : MonoBehaviour {
                     HighlightTile(input, false);
                 }
             }
-        }
+        }*/
  
 
         if (!currentCamera)
@@ -93,7 +85,6 @@ public class Board : MonoBehaviour {
         Ray ray = currentCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out info, 100, LayerMask.GetMask("Tile")) && Input.GetMouseButtonUp(0))
         {
-
 
             // Get the indexes of the tile i've hit
             Vector2Int hitPosition = GetTileIndex(info.transform.gameObject);
@@ -153,10 +144,12 @@ public class Board : MonoBehaviour {
         if (colored == true)
         {
             tileObject.AddComponent<MeshRenderer>().material = darkMat;
+            tileObject.tag = "darkMat";
         }
         else
         {
             tileObject.AddComponent<MeshRenderer>().material = lightMat;
+            tileObject.tag = "lightMat";
         }
 
         Vector3[] vertices = new Vector3[4];
@@ -270,14 +263,24 @@ public class Board : MonoBehaviour {
 
     private GameObject HighlightTile(Vector2Int tile, bool color)
     {
+
+        GameObject selectedTile = tiles[tile.x, tile.y];
+
         // tileObject.AddComponent<MeshRenderer>().material = darkMat;
         if(color == true)
         {
-            tiles[tile.x, tile.y].GetComponent<MeshRenderer>().material = hoverMat;
+            selectedTile.GetComponent<MeshRenderer>().material = hoverMat;
         }
         else
         {
-            tiles[tile.x, tile.y].GetComponent<MeshRenderer>().material = lightMat;
+            if(selectedTile.tag == "lightMat")
+            {
+                selectedTile.GetComponent<MeshRenderer>().material = lightMat;
+            }
+            else
+            {
+                selectedTile.GetComponent<MeshRenderer>().material = darkMat;
+            }
         }
         return tiles[tile.x, tile.y];
     }
