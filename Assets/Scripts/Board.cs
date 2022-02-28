@@ -72,8 +72,13 @@ public class Board : MonoBehaviour {
                 if(test_bs[i,j] == 1)
                 {
                     Vector2Int input = new Vector2Int(i, j);
-                    HighlightTile(input);
-                }    
+                    HighlightTile(input, true);
+                }
+                else
+                {
+                    Vector2Int input = new Vector2Int(i, j);
+                    HighlightTile(input, false);
+                }
             }
         }
  
@@ -263,11 +268,17 @@ public class Board : MonoBehaviour {
 
     }
 
-    private GameObject HighlightTile(Vector2Int tile)
+    private GameObject HighlightTile(Vector2Int tile, bool color)
     {
         // tileObject.AddComponent<MeshRenderer>().material = darkMat;
-
-        tiles[tile.x, tile.y].GetComponent<MeshRenderer>().material = hoverMat;
+        if(color == true)
+        {
+            tiles[tile.x, tile.y].GetComponent<MeshRenderer>().material = hoverMat;
+        }
+        else
+        {
+            tiles[tile.x, tile.y].GetComponent<MeshRenderer>().material = lightMat;
+        }
         return tiles[tile.x, tile.y];
     }
 
