@@ -18,7 +18,9 @@ public class Board : MonoBehaviour {
     [Header("Sounds")]
 
     //IO
-    IODriver testDriver = new IODriver();
+    IODriver mainDriver = new IODriver();
+    private int[,] initial_bs;
+    private int[,] final_bs;
     
 
     //Board
@@ -73,6 +75,28 @@ public class Board : MonoBehaviour {
                 }
             }
         }*/
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if(initial_bs == null)
+            {
+                Debug.Log("1");
+                initial_bs = mainDriver.boardToArray("1111111100000000000000001111111111111111000000000000000011111111");
+            } else if(initial_bs != null && final_bs == null)
+            {
+                Debug.Log("2");
+                final_bs = mainDriver.boardToArray("1111111100000000000000001111111111111110100000000000000011111111");
+            } else if(initial_bs != null && final_bs != null)
+            {
+                Debug.Log("3");
+                int[] test_move = mainDriver.getDifference(initial_bs, final_bs);
+                Vector2Int initial_tile = new Vector2Int(test_move[0], test_move[1]);
+                Vector2Int final_tile = new Vector2Int(test_move[2], test_move[3]);
+                MovePieceByV2I(initial_tile, final_tile);
+                initial_bs = null;
+                final_bs = null;
+            }
+        }
  
 
         if (!currentCamera)
@@ -258,6 +282,21 @@ public class Board : MonoBehaviour {
         board_state[square.x, square.y] = temp;
 
         return ConvertToUCI(UCIReturnValue); ;
+
+    }
+
+    private string MovePieceByV2I(Vector2Int initial_tile, Vector2Int final_tile) 
+    {
+
+        string returnString = string.Format("{0}{1}{2}{3}", initial_tile.x, initial_tile.y, final_tile.x, final_tile.y);
+
+        chessPieces[initial_tile.x, initial_tile.y].transform.position = new Vector3(final_tile.y - TILE_OFFSET_X, 7 - final_tile.x - TILE_OFFSET_Y, 0);
+        chessPieces[final_tile.x, final_tile.y] = chessPieces[initial_tile.x, initial_tile.y];
+        char temp = board_state[initial_tile.x, initial_tile.y];
+        board_state[initial_tile.x, initial_tile.y] = '-';
+        board_state[final_tile.x, final_tile.y] = temp;
+
+        return returnString;
 
     }
 

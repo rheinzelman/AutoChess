@@ -36,10 +36,11 @@ namespace IODriverNamespace
             //OpenConnection();
         }
 
-        public int[,] boardToArray()
+        public int[,] boardToArray(string input_array)
         {
 
-            string board_state = ReadArray();
+            //string board_state = ReadArray();
+            string board_state = input_array;
 
             int[,] returnArray = new int[8, 8];
 
@@ -49,19 +50,40 @@ namespace IODriverNamespace
             {
                 for (int j = 0; j < returnArray.GetLength(1); j++)
                 {
-                    int arrayRow = keyArray[i,j] % 8;
-                    int arrayCol = (int)Math.Floor((double)(keyArray[i,j] / 8));
-                  
+                    int arrayRow = keyArray[i, j] % 8;
+                    int arrayCol = (int)Math.Floor((double)(keyArray[i, j] / 8));
+
                     returnArray[arrayRow, arrayCol] = board_state[arrayIndex] - '0';
                     arrayIndex++;
                 }
             }
-
-            
-            
- 
-
             return returnArray;
+        }
+
+        public int[] getDifference(int[,] initial, int[,] final)
+        {
+
+            int[] returnValue = new int[4];
+
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    final[i, j] = final[i, j] - initial[i, j];
+                    Debug.Log(final[i, j]);
+                    if (final[i, j] == -1)
+                    {
+                        returnValue[0] = i;
+                        returnValue[1] = j;
+                    }
+                    else if (final[i, j] == 1)
+                    {
+                        returnValue[2] = i;
+                        returnValue[3] = j;
+                    }
+                }
+            }
+            return returnValue;
         }
 
         public void OpenConnection()
@@ -106,3 +128,42 @@ namespace IODriverNamespace
     
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
