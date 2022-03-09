@@ -454,7 +454,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   newGameScene: SampleScene
   boardSyncScene: Sync
-  titleScene: 
+  titleScene: TitleScene
 --- !u!1 &504558924
 GameObject:
   m_ObjectHideFlags: 0
@@ -1176,7 +1176,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: bf0263c3ecdfb214ba80094e41485815, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5d026b8bd98f9db42982e3fb86b9abf8, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

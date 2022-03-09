@@ -34,7 +34,7 @@ public class MainMenu : MonoBehaviour
         SceneManager.LoadScene(boardSyncScene);
     }
 
-    public void title()
+    public void Title()
     {
         SceneManager.LoadScene(titleScene);
     }
