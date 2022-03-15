@@ -1,4 +1,0 @@
-repository "AutoChess"
-  path "/"
-    br "/main"
-    co "/main"
