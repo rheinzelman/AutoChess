@@ -206,6 +206,107 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1633040980
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1633040984}
+  - component: {fileID: 1633040983}
+  - component: {fileID: 1633040982}
+  - component: {fileID: 1633040981}
+  m_Layer: 0
+  m_Name: Board2D
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1633040981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1633040980}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34904aec3b483b64ca6438a262d1338b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  horizontalSquares: 8
+  verticalSquares: 8
+--- !u!114 &1633040982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1633040980}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5736e65a20688af4ca87a2f0f7639d58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lightTilePrefab: {fileID: 1536143466918546498, guid: bf584a79763f46f4aab7707da6a59ec9, type: 3}
+  darkTilePrefab: {fileID: 6439895904287485410, guid: 9aa8fe66e9e8ebf4ea75cc9f9c43f411, type: 3}
+  prefabs:
+  - {fileID: 1869276740851470354, guid: cd3c64ea824eb614c943716c590b50ae, type: 3}
+  - {fileID: 3944118618090396319, guid: de0bb60cf00b3b04d99fed01d41a7e14, type: 3}
+  - {fileID: 6814635156845054368, guid: df3cb5df1a9955d4f939ec4ab3a98d17, type: 3}
+  - {fileID: 1452300457329145370, guid: a0091d06d01e1e5489fc43c4d738a7f9, type: 3}
+  - {fileID: 5080568355588422512, guid: 59a8752c240320b4eb1c1f0b2e9b3b78, type: 3}
+  - {fileID: 7088871415418846273, guid: 054ca9ee7cd3bc34fbbf381de43c831e, type: 3}
+  teamColors:
+  - {r: 1, g: 1, b: 1, a: 1}
+  - {r: 0.3773585, g: 0.3773585, b: 0.3773585, a: 1}
+  lightMat: {fileID: 2100000, guid: 18ee2b0f9577a0742aa4b237b7b20c63, type: 2}
+  darkMat: {fileID: 2100000, guid: b6a5e8d40d7cd904bb0e4dfe155dc8ff, type: 2}
+  hoverMat: {fileID: 2100000, guid: c1015775fb2d34549a4b3d7a943829ed, type: 2}
+  TILE_COUNT_X: 8
+  TILE_COUNT_Y: 8
+  chessManager: {fileID: 1633040981}
+  boardManager: {fileID: 1633040983}
+--- !u!114 &1633040983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1633040980}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d40148bfaa9785e4f931ba3a0d016f80, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  horizontalSquares: 8
+  verticalSquares: 8
+  WhitePieces: []
+  BlackPieces: []
+  WhiteKing: {fileID: 0}
+  BlackKing: {fileID: 0}
+  chessManager: {fileID: 0}
+  board2D: {fileID: 1633040982}
+  boardUpdate:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!4 &1633040984
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1633040980}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.4764128, y: 6.0374494, z: -27.761095}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1743844322
 GameObject:
   m_ObjectHideFlags: 0
@@ -223,7 +324,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1743844323
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -236,9 +337,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5736e65a20688af4ca87a2f0f7639d58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lightMat: {fileID: 2100000, guid: 18ee2b0f9577a0742aa4b237b7b20c63, type: 2}
-  darkMat: {fileID: 2100000, guid: b6a5e8d40d7cd904bb0e4dfe155dc8ff, type: 2}
-  hoverMat: {fileID: 2100000, guid: c1015775fb2d34549a4b3d7a943829ed, type: 2}
+  lightTilePrefab: {fileID: 0}
+  darkTilePrefab: {fileID: 0}
   prefabs:
   - {fileID: 1869276740851470354, guid: cd3c64ea824eb614c943716c590b50ae, type: 3}
   - {fileID: 3944118618090396319, guid: de0bb60cf00b3b04d99fed01d41a7e14, type: 3}
@@ -249,6 +349,13 @@ MonoBehaviour:
   teamColors:
   - {r: 1, g: 1, b: 1, a: 1}
   - {r: 0.3773585, g: 0.3773585, b: 0.3773585, a: 1}
+  lightMat: {fileID: 2100000, guid: 18ee2b0f9577a0742aa4b237b7b20c63, type: 2}
+  darkMat: {fileID: 2100000, guid: b6a5e8d40d7cd904bb0e4dfe155dc8ff, type: 2}
+  hoverMat: {fileID: 2100000, guid: c1015775fb2d34549a4b3d7a943829ed, type: 2}
+  TILE_COUNT_X: 8
+  TILE_COUNT_Y: 8
+  chessManager: {fileID: 0}
+  boardManager: {fileID: 0}
 --- !u!4 &1743844324
 Transform:
   m_ObjectHideFlags: 0
