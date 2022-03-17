@@ -38,13 +38,10 @@ public class Knight : ChessPiece
         //if move is valid coordinate and no piece then move is added to legal positions
         foreach (Vector2Int pos in possibleMoves)
         {
-            if (board.HasPieceAt(pos))
-                if (board.GetPieceAt(pos).pieceColor != pieceColor)
+            if (board.HasPieceAt(pos) && board.GetPieceAt(pos).pieceColor != pieceColor)
                     LegalAttacks.Add(pos);
-                else return;
-            else if (board.IsValidCoordinate(pos))
+            if (board.IsValidCoordinate(pos) && !board.HasPieceAt(pos))
                 LegalPositions.Add(pos);
-
         }
     }
 
