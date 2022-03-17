@@ -4,12 +4,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+// Defines a Unity Event that takes a Vector2Int argument
+[System.Serializable]
+public class PieceEvent : UnityEvent<Vector2Int> { }
+[System.Serializable]
+public class PieceMoveEvent : UnityEvent<Vector2Int, Vector2Int> { }
+
 public class BoardManager : MonoBehaviour
 {
+    // Square information
     public Square[,] squares;
     public int horizontalSquares = 8;
     public int verticalSquares = 8;
 
+    // Place to store en passant
     public Dictionary<Vector2Int, ChessPiece> EnPassantSquares = new Dictionary<Vector2Int, ChessPiece>();
 
     //These lists hold all pieces on the board based on color
@@ -17,6 +25,7 @@ public class BoardManager : MonoBehaviour
     public List<ChessPiece> WhitePieces = new List<ChessPiece>();
     public List<ChessPiece> BlackPieces = new List<ChessPiece>();
 
+    // Kings of both sides
     [SerializeField]
     private King WhiteKing;
     [SerializeField]
@@ -26,31 +35,19 @@ public class BoardManager : MonoBehaviour
     public ChessManager chessManager;
     public Board2D board2D; 
 
+    // Unity events
     public UnityEvent boardUpdate = new UnityEvent();
+    public PieceEvent pieceCreated = new PieceEvent();
+    public PieceEvent pieceRemoved = new PieceEvent();
+    public PieceMoveEvent pieceMoved = new PieceMoveEvent();
 
     void Start()
     {
         SetupSquares();
 
-        InitializePiecesFromArray(chessManager.board_state);
-    }
+        chessManager = GetComponentInParent<ChessManager>();
 
-    [Button]
-    public void GetPieces()
-    {
-        //Clear lists
-        WhitePieces.Clear();
-        BlackPieces.Clear();
-        //iterate through all squares and find pieces
-        //when a piece is found use piece color to add to appropriate list
-        foreach(Square sq in squares)
-        {
-            if (sq.HasPiece() && GetPieceAt(sq.coordinate).pieceColor == PieceColor.White)
-                WhitePieces.Add(GetPieceAt(sq.coordinate));
-            else if (sq.HasPiece() && GetPieceAt(sq.coordinate).pieceColor == PieceColor.Black)
-                BlackPieces.Add(GetPieceAt(sq.coordinate));
-            else return;
-        }
+        InitializePiecesFromArray(chessManager.board_state);
     }
     private void SetupSquares()
     {
@@ -94,6 +91,37 @@ public class BoardManager : MonoBehaviour
         return squares[pos.x, pos.y].piece;
     }
 
+    [Button]
+    public void GetPieces()
+    {
+        //Clear lists
+        WhitePieces.Clear();
+        BlackPieces.Clear();
+        //iterate through all squares and find pieces
+        //when a piece is found use piece color to add to appropriate list
+        foreach (Square sq in squares)
+        {
+            if (sq.HasPiece() && GetPieceAt(sq.coordinate).pieceColor == PieceColor.White)
+                WhitePieces.Add(GetPieceAt(sq.coordinate));
+            else if (sq.HasPiece() && GetPieceAt(sq.coordinate).pieceColor == PieceColor.Black)
+                BlackPieces.Add(GetPieceAt(sq.coordinate));
+            else return;
+        }
+    }
+
+    public bool MovePiece(Vector2Int from, Vector2Int to)
+    {
+        ChessPiece piece = GetPieceAt(from);
+
+        if (!piece || !piece.MoveToPosition(to)) return false;
+
+        pieceMoved.Invoke(from, to);
+
+        print("Moving a " + piece.name + ": " + from + " -> " + to);
+
+        return true;
+    }
+
     public void TakePiece(Vector2Int pos)
     {
         //Remove piece from piece list
@@ -108,6 +136,19 @@ public class BoardManager : MonoBehaviour
             RemovePiece(pos);
 
     }
+    private void RemovePiece(Vector2Int pos)
+    {
+        pieceRemoved.Invoke(pos);
+
+        Square square = squares[pos.x, pos.y];
+
+        ChessPiece piece = square.piece;
+
+        square.piece = null;
+
+        Destroy(piece.gameObject);
+    }
+
 
     public void InitializePiecesFromArray(char[,] boardState)
     {
@@ -157,27 +198,12 @@ public class BoardManager : MonoBehaviour
             AddKing(piecePos, PieceColor.White);
     }
 
-    public bool MovePiece(Vector2Int from, Vector2Int to)
-    {
-        ChessPiece piece = GetPieceAt(from);
+    //private void ConvertPieceToFen(int x, int y, char type)
+    //{
+    //    type = '-';
 
-        if (!piece || !piece.MoveToPosition(to)) return false;
-
-        print("Moving a " + piece.name + ": " + from + " -> " + to);
-
-        return true;
-    }
-
-    private void RemovePiece(Vector2Int pos)
-    {
-        Square square = squares[pos.x, pos.y];
-
-        ChessPiece piece = square.piece;
-
-        square.piece = null;
-
-        Destroy(piece.gameObject);
-    }
+        
+    //}
 
     private void InitializePiece(GameObject newPiece, Vector2Int pos, PieceColor color)
     {
@@ -185,7 +211,7 @@ public class BoardManager : MonoBehaviour
 
         Square sq = squares[pos.x, pos.y];
 
-        sq.piece = newPiece.GetComponent<ChessPiece>();//newPiece.AddComponent<Pawn>();
+        sq.piece = newPiece.GetComponent<ChessPiece>();
 
         sq.piece.board = this;
 
@@ -210,8 +236,20 @@ public class BoardManager : MonoBehaviour
                 BlackKing = sq.piece as King;
         }
 
+        pieceCreated.Invoke(pos);
+
         boardUpdate.Invoke();
     }
+
+    //public void UpdateBoardState()
+    //{
+    //    char[,] newState = new char[8, 8];
+
+    //    //foreach(Square sq in squares)
+    //    //    chessManager.board_state
+
+    //    //chessManager.board_state
+    //}
 
     [Button]
     public void AddPawn(Vector2Int pos, PieceColor color)

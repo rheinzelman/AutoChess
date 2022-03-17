@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-using System.Collections;
-using System.Collections.Generic;
-using System;
-
 namespace FEN
 {
     public class FENHandler
@@ -20,6 +16,7 @@ namespace FEN
         public FENHandler(string FEN)
         {
             string[] split = FEN.Split(' ');
+
             //split: 0 - board state, 1 - turn designation, 2 - castling availability, 3 - en passant squares
             this.board_state = split[0];
             this.turn = split[1];
@@ -32,12 +29,13 @@ namespace FEN
             //initialize our 8x8 array to return
             char[,] result = new char[8, 8];
 
-            // Initialize x and y;
+            // Initialize x and y
             int x = 0;
             int y = 0;
 
             foreach(char c in board_state)
             {
+                // If the character is a '/' then start the next row and skip this iteration
                 if (c == '/')
                 {
                     x = 0;
@@ -45,9 +43,11 @@ namespace FEN
                     continue;
                 }
 
+                // If the character is a letter, put it in the array
                 if (char.IsLetter(c))
                     result[x++, y] = c;
 
+                // If the character is a digit, place that many '-' in the array
                 if (char.IsDigit(c))
                     for (int i = 0; i < char.GetNumericValue(c); i++)
                         result[x++, y] = '-';
@@ -56,7 +56,7 @@ namespace FEN
             return result;
         }
 
-        //Convert the board state portion of the FEN to an 8x8 array
+        // Convert the board state portion of the FEN to an 8x8 array
         //public char[,] getArray()
         //{
 

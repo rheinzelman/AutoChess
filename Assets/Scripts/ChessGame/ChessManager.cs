@@ -8,9 +8,6 @@ public enum PlayerColor
     White,
     Black
 }
-
-[RequireComponent(typeof(BoardManager))]
-[RequireComponent(typeof(Board2D))]
 public class ChessManager : MonoBehaviour
 {
     private BoardManager board;
@@ -33,8 +30,8 @@ public class ChessManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        board ??= GetComponent<BoardManager>();
-        board2D ??= GetComponent<Board2D>();
+        board ??= GetComponentInChildren<BoardManager>();
+        board2D ??= GetComponentInChildren<Board2D>();
 
         board.chessManager = this;
         board.board2D = board2D;

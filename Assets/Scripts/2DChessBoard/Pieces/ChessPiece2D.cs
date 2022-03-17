@@ -10,9 +10,7 @@ public enum ChessPieceType
     b = 4,
     q = 5,
     k = 6
-
 }
-
 
 public class ChessPiece2D : MonoBehaviour
 {

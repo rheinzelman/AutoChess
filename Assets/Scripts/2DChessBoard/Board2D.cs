@@ -44,6 +44,7 @@ public class Board2D : MonoBehaviour {
     private Camera currentCamera;
 
     [Header("Board Settings")]
+
     //ChessManager
     public ChessManager chessManager;
     public BoardManager boardManager;
@@ -59,11 +60,13 @@ public class Board2D : MonoBehaviour {
 
         chessPieces = new ChessPiece2D[TILE_COUNT_Y, TILE_COUNT_X];
         tiles = new GameObject[TILE_COUNT_Y, TILE_COUNT_X];
-
         chessPieces = new ChessPiece2D[TILE_COUNT_X, TILE_COUNT_Y];
 
         SetupTiles();
         DrawPieces();
+
+        boardManager.pieceRemoved.AddListener(DestroyPieceObject);
+        boardManager.pieceMoved.AddListener(TransferPiece);
     }
 
     //Every frame
@@ -182,6 +185,45 @@ public class Board2D : MonoBehaviour {
         return tileObject;
     }
 
+    // Draw Single Tile
+    //private GameObject DrawSingleTile(float tileSize, int i, int j, bool colored)
+    //{
+    //    GameObject tileObject = new GameObject(string.Format("Y:{0}, X:{1}", i, j));
+    //    tileObject.transform.parent = transform;
+
+    //    Mesh mesh = new Mesh();
+    //    tileObject.AddComponent<MeshFilter>().mesh = mesh;
+
+    //    if (colored == true)
+    //    {
+    //        tileObject.AddComponent<MeshRenderer>().material = darkMat;
+    //        tileObject.tag = "darkMat";
+    //    }
+    //    else
+    //    {
+    //        tileObject.AddComponent<MeshRenderer>().material = lightMat;
+    //        tileObject.tag = "lightMat";
+    //    }
+
+    //    Vector3[] vertices = new Vector3[4];
+    //    vertices[0] = new Vector3(j * tileSize, TILE_COUNT_X - i * tileSize); //topleft
+    //    vertices[1] = new Vector3((j + 1) * tileSize, TILE_COUNT_X - i * tileSize); //topright
+    //    vertices[2] = new Vector3(j * tileSize, TILE_COUNT_Y - (i + 1) * tileSize); //bottomleft
+    //    vertices[3] = new Vector3((j + 1) * tileSize, TILE_COUNT_Y - (i + 1) * tileSize); //bottomright
+
+    //    int[] tris = new int[] { 0, 1, 2, 1, 3, 2 };
+
+    //    mesh.vertices = vertices;
+    //    mesh.triangles = tris;
+
+    //    tileObject.AddComponent<BoxCollider>();
+
+    //    tileObject.layer = LayerMask.NameToLayer("Tile");
+
+
+    //    return tileObject;
+    //}
+
     // Set up all pieces
     private void DrawPieces()
     {   
@@ -289,19 +331,33 @@ public class Board2D : MonoBehaviour {
         string returnString = string.Format("From: X = {0}, Y = {1} -- To: X = {2}, Y = {3}", initial_tile.x, initial_tile.y, final_tile.x, final_tile.y);
 
         if (!boardManager.MovePiece(initial_tile, final_tile)) return "Illegal move! - " + returnString;
-            
-        if (chessPieces[final_tile.x, final_tile.y]) 
-            chessPieces[final_tile.x, final_tile.y].DestroyChessPiece();
 
-        chessPieces[initial_tile.x, initial_tile.y].transform.position = new Vector3(final_tile.x - TILE_OFFSET_X, 7 - final_tile.y - TILE_OFFSET_Y, 0);
-        chessPieces[final_tile.x, final_tile.y] = chessPieces[initial_tile.x, initial_tile.y];
-        chessPieces[initial_tile.x, initial_tile.y] = null;
+        //DestroyPiece(final_tile);
+        //TransferPiece(initial_tile, final_tile);
+
+        return returnString;
+    }
+
+    public void UpdateBoardState(Vector2Int initial_tile, Vector2Int final_tile)
+    {
         char temp = chessManager.board_state[initial_tile.x, initial_tile.y];
         chessManager.board_state[initial_tile.x, initial_tile.y] = '-';
         chessManager.board_state[final_tile.x, final_tile.y] = temp;
+    }
 
-        return returnString;
+    public void DestroyPieceObject(Vector2Int tile)
+    {
+        if (chessPieces[tile.x, tile.y])
+            chessPieces[tile.x, tile.y].DestroyChessPiece();
+    }
 
+    public void TransferPiece(Vector2Int initial_tile, Vector2Int final_tile)
+    {
+        chessPieces[initial_tile.x, initial_tile.y].transform.position = new Vector3(final_tile.x - TILE_OFFSET_X, 7 - final_tile.y - TILE_OFFSET_Y, 0);
+        chessPieces[final_tile.x, final_tile.y] = chessPieces[initial_tile.x, initial_tile.y];
+        chessPieces[initial_tile.x, initial_tile.y] = null;
+
+        UpdateBoardState(initial_tile, final_tile);
     }
 
     private GameObject HighlightTile(Vector2Int tile, bool color)

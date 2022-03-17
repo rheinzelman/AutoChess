@@ -32,6 +32,8 @@ public abstract class ChessPiece : MonoBehaviour
 
     public Square square;
 
+    public char fenCode;
+
     protected virtual void Start()
     {
         board.boardUpdate.AddListener(FindLegalPositions);
