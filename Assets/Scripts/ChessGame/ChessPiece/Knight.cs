@@ -39,7 +39,7 @@ public class Knight : ChessPiece
         foreach (Vector2Int pos in possibleMoves)
         {
             if (board.HasPieceAt(pos) && board.GetPieceAt(pos).pieceColor != pieceColor)
-                    LegalAttacks.Add(pos);
+                LegalAttacks.Add(pos);
             if (board.IsValidCoordinate(pos) && !board.HasPieceAt(pos))
                 LegalPositions.Add(pos);
         }
