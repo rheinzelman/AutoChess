@@ -111,7 +111,6 @@ public class Board2D : MonoBehaviour {
 
             // Get the indexes of the tile i've hit
             Vector2Int hitPosition = GetTileIndex(info.transform.gameObject);
-            print("Hit: " + hitPosition);
             if (chessPieces[hitPosition.x, hitPosition.y]) print("Piece: " + chessPieces[hitPosition.x, hitPosition.y].name);
 
 
@@ -119,34 +118,31 @@ public class Board2D : MonoBehaviour {
             if (chessPieces[hitPosition.x, hitPosition.y] && selectedPiece == deselectValue)
             {
                 selectedPiece = new Vector2Int(hitPosition.x, hitPosition.y);
-                print("Selected: " + selectedPiece);
+                HighlightTile(hitPosition.x, hitPosition.y, true);
             }
             //else if we select the same piece again, deselect
             else if (hitPosition == selectedPiece)
             {
-                print("Delected: " + selectedPiece);
+                HighlightTile(hitPosition.x, hitPosition.y, false);
                 selectedPiece = deselectValue;
             }
-
-            // If no piece is selected, exit the function
-            if (selectedPiece == deselectValue) return;
-
             //If we have selected a piece and we are then selecting an empty tile 
-            if (selectedPiece != deselectValue && chessPieces[hitPosition.x, hitPosition.y] == null)
+            else if (selectedPiece != deselectValue && chessPieces[hitPosition.x, hitPosition.y] == null)
             {
-                print("Attempting move: " + selectedPiece + " -> " + hitPosition);
-                Debug.Log(MovePiece(selectedPiece, hitPosition));
+                HighlightTile(selectedPiece.x, selectedPiece.y, false);
+                MovePiece(selectedPiece, hitPosition);
                 selectedPiece = deselectValue;
-
             }
             //else if we select a piece with the opposite team, destroy opponent piece
             else if (chessPieces[hitPosition.x, hitPosition.y].team != chessPieces[selectedPiece.x, selectedPiece.y].team)
             {
-                //chessPieces[hitPosition.x, hitPosition.y].DestroyChessPiece();
-                print("Attempting take: " + selectedPiece + " -> " + hitPosition);
+                HighlightTile(selectedPiece.x, selectedPiece.y, false);
                 MovePiece(selectedPiece, hitPosition);
                 selectedPiece = deselectValue;
             }
+            // If no piece is selected, exit the function
+            if (selectedPiece == deselectValue) return;
+
         }
 
 
@@ -360,19 +356,18 @@ public class Board2D : MonoBehaviour {
         UpdateBoardState(initial_tile, final_tile);
     }
 
-    private GameObject HighlightTile(Vector2Int tile, bool color)
+    private GameObject HighlightTile(int row, int col, bool color)
     {
 
-        GameObject selectedTile = tiles[tile.x, tile.y];
+        GameObject selectedTile = tiles[row, col];
 
-        // tileObject.AddComponent<MeshRenderer>().material = darkMat;
-        if(color == true)
+        if (color == true)
         {
             selectedTile.GetComponent<MeshRenderer>().material = hoverMat;
         }
         else
         {
-            if(selectedTile.tag == "lightMat")
+            if (selectedTile.tag == "lightMat")
             {
                 selectedTile.GetComponent<MeshRenderer>().material = lightMat;
             }
@@ -381,7 +376,7 @@ public class Board2D : MonoBehaviour {
                 selectedTile.GetComponent<MeshRenderer>().material = darkMat;
             }
         }
-        return tiles[tile.x, tile.y];
+        return tiles[row, col];
     }
 
 }
