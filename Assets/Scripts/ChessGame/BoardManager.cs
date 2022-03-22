@@ -24,6 +24,7 @@ public class BoardManager : MonoBehaviour
     //the functionality of these lists will be implemented and maintained by Kaleb
     public List<ChessPiece> WhitePieces = new List<ChessPiece>();
     public List<ChessPiece> BlackPieces = new List<ChessPiece>();
+    public List<ChessPiece> Graveyard = new List<ChessPiece>();
 
     // Kings of both sides
     [SerializeField]
@@ -117,8 +118,6 @@ public class BoardManager : MonoBehaviour
 
         pieceMoved.Invoke(from, to);
 
-        print("Moving a " + piece.name + ": " + from + " -> " + to);
-
         return true;
     }
 
@@ -146,7 +145,15 @@ public class BoardManager : MonoBehaviour
 
         square.piece = null;
 
+        Graveyard.Add(piece);
+
         Destroy(piece.gameObject);
+
+        for(int i = 0; i < Graveyard.Count; i++)
+        {
+            print(Graveyard[i]);
+        }
+
     }
 
 

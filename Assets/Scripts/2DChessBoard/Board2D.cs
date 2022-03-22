@@ -118,7 +118,7 @@ public class Board2D : MonoBehaviour {
                 selectedPiece = deselectValue;
             }
             //else if we select a piece with the opposite team, destroy opponent piece
-            else if (chessPieces[hitPosition.x, hitPosition.y].team != chessPieces[selectedPiece.x, selectedPiece.y].team)
+            else if (selectedPiece != deselectValue && chessPieces[hitPosition.x, hitPosition.y] != null && chessPieces[hitPosition.x, hitPosition.y].team != chessPieces[selectedPiece.x, selectedPiece.y].team)
             {
                 HighlightLegalTiles(selectedPiece, false);
                 HighlightTile(selectedPiece.x, selectedPiece.y, false);
@@ -126,7 +126,7 @@ public class Board2D : MonoBehaviour {
                 selectedPiece = deselectValue;
             }
             // If no piece is selected, exit the function
-            if (selectedPiece == deselectValue) return;
+            if (selectedPiece == deselectValue) return ;
 
         }
 
