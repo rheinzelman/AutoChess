@@ -10,6 +10,7 @@ public class Board2D : MonoBehaviour {
     [Header("Tile Prefabs")]
     [SerializeField] private GameObject lightTilePrefab;
     [SerializeField] private GameObject darkTilePrefab;
+    [SerializeField] private GameObject legalTilePrefab;
 
     [Header("Piece Prefabs")]
     [SerializeField] private GameObject[] prefabs;
@@ -368,11 +369,24 @@ public class Board2D : MonoBehaviour {
         ChessPiece chessPiece = boardManager.GetPieceAt(square);
 
         chessPiece.FindLegalPositions();
-
-        for(int i = 0; i < chessPiece.LegalPositions.Count; i++)
+        
+        if (highlight)
         {
-            HighlightTile(chessPiece.LegalPositions[i].x, chessPiece.LegalPositions[i].y, highlight);
+            for (int i = 0; i < chessPiece.LegalPositions.Count; i++)
+            {
+                GameObject tileObject = Instantiate(legalTilePrefab, new Vector3(chessPiece.LegalPositions[i].x + 0.5f, TILE_COUNT_Y - chessPiece.LegalPositions[i].y - 0.5f, 0), Quaternion.identity);
+                tileObject.tag = "legalTile";
+            }
         }
+        else
+        {
+            GameObject[] legalTiles = GameObject.FindGameObjectsWithTag("legalTile");
+            foreach(GameObject tile in legalTiles)
+            {
+                GameObject.Destroy(tile);
+            }
+        }
+        
 
     }
 
