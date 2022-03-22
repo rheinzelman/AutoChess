@@ -6,6 +6,7 @@ TagManager:
   tags:
   - darkMat
   - lightMat
+  - legalTile
   layers:
   - Default
   - TransparentFX

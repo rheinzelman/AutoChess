@@ -253,6 +253,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lightTilePrefab: {fileID: 1536143466918546498, guid: bf584a79763f46f4aab7707da6a59ec9, type: 3}
   darkTilePrefab: {fileID: 6439895904287485410, guid: 9aa8fe66e9e8ebf4ea75cc9f9c43f411, type: 3}
+  legalTilePrefab: {fileID: 9163434007872510278, guid: ea61effbf8f4bc9478b64c40d4f2d330, type: 3}
   prefabs:
   - {fileID: 1869276740851470354, guid: cd3c64ea824eb614c943716c590b50ae, type: 3}
   - {fileID: 3944118618090396319, guid: de0bb60cf00b3b04d99fed01d41a7e14, type: 3}
@@ -270,6 +271,7 @@ MonoBehaviour:
   TILE_COUNT_Y: 8
   chessManager: {fileID: 1633040981}
   boardManager: {fileID: 1633040983}
+  gameManager: {fileID: 0}
 --- !u!114 &1633040983
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -291,6 +293,15 @@ MonoBehaviour:
   chessManager: {fileID: 0}
   board2D: {fileID: 1633040982}
   boardUpdate:
+    m_PersistentCalls:
+      m_Calls: []
+  pieceCreated:
+    m_PersistentCalls:
+      m_Calls: []
+  pieceRemoved:
+    m_PersistentCalls:
+      m_Calls: []
+  pieceMoved:
     m_PersistentCalls:
       m_Calls: []
 --- !u!4 &1633040984
@@ -339,6 +350,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lightTilePrefab: {fileID: 0}
   darkTilePrefab: {fileID: 0}
+  legalTilePrefab: {fileID: 0}
   prefabs:
   - {fileID: 1869276740851470354, guid: cd3c64ea824eb614c943716c590b50ae, type: 3}
   - {fileID: 3944118618090396319, guid: de0bb60cf00b3b04d99fed01d41a7e14, type: 3}
@@ -356,6 +368,7 @@ MonoBehaviour:
   TILE_COUNT_Y: 8
   chessManager: {fileID: 0}
   boardManager: {fileID: 0}
+  gameManager: {fileID: 0}
 --- !u!4 &1743844324
 Transform:
   m_ObjectHideFlags: 0
