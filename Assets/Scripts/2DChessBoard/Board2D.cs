@@ -48,6 +48,7 @@ public class Board2D : MonoBehaviour {
     //ChessManager
     public ChessManager chessManager;
     public BoardManager boardManager;
+    public GameManager gameManager;
 
 
     // On Startup
@@ -75,25 +76,7 @@ public class Board2D : MonoBehaviour {
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            if(initial_bs == null)
-            {
-                Debug.Log("1");
-                initial_bs = mainDriver.boardToArray("1111111100000000000000001111111111111111000000000000000011111111");
-            } else if(initial_bs != null && final_bs == null)
-            {
-                Debug.Log("2");
-                final_bs = mainDriver.boardToArray("1111111100000000000000001111111111111110100000000000000011111111");
-            } else if(initial_bs != null && final_bs != null)
-            {
-                Debug.Log("3");
-                int[] test_move = mainDriver.getDifference(initial_bs, final_bs);
-                Vector2Int initial_tile = new Vector2Int(test_move[0], test_move[1]);
-                Vector2Int final_tile = new Vector2Int(test_move[2], test_move[3]);
-                //MovePieceByV2I(initial_tile, final_tile);
-                MovePiece(initial_tile, final_tile);
-                initial_bs = null;
-                final_bs = null;
-            }
+            //Board interaction will go here
         }
  
 
@@ -107,28 +90,28 @@ public class Board2D : MonoBehaviour {
         Ray ray = currentCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out info, 100, LayerMask.GetMask("Tile")) && Input.GetMouseButtonDown(0))
         {
-            print(info.transform.gameObject);
 
             // Get the indexes of the tile i've hit
             Vector2Int hitPosition = GetTileIndex(info.transform.gameObject);
-            if (chessPieces[hitPosition.x, hitPosition.y]) print("Piece: " + chessPieces[hitPosition.x, hitPosition.y].name);
-
 
             //if we click a tile that has a piece
             if (chessPieces[hitPosition.x, hitPosition.y] && selectedPiece == deselectValue)
             {
                 selectedPiece = new Vector2Int(hitPosition.x, hitPosition.y);
+                HighlightLegalTiles(selectedPiece, true);
                 HighlightTile(hitPosition.x, hitPosition.y, true);
             }
             //else if we select the same piece again, deselect
             else if (hitPosition == selectedPiece)
             {
+                HighlightLegalTiles(selectedPiece, false);
                 HighlightTile(hitPosition.x, hitPosition.y, false);
                 selectedPiece = deselectValue;
             }
             //If we have selected a piece and we are then selecting an empty tile 
             else if (selectedPiece != deselectValue && chessPieces[hitPosition.x, hitPosition.y] == null)
             {
+                HighlightLegalTiles(selectedPiece, false);
                 HighlightTile(selectedPiece.x, selectedPiece.y, false);
                 MovePiece(selectedPiece, hitPosition);
                 selectedPiece = deselectValue;
@@ -136,6 +119,7 @@ public class Board2D : MonoBehaviour {
             //else if we select a piece with the opposite team, destroy opponent piece
             else if (chessPieces[hitPosition.x, hitPosition.y].team != chessPieces[selectedPiece.x, selectedPiece.y].team)
             {
+                HighlightLegalTiles(selectedPiece, false);
                 HighlightTile(selectedPiece.x, selectedPiece.y, false);
                 MovePiece(selectedPiece, hitPosition);
                 selectedPiece = deselectValue;
@@ -377,6 +361,19 @@ public class Board2D : MonoBehaviour {
             }
         }
         return tiles[row, col];
+    }
+
+    private void HighlightLegalTiles(Vector2Int square, bool highlight)
+    {
+        ChessPiece chessPiece = boardManager.GetPieceAt(square);
+
+        chessPiece.FindLegalPositions();
+
+        for(int i = 0; i < chessPiece.LegalPositions.Count; i++)
+        {
+            HighlightTile(chessPiece.LegalPositions[i].x, chessPiece.LegalPositions[i].y, highlight);
+        }
+
     }
 
 }
