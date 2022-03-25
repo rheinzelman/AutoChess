@@ -9,7 +9,7 @@ namespace IODriverNamespace
     public class IODriver : MonoBehaviour
     {
 
-        public static SerialPort sp = new SerialPort("COM7", 115200);
+        public static SerialPort sp = new SerialPort("COM3", 115200);
 
         private string initial_state;
         private string current_state;
@@ -79,15 +79,19 @@ namespace IODriverNamespace
         public List<Vector2Int> getDifference(int[,] initial, int[,] final)
         {
 
+            //A list containing the initial and final piece movement
             List<Vector2Int> returnValue = new List<Vector2Int>();
+            //placeholder in the list to access later
+            returnValue.Add(new Vector2Int());
             returnValue.Add(new Vector2Int());
 
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
                 {
+                    //subtract initial and final board states
                     final[i, j] = final[i, j] - initial[i, j];
-                    Debug.Log(final[i, j]);
+                    //-1 will represent the from square and 1 will represent the to square
                     if (final[i, j] == -1)
                     {
                         returnValue[0] = new Vector2Int(i, j);
@@ -99,6 +103,8 @@ namespace IODriverNamespace
                 }
             }
 
+            //ensure that there is only one piece movement picked up from the physical board
+            //if there isn't return an empty Vector2Int List
             if(checkDifference(final) == true)
             {
                 return returnValue;
@@ -112,7 +118,9 @@ namespace IODriverNamespace
 
         public void sendMove(string input)
         {
-
+            Debug.Log("sendMove");
+            sp.Write("$H");
+            sp.Write("X100Y100");
         }
 
         public void OpenConnection()
@@ -127,8 +135,8 @@ namespace IODriverNamespace
                 else
                 {
                     sp.Open();
-                    sp.WriteTimeout = 100;
-                    sp.ReadTimeout = 100;
+                    sp.WriteTimeout = 200;
+                    sp.ReadTimeout = 200;
                 }
             }
             else
@@ -142,6 +150,9 @@ namespace IODriverNamespace
                     print("Port == null");
                 }
             }
+
+            sp.Write("$H");
+            sp.Write("X100Y100");
         }
             
         public static string ReadArray()
