@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using FEN;
 using IODriverNamespace;
@@ -59,6 +60,7 @@ public class Board2D : MonoBehaviour {
     private void Start()
     {
         mainDriver = gameObject.AddComponent<IODriver>();
+        initial_bs = mainDriver.boardToArray();
 
         chessPieces = new ChessPiece2D[TILE_COUNT_Y, TILE_COUNT_X];
         tiles = new GameObject[TILE_COUNT_Y, TILE_COUNT_X];
@@ -69,17 +71,46 @@ public class Board2D : MonoBehaviour {
 
         boardManager.pieceRemoved.AddListener(DestroyPieceObject);
         boardManager.pieceMoved.AddListener(TransferPiece);
+
+      
     }
 
     //Every frame
     private void Update()
     {
 
+        int [,] physical_board_state = mainDriver.boardToArray();
+
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (physical_board_state[i, j] == 1)
+                {
+                    HighlightTile(i, j, true);
+                }
+                else
+                {
+                    HighlightTile(i, j, false);
+                }
+            }
+        }
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            //Board interaction will go here
+            Debug.Log("1");
+            final_bs = mainDriver.boardToArray();
+            
+            Debug.Log("3");
+            List<Vector2Int> test_move = mainDriver.getDifference(initial_bs, final_bs);   
+            if(mainDriver.checkDifference() == true)
+            {
+                Vector2Int initial_tile = new Vector2Int(test_move[0], test_move[1]);
+                Vector2Int final_tile = new Vector2Int(test_move[2], test_move[3]);
+                MovePieceByV2I(initial_tile, final_tile);
+            }
+            final_bs = null;
         }
- 
+
 
         if (!currentCamera)
         {

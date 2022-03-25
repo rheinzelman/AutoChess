@@ -2,12 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-
-using System.Collections;
-using System.Collections.Generic;
-using System;
 using System.IO.Ports;
-using System.Threading;
 
 namespace IODriverNamespace
 {
@@ -33,14 +28,13 @@ namespace IODriverNamespace
 
         public IODriver()
         {
-            //OpenConnection();
+            OpenConnection();
         }
 
-        public int[,] boardToArray(string input_array)
+        public int[,] boardToArray()
         {
 
-            //string board_state = ReadArray();
-            string board_state = input_array;
+            string board_state = ReadArray();
 
             int[,] returnArray = new int[8, 8];
 
@@ -60,10 +54,33 @@ namespace IODriverNamespace
             return returnArray;
         }
 
-        public int[] getDifference(int[,] initial, int[,] final)
+        public bool checkDifference(int[,] arr)
+        {
+            int sum = 0;
+
+            for(int i = 0; i < 8; i++)
+            {
+                for(int j = 0; j < 8; j++)
+                {
+                    sum += arr[i, j];
+                }
+            }
+
+            if(sum == 0) {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
+        public List<Vector2Int> getDifference(int[,] initial, int[,] final)
         {
 
-            int[] returnValue = new int[4];
+            List<Vector2Int> returnValue = new List<Vector2Int>();
+            returnValue.Add(new Vector2Int());
 
             for (int i = 0; i < 8; i++)
             {
@@ -73,17 +90,29 @@ namespace IODriverNamespace
                     Debug.Log(final[i, j]);
                     if (final[i, j] == -1)
                     {
-                        returnValue[0] = i;
-                        returnValue[1] = j;
+                        returnValue[0] = new Vector2Int(i, j);
                     }
                     else if (final[i, j] == 1)
                     {
-                        returnValue[2] = i;
-                        returnValue[3] = j;
+                        returnValue[1] = new Vector2Int(i, j);
                     }
                 }
             }
-            return returnValue;
+
+            if(checkDifference(final) == true)
+            {
+                return returnValue;
+            }
+            else
+            {
+                Debug.Log("getDifference Error");
+                return new List<Vector2Int>();
+            }
+        }
+
+        public void sendMove(string input)
+        {
+
         }
 
         public void OpenConnection()
