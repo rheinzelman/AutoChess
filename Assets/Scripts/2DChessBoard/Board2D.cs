@@ -25,7 +25,7 @@ public class Board2D : MonoBehaviour {
     //[Header("Sounds")]
 
     //IO
-    IODriver mainDriver;// = new IODriver();
+    IODriver mainDriver;
     private int[,] initial_bs;
     private int[,] final_bs;
 
@@ -95,18 +95,16 @@ public class Board2D : MonoBehaviour {
                 }
             }
         }
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            Debug.Log("1");
             final_bs = mainDriver.boardToArray();
             
-            Debug.Log("3");
-            List<Vector2Int> test_move = mainDriver.getDifference(initial_bs, final_bs);   
-            if(mainDriver.checkDifference() == true)
+            List<Vector2Int> physical_move = mainDriver.getDifference(initial_bs, final_bs);   
+            //physical_move Vector2Int list will be empty if the checkDifference throws an error
+            if(physical_move != null)
             {
-                Vector2Int initial_tile = new Vector2Int(test_move[0], test_move[1]);
-                Vector2Int final_tile = new Vector2Int(test_move[2], test_move[3]);
-                MovePieceByV2I(initial_tile, final_tile);
+                MovePiece(physical_move[0], physical_move[1]);
             }
             final_bs = null;
         }
