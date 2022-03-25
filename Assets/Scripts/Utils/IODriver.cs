@@ -119,8 +119,9 @@ namespace IODriverNamespace
         public void sendMove(string input)
         {
             Debug.Log("sendMove");
-            sp.Write("$H");
-            sp.Write("X100Y100");
+            sp.WriteLine("$H");
+            sp.WriteTimeout = 100;
+            sp.WriteLine("X100Y100");
         }
 
         public void OpenConnection()
@@ -150,9 +151,6 @@ namespace IODriverNamespace
                     print("Port == null");
                 }
             }
-
-            sp.Write("$H");
-            sp.Write("X100Y100");
         }
             
         public static string ReadArray()
