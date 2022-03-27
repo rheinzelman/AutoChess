@@ -103,9 +103,26 @@ public class Board2D : MonoBehaviour {
         //when spacebar is pressed, attempt to grab physical board state and represent virtually
         if (Input.GetKeyDown(KeyCode.Space))
         {
+
             
             //grab the final board state
             final_bs = mainDriver.boardToArray();
+
+            /*for(int i = 0; i< 8; i++)
+            {
+                for(int j = 0; j< 8; j++)
+                {
+                    print("X: " + i + "Y: " + j + ", " + initial_bs[i, j]);
+                }
+            }
+
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    print("X: " + i + "Y: " + j + ", " + final_bs[i, j]);
+                }
+            }*/
 
             //compare initial and final board state
             List<Vector2Int> physical_move = mainDriver.getDifference(initial_bs, final_bs);   
@@ -115,10 +132,7 @@ public class Board2D : MonoBehaviour {
             {
                 MovePiece(physical_move[0], physical_move[1]);
             }
-            initial_bs = final_bs;
-            final_bs = null;
-            mainDriver.sendMove("test");
-            
+            initial_bs = mainDriver.boardToArray();         
 
         }
 
@@ -160,7 +174,7 @@ public class Board2D : MonoBehaviour {
                 selectedPiece = deselectValue;
             }
             //else if we select a piece with the opposite team, destroy opponent piece
-            else if (chessPieces[hitPosition.x, hitPosition.y].team != chessPieces[selectedPiece.x, selectedPiece.y].team)
+            else if (chessPieces[hitPosition.x, hitPosition.y] != null && chessPieces[hitPosition.x, hitPosition.y].team != chessPieces[selectedPiece.x, selectedPiece.y].team)
             {
                 HighlightLegalTiles(selectedPiece, false);
                 HighlightTile(selectedPiece.x, selectedPiece.y, false);
@@ -168,11 +182,9 @@ public class Board2D : MonoBehaviour {
                 selectedPiece = deselectValue;
             }
             // If no piece is selected, exit the function
-            if (selectedPiece == deselectValue) return;
+            else if (selectedPiece == deselectValue && chessPieces[hitPosition.x, hitPosition.y] == null) return;
 
         }
-
-
 
     }
 

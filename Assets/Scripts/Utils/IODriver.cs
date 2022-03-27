@@ -76,11 +76,12 @@ namespace IODriverNamespace
             {
                 for(int j = 0; j < 8; j++)
                 {
-                    sum += arr[i, j];
+                    if(arr[i,j] != 0)
+                    sum += 1;
                 }
             }
 
-            if(sum == 0) {
+            if(sum == 2) {
                 return true;
             }
             else
@@ -135,7 +136,7 @@ namespace IODriverNamespace
             
         }
 
-        public void OpenConnection()
+        /*public void OpenConnection()
         {
             if (sp != null)
             {
@@ -162,7 +163,7 @@ namespace IODriverNamespace
                     print("Port == null");
                 }
             }
-        }
+        }*/
             
         public static string ReadArray()
         {
