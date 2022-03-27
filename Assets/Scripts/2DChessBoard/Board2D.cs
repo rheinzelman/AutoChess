@@ -104,35 +104,29 @@ public class Board2D : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Space))
         {
 
-            
+
             //grab the final board state
             final_bs = mainDriver.boardToArray();
 
-            /*for(int i = 0; i< 8; i++)
-            {
-                for(int j = 0; j< 8; j++)
-                {
-                    print("X: " + i + "Y: " + j + ", " + initial_bs[i, j]);
-                }
-            }
-
-            for (int i = 0; i < 8; i++)
-            {
-                for (int j = 0; j < 8; j++)
-                {
-                    print("X: " + i + "Y: " + j + ", " + final_bs[i, j]);
-                }
-            }*/
-
             //compare initial and final board state
-            List<Vector2Int> physical_move = mainDriver.getDifference(initial_bs, final_bs);   
+            List<Vector2Int> physical_move = mainDriver.getDifference(initial_bs, final_bs);
+
+            string legality;
             
             //physical_move Vector2Int list will be empty if the checkDifference throws an error
             if(physical_move != null)
             {
-                MovePiece(physical_move[0], physical_move[1]);
+                legality = MovePiece(physical_move[0], physical_move[1]);
+
+                if (legality.Contains("Illegal"))
+                {
+                    initial_bs = mainDriver.boardToArray();
+                } else
+                {
+                    print("Illegal move!, move the board back to it's original state.");
+                }
             }
-            initial_bs = mainDriver.boardToArray();         
+                   
 
         }
 
@@ -346,20 +340,6 @@ public class Board2D : MonoBehaviour {
 
     //}
 
-    //private string MovePieceByV2I(Vector2Int initial_tile, Vector2Int final_tile) 
-    //{
-
-    //    string returnString = string.Format("{0}{1}{2}{3}", initial_tile.x, initial_tile.y, final_tile.x, final_tile.y);
-
-    //    chessPieces[initial_tile.x, initial_tile.y].transform.position = new Vector3(final_tile.y - TILE_OFFSET_X, 7 - final_tile.x - TILE_OFFSET_Y, 0);
-    //    chessPieces[final_tile.x, final_tile.y] = chessPieces[initial_tile.x, initial_tile.y];
-    //    char temp = chessManager.board_state[initial_tile.x, initial_tile.y];
-    //    chessManager.board_state[initial_tile.x, initial_tile.y] = '-';
-    //    chessManager.board_state[final_tile.x, final_tile.y] = temp;
-
-    //    return returnString;
-
-    //}
 
     public string MovePiece(Vector2Int initial_tile, Vector2Int final_tile)
     {
