@@ -55,13 +55,14 @@ public class Board2D : MonoBehaviour {
 
     // On Startup
     private void Awake() {
+
     }
 
     private void Start()
     {
         //IO Diver initialization, initial board state is recorded when game is initialized 
         mainDriver = gameObject.AddComponent<IODriver>();
-        //initial_bs = mainDriver.boardToArray();
+        initial_bs = mainDriver.boardToArray();
 
         chessPieces = new ChessPiece2D[TILE_COUNT_Y, TILE_COUNT_X];
         tiles = new GameObject[TILE_COUNT_Y, TILE_COUNT_X];
@@ -81,7 +82,7 @@ public class Board2D : MonoBehaviour {
     {
 
         //grab the board state 
-        /*int [,] physical_board_state = mainDriver.boardToArray();
+        int [,] physical_board_state = mainDriver.boardToArray();
 
         //highlight squares that have pieces on them (will be removed when hardware is more sturdy)
         for (int i = 0; i < 8; i++)
@@ -97,24 +98,27 @@ public class Board2D : MonoBehaviour {
                     HighlightTile(i, j, false);
                 }
             }
-        }*/
+        }
 
         //when spacebar is pressed, attempt to grab physical board state and represent virtually
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            /*
+            
             //grab the final board state
             final_bs = mainDriver.boardToArray();
-            
+
             //compare initial and final board state
             List<Vector2Int> physical_move = mainDriver.getDifference(initial_bs, final_bs);   
+            
             //physical_move Vector2Int list will be empty if the checkDifference throws an error
             if(physical_move != null)
             {
                 MovePiece(physical_move[0], physical_move[1]);
             }
-            final_bs = null;*/
+            initial_bs = final_bs;
+            final_bs = null;
             mainDriver.sendMove("test");
+            
 
         }
 
