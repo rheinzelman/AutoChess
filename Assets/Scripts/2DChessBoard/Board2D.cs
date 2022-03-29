@@ -62,7 +62,7 @@ public class Board2D : MonoBehaviour {
     {
         //IO Diver initialization, initial board state is recorded when game is initialized 
         mainDriver = gameObject.AddComponent<IODriver>();
-        initial_bs = mainDriver.boardToArray();
+        //initial_bs = mainDriver.boardToArray();
 
         chessPieces = new ChessPiece2D[TILE_COUNT_Y, TILE_COUNT_X];
         tiles = new GameObject[TILE_COUNT_Y, TILE_COUNT_X];
@@ -82,7 +82,7 @@ public class Board2D : MonoBehaviour {
     {
 
         //grab the board state 
-        int [,] physical_board_state = mainDriver.boardToArray();
+        /*int [,] physical_board_state = mainDriver.boardToArray();
 
         //highlight squares that have pieces on them (will be removed when hardware is more sturdy)
         for (int i = 0; i < 8; i++)
@@ -128,6 +128,14 @@ public class Board2D : MonoBehaviour {
             }
                    
 
+        }*/
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            string square1 = "b1";
+            string square2 = "c3";
+
+            mainDriver.performKnightMove(square1, square2);
         }
 
 

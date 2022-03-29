@@ -10,7 +10,7 @@ namespace IODriverNamespace
     public class IODriver : MonoBehaviour
     {
 
-        public static SerialPort sp = new SerialPort("COM3", 115200);
+        public static SerialPort sp;// = new SerialPort("COM3", 115200);
 
         private string initial_state;
         private string current_state;
@@ -40,8 +40,144 @@ namespace IODriverNamespace
         int step;
         float[,] positionArray;
 
-        public IODriver()
+        public Dictionary<string, string> GRBLDict = new Dictionary<string, string>();
+
+        private void Start()
         {
+
+            // A COLS
+
+            GRBLDict.Add("a1","X100Y200");
+            GRBLDict.Add("a2","");
+            GRBLDict.Add("a3","");
+            GRBLDict.Add("a4","");
+            GRBLDict.Add("a5","");
+            GRBLDict.Add("a6","");
+            GRBLDict.Add("a7","");
+            GRBLDict.Add("a8","");
+
+            GRBLDict.Add("a1h", "");
+            GRBLDict.Add("a2h", "");
+            GRBLDict.Add("a3h", "");
+            GRBLDict.Add("a4h", "");
+            GRBLDict.Add("a5h", "");
+            GRBLDict.Add("a6h", "");
+            GRBLDict.Add("a7h", "");
+            GRBLDict.Add("a8h", "");
+            
+            // B COLS
+
+            GRBLDict.Add("b1", "");
+            GRBLDict.Add("b2", "");
+            GRBLDict.Add("b3", "");
+            GRBLDict.Add("b4", "");
+            GRBLDict.Add("b5", "");
+            GRBLDict.Add("b6", "");
+            GRBLDict.Add("b7", "");
+            GRBLDict.Add("b8", "");
+
+            GRBLDict.Add("b1h", "");
+            GRBLDict.Add("b2h", "");
+            GRBLDict.Add("b3h", "");
+            GRBLDict.Add("b4h", "");
+            GRBLDict.Add("b5h", "");
+            GRBLDict.Add("b6h", "");
+            GRBLDict.Add("b7h", "");
+            GRBLDict.Add("b8h", "");
+
+            // C COLS
+
+            GRBLDict.Add("c1", "");
+            GRBLDict.Add("c2", "");
+            GRBLDict.Add("c3", "");
+            GRBLDict.Add("c4", "");
+            GRBLDict.Add("c5", "");
+            GRBLDict.Add("c6", "");
+            GRBLDict.Add("c7", "");
+            GRBLDict.Add("c8", "");
+
+            GRBLDict.Add("c1h", "");
+            GRBLDict.Add("c2h", "");
+            GRBLDict.Add("c3h", "");
+            GRBLDict.Add("c4h", "");
+            GRBLDict.Add("c5h", "");
+            GRBLDict.Add("c6h", "");
+            GRBLDict.Add("c7h", "");
+            GRBLDict.Add("c8h", "");
+
+            // D COLS
+
+            GRBLDict.Add("d1", "");
+            GRBLDict.Add("d2", "");
+            GRBLDict.Add("d3", "");
+            GRBLDict.Add("d4", "");
+            GRBLDict.Add("d5", "");
+            GRBLDict.Add("d6", "");
+            GRBLDict.Add("d7", "");
+            GRBLDict.Add("d8", "");
+           
+            GRBLDict.Add("d1h", "");
+            GRBLDict.Add("d2h", "");
+            GRBLDict.Add("d3h", "");
+            GRBLDict.Add("d4h", "");
+            GRBLDict.Add("d5h", "");
+            GRBLDict.Add("d6h", "");
+            GRBLDict.Add("d7h", "");
+            GRBLDict.Add("d8h", "");
+
+            // E COLS
+
+            GRBLDict.Add("e1", "");
+            GRBLDict.Add("e2", "");
+            GRBLDict.Add("e3", "");
+            GRBLDict.Add("e4", "");
+            GRBLDict.Add("e5", "");
+            GRBLDict.Add("e6", "");
+            GRBLDict.Add("e7", "");
+            GRBLDict.Add("e8", "");
+
+            GRBLDict.Add("e1h", "");
+            GRBLDict.Add("e2h", "");
+            GRBLDict.Add("e3h", "");
+            GRBLDict.Add("e4h", "");
+            GRBLDict.Add("e5h", "");
+            GRBLDict.Add("e6h", "");
+            GRBLDict.Add("e7h", "");
+            GRBLDict.Add("e8h", "");
+
+            // F COLS
+
+            GRBLDict.Add("f1", "");
+            GRBLDict.Add("f2", "");
+            GRBLDict.Add("f3", "");
+            GRBLDict.Add("f4", "");
+            GRBLDict.Add("f5", "");
+            GRBLDict.Add("f6", "");
+            GRBLDict.Add("f7", "");
+            GRBLDict.Add("f8", "");
+
+            GRBLDict.Add("f1h", "");
+            GRBLDict.Add("f2h", "");
+            GRBLDict.Add("f3h", "");
+            GRBLDict.Add("f4h", "");
+            GRBLDict.Add("f5h", "");
+            GRBLDict.Add("f6h", "");
+            GRBLDict.Add("f7h", "");
+            GRBLDict.Add("f8h", "");
+
+            // G COLS
+
+            GRBLDict.Add("g1", "");
+            GRBLDict.Add("g2", "");
+            GRBLDict.Add("g3", "");
+            GRBLDict.Add("g4", "");
+            GRBLDict.Add("g5", "");
+            GRBLDict.Add("g6", "");
+            GRBLDict.Add("g7", "");
+            GRBLDict.Add("g8", "");
+
+            GRBLDict.Add("MAGON", "");
+            GRBLDict.Add("MAGOFF", "");
 
         }
 
@@ -131,11 +267,6 @@ namespace IODriverNamespace
             }
         }
 
-        public void sendMove(string input)
-        {
-            
-        }
-
         /*public void OpenConnection()
         {
             if (sp != null)
@@ -173,6 +304,93 @@ namespace IODriverNamespace
 
             return Sensor;
         }
+
+        public void performMove(string square1, string square2)
+        {
+            moveCoreXY(square1);
+            activateMagnet(true);
+            moveCoreXY(square2);
+            activateMagnet(false);
+        }
+
+        public void performKnightMove(string square1, string square2)
+        {
+            /*
+             b1 c3 
+            */
+
+
+            if(knightDirection(square1, square2) == true)
+            {
+                
+                moveCoreXY(square1);
+                activateMagnet(true);
+
+                // if the knight is moving in the right direction
+                // redefine square1 to be a half square to the right
+                // move to intermediary square
+                // move to square2
+                if(knightDirection(square1, square2) == true)
+                {
+                    square1 += "h";
+                    string intermediarySquare = square1[0].ToString();
+                    intermediarySquare += square2[1].ToString() + "h";
+                }
+                else
+                {
+                    //string intermediarySquare = (char)(square1[0] - 1).ToString();
+                }
+                
+
+                moveCoreXY(square1);
+                moveCoreXY(intermediarySquare);
+                moveCoreXY(square2);
+
+                
+                
+                
+            }
+        }
+
+        // returns true if square2 is to the right of square1
+        private bool knightDirection(string square1, string square2)
+        {
+            if (square1[0] < square2[0])
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public void moveCoreXY(string square)
+        {
+            sp.WriteLine(GRBLDict[square]);
+        }
+
+        public void activateMagnet(bool activated)
+        {
+            if(activated == true)
+            {
+                sp.WriteLine(GRBLDict["MAGON"]);
+            }else
+            {
+                sp.WriteLine(GRBLDict["MAGOFF"]);
+            }
+        }
+
+        /*
+         
+        performMove(square1, square2){
+            move(square1)
+            activateMagnet(true)
+            move(square2)
+            activateMagnet(false)
+        }
+          
+        */
 
     }
     
