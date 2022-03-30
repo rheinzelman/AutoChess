@@ -132,8 +132,8 @@ public class Board2D : MonoBehaviour {
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            string square1 = "b8";
-            string square2 = "a6";
+            string square1 = "c3";
+            string square2 = "d1";
 
             mainDriver.performKnightMove(square1, square2);
         }
