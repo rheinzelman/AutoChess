@@ -256,10 +256,10 @@ public class Board2D : MonoBehaviour {
 
     private void DrawCoords()
     {
-        GameObject gameCanvas = GameObject.Find("Canvas");
+        GameObject gameCanvas = GameObject.Find("UICanvas");
         for (int i = 0; i < 8; i++)
         {
-            
+            //Column Coordinates
             GameObject colTextGO = new GameObject("col coord " + i);
             colTextGO.transform.SetParent(gameCanvas.transform);
             Text colText = colTextGO.AddComponent<Text>();
@@ -277,6 +277,7 @@ public class Board2D : MonoBehaviour {
             colText.transform.position = new Vector3(TILE_OFFSET_X + 1.65F, i - TILE_OFFSET_Y - 0.7f, 0) ;
             colText.transform.localScale = new Vector3(1,1,1);
 
+            //Row Coordinates
             GameObject rowTextGO = new GameObject("row coord " + i);
             rowTextGO.transform.SetParent(gameCanvas.transform);
             Text rowText = rowTextGO.AddComponent<Text>();
