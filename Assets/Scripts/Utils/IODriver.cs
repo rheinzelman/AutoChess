@@ -308,7 +308,7 @@ namespace IODriverNamespace
             return Sensor;
         }
 
-        public void performMove(string square1, string square2)
+        public void performtandardMove(string square1, string square2)
         {
             moveCoreXY(square1);
             activateMagnet(true);
@@ -339,8 +339,9 @@ namespace IODriverNamespace
             else
             {
                 char row = square1[1];
-                square1 = square2[0].ToString() + row.ToString() + "h";
-                intermediarySquare = (square2[0]).ToString();
+                char col = square1[0];
+                square1 = ((char)((int)col - 1)).ToString() + row.ToString() + "h";
+                intermediarySquare = square1[0].ToString();
                 intermediarySquare += square2[1].ToString() + "h";
             }
 
@@ -356,7 +357,7 @@ namespace IODriverNamespace
 
         }
 
-        // returns true if square2 is to the right of square1
+        // returns true if square2 is to the right of square1, false if to the left
         private bool knightDirection(string square1, string square2)
         {
             if (square1[0] < square2[0])
@@ -371,18 +372,18 @@ namespace IODriverNamespace
 
         public void moveCoreXY(string square)
         {
-            sp.WriteLine(GRBLDict[square]);
+            //sp.WriteLine(GRBLDict[square]);
         }
 
         public void activateMagnet(bool activated)
         {
-            if(activated == true)
+            /*if(activated == true)
             {
                 sp.WriteLine(GRBLDict["MAGON"]);
             }else
             {
                 sp.WriteLine(GRBLDict["MAGOFF"]);
-            }
+            }*/
         }
 
         /*
