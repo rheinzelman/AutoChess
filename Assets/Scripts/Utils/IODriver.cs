@@ -45,6 +45,9 @@ namespace IODriverNamespace
         private void Start()
         {
 
+            // GRBL COORDINATE DICTIONARY
+            // h notates a half square position, used for knights
+
             // A COLS
 
             GRBLDict.Add("a1","X100Y200");
@@ -315,10 +318,8 @@ namespace IODriverNamespace
 
         public void performKnightMove(string square1, string square2)
         {
-            /*
-             b1 c3 
-            */
 
+            string intermediarySquare;
 
             if(knightDirection(square1, square2) == true)
             {
@@ -330,26 +331,29 @@ namespace IODriverNamespace
                 // redefine square1 to be a half square to the right
                 // move to intermediary square
                 // move to square2
-                if(knightDirection(square1, square2) == true)
-                {
-                    square1 += "h";
-                    string intermediarySquare = square1[0].ToString();
-                    intermediarySquare += square2[1].ToString() + "h";
-                }
-                else
-                {
-                    //string intermediarySquare = (char)(square1[0] - 1).ToString();
-                }
-                
 
-                moveCoreXY(square1);
-                moveCoreXY(intermediarySquare);
-                moveCoreXY(square2);
-
-                
-                
-                
+                square1 += "h";
+                intermediarySquare = square1[0].ToString();
+                intermediarySquare += square2[1].ToString() + "h";
+            } 
+            else
+            {
+                char row = square1[1];
+                square1 = square2[0].ToString() + row.ToString() + "h";
+                intermediarySquare = (square2[0]).ToString();
+                intermediarySquare += square2[1].ToString() + "h";
             }
+
+
+            Debug.Log(square1);
+            Debug.Log(intermediarySquare);
+            Debug.Log(square2);
+
+            moveCoreXY(square1);
+            moveCoreXY(intermediarySquare);
+            moveCoreXY(square2);
+            activateMagnet(false);
+
         }
 
         // returns true if square2 is to the right of square1
