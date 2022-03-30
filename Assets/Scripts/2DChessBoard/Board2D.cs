@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -25,6 +26,7 @@ public class Board2D : MonoBehaviour {
     //[Header("Sounds")]
 
     //IO
+    bool boardConnected = false;
     IODriver mainDriver;
     private int[,] initial_bs;
     private int[,] final_bs;
@@ -34,6 +36,9 @@ public class Board2D : MonoBehaviour {
     [HideInInspector] public int TILE_COUNT_Y = 8;
     private const float TILE_OFFSET_X = -0.5f;
     private const float TILE_OFFSET_Y = -0.525f;
+    private const float COORD_OFFSET_X = 5F;
+    private const float COORD_OFFSET_Y = 5F;
+    private const float PIECE_SIZE = 1.75f;
     private GameObject[,] tiles;
     private ChessPiece2D[,] chessPieces;
 
@@ -70,6 +75,7 @@ public class Board2D : MonoBehaviour {
 
         SetupTiles();
         DrawPieces();
+        DrawCoords();
 
         boardManager.pieceRemoved.AddListener(DestroyPieceObject);
         boardManager.pieceMoved.AddListener(TransferPiece);
@@ -81,54 +87,40 @@ public class Board2D : MonoBehaviour {
     private void Update()
     {
 
-        //grab the board state 
-        /*int [,] physical_board_state = mainDriver.boardToArray();
-
-        //highlight squares that have pieces on them (will be removed when hardware is more sturdy)
-        for (int i = 0; i < 8; i++)
+        if (boardConnected)
         {
-            for (int j = 0; j < 8; j++)
+            HighlightSquares();
+
+            //when spacebar is pressed, attempt to grab physical board state and represent virtually
+            if (Input.GetKeyDown(KeyCode.Space))
             {
-                if (physical_board_state[i, j] == 1)
+
+                //grab the final board state
+                final_bs = mainDriver.boardToArray();
+
+                //compare initial and final board state
+                List<Vector2Int> physical_move = mainDriver.getDifference(initial_bs, final_bs);
+
+                string legality;
+            
+                //physical_move Vector2Int list will be empty if the checkDifference throws an error
+                if(physical_move != null)
                 {
-                    HighlightTile(i, j, true);
+                    legality = MovePiece(physical_move[0], physical_move[1]);
+
+                    if (legality.Contains("Illegal"))
+                    {
+                        initial_bs = mainDriver.boardToArray();
+                    } else
+                    {
+                        print("Illegal move!, move the board back to it's original state.");
+                    }
                 }
-                else
-                {
-                    HighlightTile(i, j, false);
-                }
+                   
             }
         }
 
-        //when spacebar is pressed, attempt to grab physical board state and represent virtually
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-
-
-            //grab the final board state
-            final_bs = mainDriver.boardToArray();
-
-            //compare initial and final board state
-            List<Vector2Int> physical_move = mainDriver.getDifference(initial_bs, final_bs);
-
-            string legality;
-            
-            //physical_move Vector2Int list will be empty if the checkDifference throws an error
-            if(physical_move != null)
-            {
-                legality = MovePiece(physical_move[0], physical_move[1]);
-
-                if (legality.Contains("Illegal"))
-                {
-                    initial_bs = mainDriver.boardToArray();
-                } else
-                {
-                    print("Illegal move!, move the board back to it's original state.");
-                }
-            }
-                   
-
-        }*/
+        
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -222,44 +214,7 @@ public class Board2D : MonoBehaviour {
         return tileObject;
     }
 
-    // Draw Single Tile
-    //private GameObject DrawSingleTile(float tileSize, int i, int j, bool colored)
-    //{
-    //    GameObject tileObject = new GameObject(string.Format("Y:{0}, X:{1}", i, j));
-    //    tileObject.transform.parent = transform;
-
-    //    Mesh mesh = new Mesh();
-    //    tileObject.AddComponent<MeshFilter>().mesh = mesh;
-
-    //    if (colored == true)
-    //    {
-    //        tileObject.AddComponent<MeshRenderer>().material = darkMat;
-    //        tileObject.tag = "darkMat";
-    //    }
-    //    else
-    //    {
-    //        tileObject.AddComponent<MeshRenderer>().material = lightMat;
-    //        tileObject.tag = "lightMat";
-    //    }
-
-    //    Vector3[] vertices = new Vector3[4];
-    //    vertices[0] = new Vector3(j * tileSize, TILE_COUNT_X - i * tileSize); //topleft
-    //    vertices[1] = new Vector3((j + 1) * tileSize, TILE_COUNT_X - i * tileSize); //topright
-    //    vertices[2] = new Vector3(j * tileSize, TILE_COUNT_Y - (i + 1) * tileSize); //bottomleft
-    //    vertices[3] = new Vector3((j + 1) * tileSize, TILE_COUNT_Y - (i + 1) * tileSize); //bottomright
-
-    //    int[] tris = new int[] { 0, 1, 2, 1, 3, 2 };
-
-    //    mesh.vertices = vertices;
-    //    mesh.triangles = tris;
-
-    //    tileObject.AddComponent<BoxCollider>();
-
-    //    tileObject.layer = LayerMask.NameToLayer("Tile");
-
-
-    //    return tileObject;
-    //}
+    
 
     // Set up all pieces
     private void DrawPieces()
@@ -294,9 +249,52 @@ public class Board2D : MonoBehaviour {
 
         cp.GetComponent<SpriteRenderer>().color = teamColors[cp.team];
 
-        cp.transform.localScale = new Vector3(1.85f, 1.85f, 1);
+        cp.transform.localScale = new Vector3(PIECE_SIZE, PIECE_SIZE, 1);
         
         return cp;
+    }
+
+    private void DrawCoords()
+    {
+        GameObject gameCanvas = GameObject.Find("Canvas");
+        for (int i = 0; i < 8; i++)
+        {
+            
+            GameObject colTextGO = new GameObject("col coord " + i);
+            colTextGO.transform.SetParent(gameCanvas.transform);
+            Text colText = colTextGO.AddComponent<Text>();
+            colText.text = (i+1).ToString();
+            colText.font = (Font)Resources.GetBuiltinResource(typeof(Font), "Arial.ttf");
+            colText.fontSize = 8;
+            if(i % 2 == 0)
+            {
+                colText.color = lightMat.color;
+            }
+            else
+            {
+                colText.color = darkMat.color;
+            }
+            colText.transform.position = new Vector3(TILE_OFFSET_X + 1.65F, i - TILE_OFFSET_Y - 0.7f, 0) ;
+            colText.transform.localScale = new Vector3(1,1,1);
+
+            GameObject rowTextGO = new GameObject("row coord " + i);
+            rowTextGO.transform.SetParent(gameCanvas.transform);
+            Text rowText = rowTextGO.AddComponent<Text>();
+            rowText.text = ((char)(i + 'a')).ToString();
+            rowText.font = (Font)Resources.GetBuiltinResource(typeof(Font), "Arial.ttf");
+            rowText.fontSize = 8;
+            if (i % 2 == 0)
+            {
+                rowText.color = lightMat.color;
+            }
+            else
+            {
+                rowText.color = darkMat.color;
+            }
+            rowText.transform.position = new Vector3(i + TILE_OFFSET_X + 2.45f, TILE_OFFSET_Y - .36f, 0);
+            rowText.transform.localScale = new Vector3(1, 1, 1);
+
+        }
     }
 
     private Vector2Int GetTileIndex(GameObject mouseInfo)
@@ -404,6 +402,28 @@ public class Board2D : MonoBehaviour {
             }
         }
         return tiles[row, col];
+    }
+
+    private void HighlightSquares()
+    {
+        //grab the board state 
+        int[,] physical_board_state = mainDriver.boardToArray();
+
+        //highlight squares that have pieces on them (will be removed when hardware is more sturdy)
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (physical_board_state[i, j] == 1)
+                {
+                    HighlightTile(i, j, true);
+                }
+                else
+                {
+                    HighlightTile(i, j, false);
+                }
+            }
+        }
     }
 
     private void HighlightLegalTiles(Vector2Int square, bool highlight)
