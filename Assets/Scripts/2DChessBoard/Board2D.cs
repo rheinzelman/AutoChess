@@ -1,5 +1,7 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using FENNamespace;
 using IODriverNamespace;
@@ -25,7 +27,8 @@ public class Board2D : MonoBehaviour {
     //[Header("Sounds")]
 
     //IO
-    IODriver mainDriver;// = new IODriver();
+    bool boardConnected = false;
+    IODriver mainDriver;
     private int[,] initial_bs;
     private int[,] final_bs;
 
@@ -34,6 +37,9 @@ public class Board2D : MonoBehaviour {
     [HideInInspector] public int TILE_COUNT_Y = 8;
     private const float TILE_OFFSET_X = -0.5f;
     private const float TILE_OFFSET_Y = -0.525f;
+    private const float COORD_OFFSET_X = 5F;
+    private const float COORD_OFFSET_Y = 5F;
+    private const float PIECE_SIZE = 1.75f;
     private GameObject[,] tiles;
     private ChessPiece2D[,] chessPieces;
 
@@ -58,11 +64,14 @@ public class Board2D : MonoBehaviour {
 
     // On Startup
     private void Awake() {
+
     }
 
     private void Start()
     {
+        //IO Diver initialization, initial board state is recorded when game is initialized 
         mainDriver = gameObject.AddComponent<IODriver>();
+        //initial_bs = mainDriver.boardToArray();
 
         chessPieces = new ChessPiece2D[TILE_COUNT_Y, TILE_COUNT_X];
         tiles = new GameObject[TILE_COUNT_Y, TILE_COUNT_X];
@@ -70,12 +79,12 @@ public class Board2D : MonoBehaviour {
 
         SetupTiles();
         DrawPieces();
+        DrawCoords();
 
         boardManager.pieceRemoved.AddListener(DestroyPieceObject);
         boardManager.pieceMoved.AddListener(TransferPiece);
 
         stockfishTest = gameObject.AddComponent<StockfishHandler>();
-
 
     }
 
@@ -83,11 +92,48 @@ public class Board2D : MonoBehaviour {
     private void Update()
     {
 
+        if (boardConnected)
+        {
+            HighlightSquares();
+
+            //when spacebar is pressed, attempt to grab physical board state and represent virtually
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+
+                //grab the final board state
+                final_bs = mainDriver.boardToArray();
+
+                //compare initial and final board state
+                List<Vector2Int> physical_move = mainDriver.getDifference(initial_bs, final_bs);
+
+                string legality;
+            
+                //physical_move Vector2Int list will be empty if the checkDifference throws an error
+                if(physical_move != null)
+                {
+                    legality = MovePiece(physical_move[0], physical_move[1]);
+
+                    if (legality.Contains("Illegal"))
+                    {
+                        initial_bs = mainDriver.boardToArray();
+                    } else
+                    {
+                        print("Illegal move!, move the board back to it's original state.");
+                    }
+                }
+                   
+            }
+        }
+
+        
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
+
             Debug.Log(stockfishTest.GetMove("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"));
+
         }
- 
+
 
         if (!currentCamera)
         {
@@ -126,6 +172,7 @@ public class Board2D : MonoBehaviour {
                 selectedPiece = deselectValue;
             }
             //else if we select a piece with the opposite team, destroy opponent piece
+
             else if (selectedPiece != deselectValue && chessPieces[hitPosition.x, hitPosition.y] != null && chessPieces[hitPosition.x, hitPosition.y].team != chessPieces[selectedPiece.x, selectedPiece.y].team)
             {
                 HighlightLegalTiles(selectedPiece, false);
@@ -136,9 +183,8 @@ public class Board2D : MonoBehaviour {
             // If no piece is selected, exit the function
             if (selectedPiece == deselectValue) return ;
 
+
         }
-
-
 
     }
 
@@ -174,44 +220,7 @@ public class Board2D : MonoBehaviour {
         return tileObject;
     }
 
-    // Draw Single Tile
-    //private GameObject DrawSingleTile(float tileSize, int i, int j, bool colored)
-    //{
-    //    GameObject tileObject = new GameObject(string.Format("Y:{0}, X:{1}", i, j));
-    //    tileObject.transform.parent = transform;
-
-    //    Mesh mesh = new Mesh();
-    //    tileObject.AddComponent<MeshFilter>().mesh = mesh;
-
-    //    if (colored == true)
-    //    {
-    //        tileObject.AddComponent<MeshRenderer>().material = darkMat;
-    //        tileObject.tag = "darkMat";
-    //    }
-    //    else
-    //    {
-    //        tileObject.AddComponent<MeshRenderer>().material = lightMat;
-    //        tileObject.tag = "lightMat";
-    //    }
-
-    //    Vector3[] vertices = new Vector3[4];
-    //    vertices[0] = new Vector3(j * tileSize, TILE_COUNT_X - i * tileSize); //topleft
-    //    vertices[1] = new Vector3((j + 1) * tileSize, TILE_COUNT_X - i * tileSize); //topright
-    //    vertices[2] = new Vector3(j * tileSize, TILE_COUNT_Y - (i + 1) * tileSize); //bottomleft
-    //    vertices[3] = new Vector3((j + 1) * tileSize, TILE_COUNT_Y - (i + 1) * tileSize); //bottomright
-
-    //    int[] tris = new int[] { 0, 1, 2, 1, 3, 2 };
-
-    //    mesh.vertices = vertices;
-    //    mesh.triangles = tris;
-
-    //    tileObject.AddComponent<BoxCollider>();
-
-    //    tileObject.layer = LayerMask.NameToLayer("Tile");
-
-
-    //    return tileObject;
-    //}
+    
 
     // Set up all pieces
     private void DrawPieces()
@@ -246,9 +255,53 @@ public class Board2D : MonoBehaviour {
 
         cp.GetComponent<SpriteRenderer>().color = teamColors[cp.team];
 
-        cp.transform.localScale = new Vector3(1.85f, 1.85f, 1);
+        cp.transform.localScale = new Vector3(PIECE_SIZE, PIECE_SIZE, 1);
         
         return cp;
+    }
+
+    private void DrawCoords()
+    {
+        GameObject gameCanvas = GameObject.Find("UICanvas");
+        for (int i = 0; i < 8; i++)
+        {
+            //Column Coordinates
+            GameObject colTextGO = new GameObject("col coord " + i);
+            colTextGO.transform.SetParent(gameCanvas.transform);
+            Text colText = colTextGO.AddComponent<Text>();
+            colText.text = (i+1).ToString();
+            colText.font = (Font)Resources.GetBuiltinResource(typeof(Font), "Arial.ttf");
+            colText.fontSize = 8;
+            if(i % 2 == 0)
+            {
+                colText.color = lightMat.color;
+            }
+            else
+            {
+                colText.color = darkMat.color;
+            }
+            colText.transform.position = new Vector3(TILE_OFFSET_X + 1.65F, i - TILE_OFFSET_Y - 0.7f, 0) ;
+            colText.transform.localScale = new Vector3(1,1,1);
+
+            //Row Coordinates
+            GameObject rowTextGO = new GameObject("row coord " + i);
+            rowTextGO.transform.SetParent(gameCanvas.transform);
+            Text rowText = rowTextGO.AddComponent<Text>();
+            rowText.text = ((char)(i + 'a')).ToString();
+            rowText.font = (Font)Resources.GetBuiltinResource(typeof(Font), "Arial.ttf");
+            rowText.fontSize = 8;
+            if (i % 2 == 0)
+            {
+                rowText.color = lightMat.color;
+            }
+            else
+            {
+                rowText.color = darkMat.color;
+            }
+            rowText.transform.position = new Vector3(i + TILE_OFFSET_X + 2.45f, TILE_OFFSET_Y - .36f, 0);
+            rowText.transform.localScale = new Vector3(1, 1, 1);
+
+        }
     }
 
     private Vector2Int GetTileIndex(GameObject mouseInfo)
@@ -300,20 +353,6 @@ public class Board2D : MonoBehaviour {
 
     //}
 
-    //private string MovePieceByV2I(Vector2Int initial_tile, Vector2Int final_tile) 
-    //{
-
-    //    string returnString = string.Format("{0}{1}{2}{3}", initial_tile.x, initial_tile.y, final_tile.x, final_tile.y);
-
-    //    chessPieces[initial_tile.x, initial_tile.y].transform.position = new Vector3(final_tile.y - TILE_OFFSET_X, 7 - final_tile.x - TILE_OFFSET_Y, 0);
-    //    chessPieces[final_tile.x, final_tile.y] = chessPieces[initial_tile.x, initial_tile.y];
-    //    char temp = chessManager.board_state[initial_tile.x, initial_tile.y];
-    //    chessManager.board_state[initial_tile.x, initial_tile.y] = '-';
-    //    chessManager.board_state[final_tile.x, final_tile.y] = temp;
-
-    //    return returnString;
-
-    //}
 
     public string MovePiece(Vector2Int initial_tile, Vector2Int final_tile)
     {
@@ -370,6 +409,28 @@ public class Board2D : MonoBehaviour {
             }
         }
         return tiles[row, col];
+    }
+
+    private void HighlightSquares()
+    {
+        //grab the board state 
+        int[,] physical_board_state = mainDriver.boardToArray();
+
+        //highlight squares that have pieces on them (will be removed when hardware is more sturdy)
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (physical_board_state[i, j] == 1)
+                {
+                    HighlightTile(i, j, true);
+                }
+                else
+                {
+                    HighlightTile(i, j, false);
+                }
+            }
+        }
     }
 
     private void HighlightLegalTiles(Vector2Int square, bool highlight)
