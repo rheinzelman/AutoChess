@@ -114,7 +114,7 @@ public class Board2D : MonoBehaviour {
             
                 //physical_move Vector2Int list will be empty if the checkDifference throws an error
                 if(physical_move != null)
-                {
+                {   
                     legality = MovePiece(physical_move[0], physical_move[1]);
 
                     if (legality.Contains("Illegal"))
@@ -134,7 +134,8 @@ public class Board2D : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Space))
         {
 
-            Debug.Log(fenTest.getCurrentFEN(chessManager.board_state));
+            //Debug.Log(fenTest.getCurrentFEN(chessManager.board_state));
+            Debug.Log(stockfishTest.GetMove(fenTest.getCurrentFEN(chessManager.board_state)));
 
         }
 
