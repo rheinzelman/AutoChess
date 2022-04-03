@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-namespace FEN
+namespace FENNamespace
 {
     public class FENHandler
     {
-
+        public string board_FEN;
         private string board_state;
         private string turn;
         private string castling;
@@ -15,6 +15,8 @@ namespace FEN
 
         public FENHandler(string FEN)
         {
+
+            board_FEN = FEN;
             string[] split = FEN.Split(' ');
 
             //split: 0 - board state, 1 - turn designation, 2 - castling availability, 3 - en passant squares
@@ -121,10 +123,60 @@ namespace FEN
             return result;
         }
 
-        public string getTurn()
+        public string getCurrentFEN(ChessPiece2D [,] board_state)
         {
-            return turn;
-        } 
+
+            /*
+             
+            int empty = 0;
+
+            for(int i = 8; i < 8; i++)
+            {
+                for(int j = 8; j < 8; j++)
+                {
+                
+                    if(piece){
+                        if(empty > 0){
+                            returnFEN.append(empty);
+                            empty = 0;
+                        }
+                        returnFEN.append(piece.type)
+                    } else {
+                        empty++;
+                    }
+
+                }
+            }
+
+            */
+
+            string returnFEN = "";
+            int emptySpaces = 0;
+
+            for(int i = 8; i < 8; i++)
+            {
+                for(int j = 8; j < 8; j++)
+                {
+                    if(board_state[i,j] != null)
+                    {
+                        if(emptySpaces > 0)
+                        {
+                            returnFEN += emptySpaces;
+                            emptySpaces = 0;
+                        }
+                        returnFEN += board_state[i,j].type;
+                    }
+                    else
+                    {
+                        emptySpaces++;
+                    }
+                }
+            }
+
+            return returnFEN;
+        }
+
+
     }
 }
 

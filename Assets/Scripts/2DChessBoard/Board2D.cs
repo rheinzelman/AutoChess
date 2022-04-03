@@ -1,8 +1,9 @@
 using UnityEngine;
 using System;
 using System.Threading;
-using FEN;
+using FENNamespace;
 using IODriverNamespace;
+using StockfishHandlerNamespace;
 
 public class Board2D : MonoBehaviour {
 
@@ -36,6 +37,9 @@ public class Board2D : MonoBehaviour {
     private GameObject[,] tiles;
     private ChessPiece2D[,] chessPieces;
 
+    //stockfish test
+    public StockfishHandler stockfishTest;
+
     //Piece Movement
     //private ChessPiece2D selectedPiece = null;
     private Vector2Int deselectValue = Vector2Int.one * -1;
@@ -46,7 +50,7 @@ public class Board2D : MonoBehaviour {
 
     [Header("Board Settings")]
 
-    //ChessManager
+    //ager
     public ChessManager chessManager;
     public BoardManager boardManager;
     public GameManager gameManager;
@@ -69,6 +73,10 @@ public class Board2D : MonoBehaviour {
 
         boardManager.pieceRemoved.AddListener(DestroyPieceObject);
         boardManager.pieceMoved.AddListener(TransferPiece);
+
+        stockfishTest = gameObject.AddComponent<StockfishHandler>();
+
+
     }
 
     //Every frame
@@ -77,7 +85,7 @@ public class Board2D : MonoBehaviour {
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            //Board interaction will go here
+            Debug.Log(stockfishTest.GetMove("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"));
         }
  
 
