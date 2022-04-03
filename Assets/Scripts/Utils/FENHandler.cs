@@ -5,7 +5,7 @@ using System;
 
 namespace FENNamespace
 {
-    public class FENHandler
+    public class FENHandler : MonoBehaviour
     {
         public string board_FEN;
         private string board_state;
@@ -123,53 +123,38 @@ namespace FENNamespace
             return result;
         }
 
-        public string getCurrentFEN(ChessPiece2D [,] board_state)
+        // returns the current board_state as a FEN
+        public string getCurrentFEN(char [,] board_state)
         {
-
-            /*
-             
-            int empty = 0;
-
-            for(int i = 8; i < 8; i++)
-            {
-                for(int j = 8; j < 8; j++)
-                {
-                
-                    if(piece){
-                        if(empty > 0){
-                            returnFEN.append(empty);
-                            empty = 0;
-                        }
-                        returnFEN.append(piece.type)
-                    } else {
-                        empty++;
-                    }
-
-                }
-            }
-
-            */
-
             string returnFEN = "";
             int emptySpaces = 0;
 
-            for(int i = 8; i < 8; i++)
+            for(int i = 0; i < 8; i++)
             {
-                for(int j = 8; j < 8; j++)
+                for(int j = 0; j < 8; j++)
                 {
-                    if(board_state[i,j] != null)
+                    if(board_state[j, i] != '-')
                     {
                         if(emptySpaces > 0)
                         {
                             returnFEN += emptySpaces;
                             emptySpaces = 0;
                         }
-                        returnFEN += board_state[i,j].type;
+                        returnFEN += board_state[j, i];
                     }
                     else
                     {
                         emptySpaces++;
                     }
+                }
+                if(emptySpaces > 0)
+                {
+                    returnFEN += emptySpaces;
+                    emptySpaces = 0;
+                }
+                if(i != 7)
+                {
+                    returnFEN += "/";
                 }
             }
 

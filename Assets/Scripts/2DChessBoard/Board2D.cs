@@ -46,6 +46,9 @@ public class Board2D : MonoBehaviour {
     //stockfish test
     public StockfishHandler stockfishTest;
 
+    //FEN test
+    public FENHandler fenTest;
+
     //Piece Movement
     //private ChessPiece2D selectedPiece = null;
     private Vector2Int deselectValue = Vector2Int.one * -1;
@@ -85,6 +88,7 @@ public class Board2D : MonoBehaviour {
         boardManager.pieceMoved.AddListener(TransferPiece);
 
         stockfishTest = gameObject.AddComponent<StockfishHandler>();
+        fenTest = gameObject.AddComponent<FENHandler>();    
 
     }
 
@@ -130,7 +134,7 @@ public class Board2D : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Space))
         {
 
-            Debug.Log(stockfishTest.GetMove("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"));
+            Debug.Log(fenTest.getCurrentFEN(chessManager.board_state));
 
         }
 
