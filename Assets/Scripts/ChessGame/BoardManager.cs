@@ -145,6 +145,7 @@ public class BoardManager : MonoBehaviour
 
         square.piece = null;
 
+
         //Graveyard.Add(chessManager.board_state[piece.square.coordinate.x, piece.square.coordinate.y]);
 
         Destroy(piece.gameObject);
