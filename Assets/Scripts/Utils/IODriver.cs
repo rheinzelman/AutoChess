@@ -404,18 +404,23 @@ namespace IODriverNamespace
         {
             sp.Open();
             sp.WriteLine(GRBLDict[square]);
-            sp.Open();
+            sp.Close();
         }
 
         public void activateMagnet(bool activated)
         {
-            /*if(activated == true)
+            if(activated == true)
             {
+                sp.Open();
                 sp.WriteLine(GRBLDict["MAGON"]);
-            }else
+                sp.Close();
+            }
+            else
             {
+                sp.Open();
                 sp.WriteLine(GRBLDict["MAGOFF"]);
-            }*/
+                sp.Close();
+            }
         }
 
         public void test()
