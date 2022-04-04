@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.IO;
 using FENNamespace;
 using IODriverNamespace;
 using StockfishHandlerNamespace;
@@ -23,6 +23,10 @@ public class Board2D : MonoBehaviour {
     [SerializeField] private Material lightMat;
     [SerializeField] private Material darkMat;
     [SerializeField] private Material hoverMat;
+
+    //Recorded Games
+    [Header("Recorded Games")]
+    [SerializeField] private TextAsset[] recordedGames;
 
     //[Header("Sounds")]
 
@@ -53,6 +57,7 @@ public class Board2D : MonoBehaviour {
     //private ChessPiece2D selectedPiece = null;
     private Vector2Int deselectValue = Vector2Int.one * -1;
     private Vector2Int selectedPiece = Vector2Int.one * -1;
+    private Vector2Int capturedPiece;
 
     //Unity
     private Camera currentCamera;
@@ -88,19 +93,22 @@ public class Board2D : MonoBehaviour {
         boardManager.pieceMoved.AddListener(TransferPiece);
 
         stockfishTest = gameObject.AddComponent<StockfishHandler>();
-        fenTest = gameObject.AddComponent<FENHandler>();    
+        fenTest = gameObject.AddComponent<FENHandler>();
+
+        PlayGameFromFile(recordedGames[0]);
 
     }
 
     //Every frame
     private void Update()
     {
-
+        
         if (boardConnected)
         {
+
             HighlightSquares();
 
-            //when spacebar is pressed, attempt to grab physical board state and represent virtually
+            //when spacebar is pressed, attempt to grab physical board state changes and represent virtually
             if (Input.GetKeyDown(KeyCode.Space))
             {
 
@@ -108,37 +116,69 @@ public class Board2D : MonoBehaviour {
                 final_bs = mainDriver.boardToArray();
 
                 //compare initial and final board state
-                List<Vector2Int> physical_move = mainDriver.getDifference(initial_bs, final_bs);
+                int [,] difference_array = mainDriver.getDifferenceArray(initial_bs, final_bs);
 
-                string legality;
-            
-                //physical_move Vector2Int list will be empty if the checkDifference throws an error
-                if(physical_move != null)
-                {   
-                    legality = MovePiece(physical_move[0], physical_move[1]);
-
-                    if (legality.Contains("Illegal"))
+                //if there was a piece moved to an empty space and a piece was previously moved to the capture square
+                if (mainDriver.checkDifference(difference_array) == 1 && capturedPiece != Vector2Int.zero)
+                {
+                    for(int i = 0; i < 8; i++)
                     {
-                        initial_bs = mainDriver.boardToArray();
-                    } else
-                    {
-                        print("Illegal move!, move the board back to it's original state.");
+                        for(int j = 0; j < 8; j++)
+                        {
+                            if(difference_array[i,j] == -1)
+                            {
+                                print("piece captured");
+                                MovePiece(new Vector2Int(i, j), capturedPiece);
+                                capturedPiece = Vector2Int.zero;
+                            }
+                        }
                     }
+                }
+                //if there was a piece moved to an empty space
+                else if (mainDriver.checkDifference(difference_array) == 1)
+                {
+                    print("piece moved to empty square");
+                    List<Vector2Int> physical_move = mainDriver.getMoveFromDifferenceArray(difference_array);
+                    MovePiece(physical_move[0], physical_move[1]);
+                }
+                //if a piece was moved to the capture square and the difference array notes that only one piece was moved
+                else if(mainDriver.checkDifference(difference_array) == 2 && mainDriver.capturedPiece() == true)
+                {
+
+                    for(int i = 0; i < 8; i++)
+                    {
+                        for(int j = 0; j < 8; j++)
+                        {
+                            if(difference_array[i,j] != 0)
+                            {
+                                print("peice moved to capture square");
+                                capturedPiece = new Vector2Int(i, j);
+                            }
+                        }
+                    }
+
+                } else if(mainDriver.checkDifference(difference_array) == 0)
+                {
+                    print("checkDifference error, move pieces back");
+                }
+                else
+                {
+                    print("unknown board read error");
                 }
                    
             }
+
+            if (Input.GetKeyDown(KeyCode.H))
+            {
+                mainDriver.homeCoreXY();
+            }
+
         }
 
-        
-
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.A))
         {
-
-            //Debug.Log(fenTest.getCurrentFEN(chessManager.board_state));
             Debug.Log(stockfishTest.GetMove(fenTest.getCurrentFEN(chessManager.board_state)));
-
         }
-
 
         if (!currentCamera)
         {
@@ -173,7 +213,9 @@ public class Board2D : MonoBehaviour {
             {
                 HighlightLegalTiles(selectedPiece, false);
                 HighlightTile(selectedPiece.x, selectedPiece.y, false);
-                MovePiece(selectedPiece, hitPosition);
+                string UCIMove = MovePiece(selectedPiece, hitPosition);
+                Debug.Log(UCIMove);
+                //mainDriver.performStandardMove(UCIMove.Substring(0,2), UCIMove.Substring(2,2));
                 selectedPiece = deselectValue;
             }
             //else if we select a piece with the opposite team, destroy opponent piece
@@ -343,32 +385,16 @@ public class Board2D : MonoBehaviour {
         return returnValue;
     }
 
-    //private string MovePiece(ChessPiece2D piece, Vector2Int square)
-    //{
-
-    //    string UCIReturnValue = string.Format("{0}{1}{2}{3}", piece.col, piece.row, square.y, square.x);
-
-    //    chessPieces[piece.row, piece.col].transform.position = new Vector3(square.y - TILE_OFFSET_X, 7 - square.x - TILE_OFFSET_Y, 0);
-    //    chessPieces[square.x, square.y] = chessPieces[piece.row, piece.col];
-    //    char temp = chessManager.board_state[piece.row,piece.col];
-    //    chessManager.board_state[piece.row,piece.col] = '-';
-    //    chessManager.board_state[square.x, square.y] = temp;
-
-    //    return ConvertToUCI(UCIReturnValue); ;
-
-    //}
-
-
     public string MovePiece(Vector2Int initial_tile, Vector2Int final_tile)
     {
-        string returnString = string.Format("From: X = {0}, Y = {1} -- To: X = {2}, Y = {3}", initial_tile.x, initial_tile.y, final_tile.x, final_tile.y);
+        string returnString = string.Format("{0}{1}{2}{3}", initial_tile.x, initial_tile.y, final_tile.x, final_tile.y);
 
         if (!boardManager.MovePiece(initial_tile, final_tile)) return "Illegal move! - " + returnString;
 
         //DestroyPiece(final_tile);
         //TransferPiece(initial_tile, final_tile);
 
-        return returnString;
+        return ConvertToUCI(returnString);
     }
 
     public void UpdateBoardState(Vector2Int initial_tile, Vector2Int final_tile)
@@ -393,6 +419,7 @@ public class Board2D : MonoBehaviour {
         UpdateBoardState(initial_tile, final_tile);
     }
 
+    // highlight a single tile
     private GameObject HighlightTile(int row, int col, bool color)
     {
 
@@ -416,6 +443,7 @@ public class Board2D : MonoBehaviour {
         return tiles[row, col];
     }
 
+    // highlight squares that have a physical piece on them
     private void HighlightSquares()
     {
         //grab the board state 
@@ -438,6 +466,7 @@ public class Board2D : MonoBehaviour {
         }
     }
 
+    // add a dot highlight to squares with legal moves for the given piece
     private void HighlightLegalTiles(Vector2Int square, bool highlight)
     {
         ChessPiece chessPiece = boardManager.GetPieceAt(square);
@@ -461,6 +490,22 @@ public class Board2D : MonoBehaviour {
             }
         }
         
+
+    }
+
+    public void PlayGameFromFile(TextAsset gameFile) 
+    {
+        string fileContents = gameFile.ToString();
+
+        string[] moves = fileContents.Split(' ');
+
+        foreach (var move in moves)
+        {
+            Vector2Int from = new Vector2Int((int)(move[0] - 96), (int)move[1] - 48);
+            Vector2Int to = new Vector2Int((int)(move[2] - 96), (int)move[3] - 48);
+            print(from + " " + to);
+            //MovePiece(from, to);
+        }
 
     }
 

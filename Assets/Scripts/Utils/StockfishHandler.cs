@@ -29,8 +29,7 @@ namespace StockfishHandlerNamespace
 
             
             var stockfish = new System.Diagnostics.Process();
-            //this eventually needs to be changed to a relative path
-            stockfish.StartInfo.FileName = "C:/Users/JEDI PLM/AutoChess/Assets/stockfish/stockfish.exe";
+            stockfish.StartInfo.FileName = Directory.GetCurrentDirectory() + "/Assets/stockfish/stockfish.exe";
             stockfish.StartInfo.UseShellExecute = false;
             stockfish.StartInfo.CreateNoWindow = true;
             stockfish.StartInfo.RedirectStandardInput = true;
