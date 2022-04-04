@@ -2,12 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using FENNamespace;
+using AutoChess.ManagerComponents;
 
-public enum PlayerColor
-{
-    White,
-    Black
-}
 public class ChessManager : MonoBehaviour
 {
     private BoardManager board;

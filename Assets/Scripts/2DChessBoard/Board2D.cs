@@ -6,6 +6,9 @@ using System.Threading;
 using FENNamespace;
 using IODriverNamespace;
 using StockfishHandlerNamespace;
+using AutoChess;
+using AutoChess.ManagerComponents;
+using AutoChess.ChessPieces;
 
 public class Board2D : MonoBehaviour {
 
