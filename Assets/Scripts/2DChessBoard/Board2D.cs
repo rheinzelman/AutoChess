@@ -27,7 +27,7 @@ public class Board2D : MonoBehaviour {
     //[Header("Sounds")]
 
     //IO
-    bool boardConnected = false;
+    bool boardConnected = true;
     IODriver mainDriver;
     private int[,] initial_bs;
     private int[,] final_bs;
@@ -108,22 +108,29 @@ public class Board2D : MonoBehaviour {
                 final_bs = mainDriver.boardToArray();
 
                 //compare initial and final board state
-                List<Vector2Int> physical_move = mainDriver.getDifference(initial_bs, final_bs);
+                int [,] difference_array = mainDriver.getDifferenceArray(initial_bs, final_bs);
 
-                string legality;
-            
-                //physical_move Vector2Int list will be empty if the checkDifference throws an error
-                if(physical_move != null)
-                {   
-                    legality = MovePiece(physical_move[0], physical_move[1]);
+                //if there was a piece moved to an empty space
+                if(mainDriver.checkDifference(difference_array) == 1)
+                {
+                    List<Vector2Int> physical_move = mainDriver.getMoveFromDifferenceArray(difference_array);
+                    MovePiece(physical_move[0], physical_move[1]);
+                } 
+                //if a piece was moved to the capture square
+                else if(mainDriver.checkDifference(difference_array) == 2 && mainDriver.capturedPiece() == true)
+                {
 
-                    if (legality.Contains("Illegal"))
-                    {
-                        initial_bs = mainDriver.boardToArray();
-                    } else
-                    {
-                        print("Illegal move!, move the board back to it's original state.");
-                    }
+                    //to piece = -1 spot
+
+
+
+                } else if(mainDriver.checkDifference(difference_array) == 0)
+                {
+                    print("checkDifference error, move pieces back");
+                }
+                else
+                {
+                    print("unknown board read error");
                 }
                    
             }

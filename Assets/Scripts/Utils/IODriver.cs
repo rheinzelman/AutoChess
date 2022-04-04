@@ -50,14 +50,14 @@ namespace IODriverNamespace
 
             // A COLS
 
-            GRBLDict.Add("a1","X100Y200");
-            GRBLDict.Add("a2","");
-            GRBLDict.Add("a3","");
-            GRBLDict.Add("a4","");
-            GRBLDict.Add("a5","");
-            GRBLDict.Add("a6","");
-            GRBLDict.Add("a7","");
-            GRBLDict.Add("a8","");
+            GRBLDict.Add("a1","X25Y265");
+            GRBLDict.Add("a2", "X25Y227");
+            GRBLDict.Add("a3", "X25Y192");
+            GRBLDict.Add("a4", "X25Y152");
+            GRBLDict.Add("a5", "X25Y115");
+            GRBLDict.Add("a6", "X25Y80");
+            GRBLDict.Add("a7", "X25Y47");
+            GRBLDict.Add("a8", "X25Y10");
 
             GRBLDict.Add("a1h", "");
             GRBLDict.Add("a2h", "");
@@ -70,14 +70,14 @@ namespace IODriverNamespace
             
             // B COLS
 
-            GRBLDict.Add("b1", "");
-            GRBLDict.Add("b2", "");
-            GRBLDict.Add("b3", "");
-            GRBLDict.Add("b4", "");
-            GRBLDict.Add("b5", "");
-            GRBLDict.Add("b6", "");
-            GRBLDict.Add("b7", "");
-            GRBLDict.Add("b8", "");
+            GRBLDict.Add("b1", "X60Y268");
+            GRBLDict.Add("b2", "X62Y230");
+            GRBLDict.Add("b3", "X62Y192");
+            GRBLDict.Add("b4", "X62Y154");
+            GRBLDict.Add("b5", "X62Y121");
+            GRBLDict.Add("b6", "X62Y83");
+            GRBLDict.Add("b7", "X62Y45");
+            GRBLDict.Add("b8", "X62Y7");
 
             GRBLDict.Add("b1h", "");
             GRBLDict.Add("b2h", "");
@@ -90,14 +90,14 @@ namespace IODriverNamespace
 
             // C COLS
 
-            GRBLDict.Add("c1", "");
-            GRBLDict.Add("c2", "");
-            GRBLDict.Add("c3", "");
-            GRBLDict.Add("c4", "");
-            GRBLDict.Add("c5", "");
-            GRBLDict.Add("c6", "");
-            GRBLDict.Add("c7", "");
-            GRBLDict.Add("c8", "");
+            GRBLDict.Add("c1", "X96Y262");
+            GRBLDict.Add("c2", "X96Y224");
+            GRBLDict.Add("c3", "X96Y190");
+            GRBLDict.Add("c4", "X96Y154");
+            GRBLDict.Add("c5", "X96Y117");
+            GRBLDict.Add("c6", "X97Y81");
+            GRBLDict.Add("c7", "X96Y43");
+            GRBLDict.Add("c8", "X97Y7");
 
             GRBLDict.Add("c1h", "");
             GRBLDict.Add("c2h", "");
@@ -110,14 +110,14 @@ namespace IODriverNamespace
 
             // D COLS
 
-            GRBLDict.Add("d1", "");
-            GRBLDict.Add("d2", "");
-            GRBLDict.Add("d3", "");
-            GRBLDict.Add("d4", "");
-            GRBLDict.Add("d5", "");
-            GRBLDict.Add("d6", "");
-            GRBLDict.Add("d7", "");
-            GRBLDict.Add("d8", "");
+            GRBLDict.Add("d1", "X131Y261");
+            GRBLDict.Add("d2", "X131Y226");
+            GRBLDict.Add("d3", "X131Y189");
+            GRBLDict.Add("d4", "X133Y152");
+            GRBLDict.Add("d5", "X133Y116");
+            GRBLDict.Add("d6", "X132Y81");
+            GRBLDict.Add("d7", "X133.5Y43");
+            GRBLDict.Add("d8", "X133Y7");
            
             GRBLDict.Add("d1h", "");
             GRBLDict.Add("d2h", "");
@@ -130,14 +130,14 @@ namespace IODriverNamespace
 
             // E COLS
 
-            GRBLDict.Add("e1", "");
-            GRBLDict.Add("e2", "");
-            GRBLDict.Add("e3", "");
-            GRBLDict.Add("e4", "");
-            GRBLDict.Add("e5", "");
-            GRBLDict.Add("e6", "");
-            GRBLDict.Add("e7", "");
-            GRBLDict.Add("e8", "");
+            GRBLDict.Add("e1", "X167Y261");
+            GRBLDict.Add("e2", "X167Y226");
+            GRBLDict.Add("e3", "X169Y190");
+            GRBLDict.Add("e4", "X168Y154");
+            GRBLDict.Add("e5", "X168Y117");
+            GRBLDict.Add("e6", "X169Y80");
+            GRBLDict.Add("e7", "X168Y45");
+            GRBLDict.Add("e8", "X168Y8");
 
             GRBLDict.Add("e1h", "");
             GRBLDict.Add("e2h", "");
@@ -150,14 +150,14 @@ namespace IODriverNamespace
 
             // F COLS
 
-            GRBLDict.Add("f1", "");
-            GRBLDict.Add("f2", "");
-            GRBLDict.Add("f3", "");
-            GRBLDict.Add("f4", "");
-            GRBLDict.Add("f5", "");
-            GRBLDict.Add("f6", "");
-            GRBLDict.Add("f7", "");
-            GRBLDict.Add("f8", "");
+            GRBLDict.Add("f1", "X204Y262");
+            GRBLDict.Add("f2", "X204Y226");
+            GRBLDict.Add("f3", "X204Y189");
+            GRBLDict.Add("f4", "X204Y154");
+            GRBLDict.Add("f5", "X204Y119");
+            GRBLDict.Add("f6", "X204Y82");
+            GRBLDict.Add("f7", "X205Y45");
+            GRBLDict.Add("f8", "X205Y8");
 
             GRBLDict.Add("f1h", "");
             GRBLDict.Add("f2h", "");
@@ -170,14 +170,23 @@ namespace IODriverNamespace
 
             // G COLS
 
-            GRBLDict.Add("g1", "");
-            GRBLDict.Add("g2", "");
-            GRBLDict.Add("g3", "");
-            GRBLDict.Add("g4", "");
-            GRBLDict.Add("g5", "");
-            GRBLDict.Add("g6", "");
-            GRBLDict.Add("g7", "");
-            GRBLDict.Add("g8", "");
+            GRBLDict.Add("g1", "X241Y262");
+            GRBLDict.Add("g2", "X241Y224");
+            GRBLDict.Add("g3", "X240Y188");
+            GRBLDict.Add("g4", "X240Y151");
+            GRBLDict.Add("g5", "X240Y114");
+            GRBLDict.Add("g6", "X240Y78");
+            GRBLDict.Add("g7", "X240Y43");
+            GRBLDict.Add("g8", "X240Y6");
+
+            GRBLDict.Add("h1", "X280Y262");
+            GRBLDict.Add("h2", "X280Y227");
+            GRBLDict.Add("h3", "X280Y192");
+            GRBLDict.Add("h4", "X280Y155");
+            GRBLDict.Add("h5", "X280Y118");
+            GRBLDict.Add("h6", "X280Y83");
+            GRBLDict.Add("h7", "X280Y46");
+            GRBLDict.Add("h8", "X282Y9");
 
             GRBLDict.Add("MAGON", "");
             GRBLDict.Add("MAGOFF", "");
@@ -207,7 +216,22 @@ namespace IODriverNamespace
             return returnArray;
         }
 
-        public bool checkDifference(int[,] arr)
+        // if there is a piece on the capture square, return true
+        public bool capturedPiece()
+        {
+            string board_state = ReadArray();
+
+            if(board_state[64] == 1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public int checkDifference(int[,] arr)
         {
             int sum = 0;
 
@@ -221,23 +245,20 @@ namespace IODriverNamespace
             }
 
             if(sum == 2) {
-                return true;
+                return 1;
+            }
+            else if(sum == 1 && ){
+                return 2;
             }
             else
             {
-                return false;
+                return 0;
             }
 
         }
 
-        public List<Vector2Int> getDifference(int[,] initial, int[,] final)
+        public int[,] getDifferenceArray(int[,] initial, int[,] final)
         {
-
-            //A list containing the initial and final piece movement
-            List<Vector2Int> returnValue = new List<Vector2Int>();
-            //placeholder in the list to access later
-            returnValue.Add(new Vector2Int());
-            returnValue.Add(new Vector2Int());
 
             for (int i = 0; i < 8; i++)
             {
@@ -245,29 +266,38 @@ namespace IODriverNamespace
                 {
                     //subtract initial and final board states
                     final[i, j] = final[i, j] - initial[i, j];
-                    //-1 will represent the from square and 1 will represent the to square
-                    if (final[i, j] == -1)
+                }
+            }
+
+            return final;
+            
+        }
+
+        public List<Vector2Int> getMoveFromDifferenceArray(int[,] differenceArray)
+        {
+
+            List<Vector2Int> move = new List<Vector2Int>();
+
+            move.Add(new Vector2Int());
+            move.Add(new Vector2Int());
+
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    if (differenceArray[i, j] == -1)
                     {
-                        returnValue[0] = new Vector2Int(i, j);
+                        move[0] = new Vector2Int(i, j);
                     }
-                    else if (final[i, j] == 1)
+                    if (differenceArray[i, j] == 1)
                     {
-                        returnValue[1] = new Vector2Int(i, j);
+                        move[1] = new Vector2Int(i, j);
                     }
                 }
             }
 
-            //ensure that there is only one piece movement picked up from the physical board
-            //if there isn't return an empty Vector2Int List
-            if(checkDifference(final) == true)
-            {
-                return returnValue;
-            }
-            else
-            {
-                Debug.Log("getDifference Error");
-                return new List<Vector2Int>();
-            }
+            return move;
+
         }
 
         /*public void OpenConnection()
@@ -385,17 +415,6 @@ namespace IODriverNamespace
                 sp.WriteLine(GRBLDict["MAGOFF"]);
             }*/
         }
-
-        /*
-         
-        performMove(square1, square2){
-            move(square1)
-            activateMagnet(true)
-            move(square2)
-            activateMagnet(false)
-        }
-          
-        */
 
     }
     
