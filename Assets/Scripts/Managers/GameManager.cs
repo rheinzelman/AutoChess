@@ -51,9 +51,9 @@ namespace AutoChess
         [SerializeField] private BasePlayerInput whiteInputHandler;
         [SerializeField] private BasePlayerInput blackInputHandler;
 
-        public bool PerformMove(Vector2Int to, Vector2Int from, MoveEventData eventData)
+        public bool PerformMove(Vector2Int from, Vector2Int to, MoveEventData eventData)
         {
-            if (playerTurn != eventData.sender.playerColor || !boardManager.GetPieceAt(to) || boardManager.GetPieceAt(to).pieceColor != (PieceColor) eventData.sender.playerColor) return false;
+            if (playerTurn != eventData.sender.playerColor || !boardManager.GetPieceAt(from) || boardManager.GetPieceAt(to).pieceColor != (PieceColor) eventData.sender.playerColor) return false;
 
             bool bMoveSuccess = boardManager.MovePiece(to, from, eventData.args);
 

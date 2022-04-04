@@ -58,9 +58,9 @@ namespace AutoChess.PlayerInput
         }
 
         // When we want to send a move, send it to the GameManager and do something
-        public virtual void SendMove(Vector2Int to, Vector2Int from) { }
+        public virtual void SendMove(Vector2Int from, Vector2Int to) { }
 
         // When the game manager sends us a move, process it and do something
-        public virtual void ReceiveMove(Vector2Int to, Vector2Int from) { }
+        public virtual void ReceiveMove(Vector2Int from, Vector2Int to) { }
     }
 }

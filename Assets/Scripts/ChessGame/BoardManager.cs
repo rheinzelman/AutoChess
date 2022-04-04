@@ -148,11 +148,9 @@ namespace AutoChess.ManagerComponents
 
             square.piece = null;
 
-
             //Graveyard.Add(chessManager.board_state[piece.square.coordinate.x, piece.square.coordinate.y]);
 
             Destroy(piece.gameObject);
-
         }
 
         public void InitializePiecesFromArray(char[,] boardState)
