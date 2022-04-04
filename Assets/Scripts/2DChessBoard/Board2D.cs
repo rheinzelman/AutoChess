@@ -95,7 +95,7 @@ public class Board2D : MonoBehaviour {
     //Every frame
     private void Update()
     {
-        /*
+        
         if (boardConnected)
         {
             HighlightSquares();
@@ -134,11 +134,11 @@ public class Board2D : MonoBehaviour {
                 }
                    
             }
-        }*/
+        }
 
         
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.B))
         {
 
             //Debug.Log(fenTest.getCurrentFEN(chessManager.board_state));
