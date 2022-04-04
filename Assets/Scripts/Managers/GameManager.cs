@@ -27,6 +27,7 @@ namespace AutoChess
         Black = 2
     }
 
+
     public class MoveEventData
     {
         public BasePlayerInput sender;
@@ -77,4 +78,5 @@ namespace AutoChess
             OnTurnSwapped.Invoke(playerTurn, activeInput);
         }
     }
+
 }
