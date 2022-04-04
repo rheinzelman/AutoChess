@@ -1,29 +1,82 @@
+using AutoChess.ManagerComponents;
+using AutoChess.PlayerInput;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
-public class GameManager : MonoBehaviour
+namespace AutoChess
 {
-
-    public bool playerTurn;
-    public bool gameOver;
-
-    private void Awake()
+    public enum PlayerColor
     {
-        
+        Unassigned,
+        White,
+        Black
     }
 
-    // Start is called before the first frame update
-    void Start()
+    public enum EndState
     {
-        playerTurn = true;
-        gameOver = false;
+        Stalemate,
+        WhiteWin,
+        BlackWin
     }
 
-    // Update is called once per frame
-    void Update()
+    public enum PieceColor
     {
-        
+        White = 1,
+        Black = 2
+    }
+
+
+    public class MoveEventData
+    {
+        public BasePlayerInput sender;
+        public string args;
+    }
+
+    [System.Serializable]
+    public class PlayerTurnEvent : UnityEvent<PlayerColor, BasePlayerInput> { }
+
+    public class GameManager : MonoBehaviour
+    {
+        [Header("Game State")]
+        [SerializeField] private PlayerColor playerTurn = PlayerColor.White;
+        [SerializeField] private bool gameOver = false;
+
+        [Header("Events")]
+        public UnityEvent OnGameOver = new UnityEvent();
+        public PlayerTurnEvent OnTurnSwapped = new PlayerTurnEvent();
+
+        [Header("Internal Components")]
+        [SerializeField] private BoardManager boardManager;
+        [SerializeField] private BasePlayerInput whiteInputHandler;
+        [SerializeField] private BasePlayerInput blackInputHandler;
+
+        public bool PerformMove(Vector2Int from, Vector2Int to, MoveEventData eventData)
+        {
+            if (playerTurn != eventData.sender.playerColor || !boardManager.GetPieceAt(from) || boardManager.GetPieceAt(to).pieceColor != (PieceColor) eventData.sender.playerColor) return false;
+
+            bool bMoveSuccess = boardManager.MovePiece(to, from, eventData.args);
+
+            if (bMoveSuccess) SwapTurns();
+
+            return bMoveSuccess;
+        }
+
+        public void SwapTurns()
+        {
+            if (playerTurn == PlayerColor.White)
+                playerTurn = PlayerColor.Black;
+            else
+                playerTurn = PlayerColor.White;
+
+            BasePlayerInput activeInput = (playerTurn == PlayerColor.White ? whiteInputHandler : blackInputHandler);
+
+            whiteInputHandler.AlternateTurn();
+            blackInputHandler.AlternateTurn();
+
+            OnTurnSwapped.Invoke(playerTurn, activeInput);
+        }
     }
 
 }

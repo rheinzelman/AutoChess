@@ -3,161 +3,164 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Pawn : ChessPiece
+namespace AutoChess.ChessPieces
 {
-    [SerializeField]
-    private Vector2Int enPassantSquare = new Vector2Int(-1, -1);
-
-    [SerializeField]
-    private bool hasMoved = false;
-
-    [Button]
-    public override void FindLegalPositions()
+    public class Pawn : ChessPiece
     {
-        base.FindLegalPositions();
+        [SerializeField]
+        private Vector2Int enPassantSquare = new Vector2Int(-1, -1);
 
-        if (!hasMoved)
-            CheckDoubleMove();
-        else
-            CheckSingleMove();
+        [SerializeField]
+        private bool hasMoved = false;
 
-        CheckDiagonals();
-    }
-
-    private void CheckDiagonals()
-    {
-        if (pieceColor == PieceColor.Black)
+        [Button]
+        public override void FindLegalPositions()
         {
-            Vector2Int attack1 = new Vector2Int(currentPosition.x + 1, currentPosition.y + 1);
-            Vector2Int attack2 = new Vector2Int(currentPosition.x - 1, currentPosition.y + 1);
+            base.FindLegalPositions();
 
-            FindAttacksAtDiagonals(attack1, attack2);
+            if (!hasMoved)
+                CheckDoubleMove();
+            else
+                CheckSingleMove();
+
+            CheckDiagonals();
         }
-        else
+
+        private void CheckDiagonals()
         {
-            Vector2Int attack1 = new Vector2Int(currentPosition.x + 1, currentPosition.y - 1);
-            Vector2Int attack2 = new Vector2Int(currentPosition.x - 1, currentPosition.y - 1);
+            if (pieceColor == PieceColor.Black)
+            {
+                Vector2Int attack1 = new Vector2Int(currentPosition.x + 1, currentPosition.y + 1);
+                Vector2Int attack2 = new Vector2Int(currentPosition.x - 1, currentPosition.y + 1);
 
-            FindAttacksAtDiagonals(attack1, attack2);
+                FindAttacksAtDiagonals(attack1, attack2);
+            }
+            else
+            {
+                Vector2Int attack1 = new Vector2Int(currentPosition.x + 1, currentPosition.y - 1);
+                Vector2Int attack2 = new Vector2Int(currentPosition.x - 1, currentPosition.y - 1);
+
+                FindAttacksAtDiagonals(attack1, attack2);
+            }
         }
-    }
 
-    private void FindAttacksAtDiagonals(Vector2Int pos1, Vector2Int pos2)
-    {
-        if (CheckForAttackAt(pos1) || CheckForEnPassantAt(pos1))
-            LegalAttacks.Add(pos1);
-
-        if (CheckForAttackAt(pos2) || CheckForEnPassantAt(pos2))
-            LegalAttacks.Add(pos2);
-    }
-
-    private bool CheckForAttackAt(Vector2Int pos)
-    {
-        return board.HasPieceAt(pos) && board.GetPieceAt(pos).pieceColor != pieceColor;
-    }
-
-    private bool CheckForEnPassantAt(Vector2Int pos)
-    {
-        if (!board.EnPassantSquares.ContainsKey(pos) || board.EnPassantSquares[pos].pieceColor == pieceColor ) return false;
-
-        return true;
-    }
-
-    private void CheckDoubleMove()
-    {
-        if (pieceColor == PieceColor.Black)
+        private void FindAttacksAtDiagonals(Vector2Int pos1, Vector2Int pos2)
         {
-            Vector2Int pos1 = new Vector2Int(currentPosition.x, currentPosition.y + 1);
+            if (CheckForAttackAt(pos1) || CheckForEnPassantAt(pos1))
+                LegalAttacks.Add(pos1);
 
-            if (!board.IsValidCoordinate(pos1) || board.HasPieceAt(pos1)) return;
-
-            LegalPositions.Add(pos1);
-
-            Vector2Int pos2 = new Vector2Int(currentPosition.x, currentPosition.y + 2);
-
-            if (!board.IsValidCoordinate(pos2) || board.HasPieceAt(pos2)) return;
-
-            LegalPositions.Add(pos2);
+            if (CheckForAttackAt(pos2) || CheckForEnPassantAt(pos2))
+                LegalAttacks.Add(pos2);
         }
-        else
+
+        private bool CheckForAttackAt(Vector2Int pos)
         {
-            Vector2Int pos1 = new Vector2Int(currentPosition.x, currentPosition.y - 1);
-
-            if (!board.IsValidCoordinate(pos1) || board.HasPieceAt(pos1)) return;
-
-            LegalPositions.Add(pos1);
-
-            Vector2Int pos2 = new Vector2Int(currentPosition.x, currentPosition.y - 2);
-
-            if (!board.IsValidCoordinate(pos2) || board.HasPieceAt(pos2)) return;
-
-            LegalPositions.Add(pos2);
+            return board.HasPieceAt(pos) && board.GetPieceAt(pos).pieceColor != pieceColor;
         }
-    }
 
-    private void CheckSingleMove()
-    {
-        if (pieceColor == PieceColor.Black)
+        private bool CheckForEnPassantAt(Vector2Int pos)
         {
-            Vector2Int pos = new Vector2Int(currentPosition.x, currentPosition.y + 1);
+            if (!board.EnPassantSquares.ContainsKey(pos) || board.EnPassantSquares[pos].pieceColor == pieceColor) return false;
 
-            if (!board.IsValidCoordinate(pos) || board.HasPieceAt(pos)) return;
-
-            LegalPositions.Add(pos);
+            return true;
         }
-        else
+
+        private void CheckDoubleMove()
         {
-            Vector2Int pos = new Vector2Int(currentPosition.x, currentPosition.y - 1);
+            if (pieceColor == PieceColor.Black)
+            {
+                Vector2Int pos1 = new Vector2Int(currentPosition.x, currentPosition.y + 1);
 
-            if (!board.IsValidCoordinate(pos) || board.HasPieceAt(pos)) return;
+                if (!board.IsValidCoordinate(pos1) || board.HasPieceAt(pos1)) return;
 
-            LegalPositions.Add(pos);
+                LegalPositions.Add(pos1);
+
+                Vector2Int pos2 = new Vector2Int(currentPosition.x, currentPosition.y + 2);
+
+                if (!board.IsValidCoordinate(pos2) || board.HasPieceAt(pos2)) return;
+
+                LegalPositions.Add(pos2);
+            }
+            else
+            {
+                Vector2Int pos1 = new Vector2Int(currentPosition.x, currentPosition.y - 1);
+
+                if (!board.IsValidCoordinate(pos1) || board.HasPieceAt(pos1)) return;
+
+                LegalPositions.Add(pos1);
+
+                Vector2Int pos2 = new Vector2Int(currentPosition.x, currentPosition.y - 2);
+
+                if (!board.IsValidCoordinate(pos2) || board.HasPieceAt(pos2)) return;
+
+                LegalPositions.Add(pos2);
+            }
         }
-    }
 
-    private void EnableEnPassant()
-    {
-        enPassantSquare = LegalPositions[0];
+        private void CheckSingleMove()
+        {
+            if (pieceColor == PieceColor.Black)
+            {
+                Vector2Int pos = new Vector2Int(currentPosition.x, currentPosition.y + 1);
 
-        board.EnPassantSquares.Add(this.enPassantSquare, this);
-    }
+                if (!board.IsValidCoordinate(pos) || board.HasPieceAt(pos)) return;
 
-    private void DisableEnPassant()
-    {
-        enPassantSquare = new Vector2Int(-1, -1);
+                LegalPositions.Add(pos);
+            }
+            else
+            {
+                Vector2Int pos = new Vector2Int(currentPosition.x, currentPosition.y - 1);
 
-        board.EnPassantSquares.Remove(this.enPassantSquare);
-    }
+                if (!board.IsValidCoordinate(pos) || board.HasPieceAt(pos)) return;
 
-    [Button]
-    public override bool MoveToPosition(Vector2Int newPos)
-    {
-        if (!LegalPositions.Contains(newPos) && !LegalAttacks.Contains(newPos)) return false;
+                LegalPositions.Add(pos);
+            }
+        }
 
-        if (!hasMoved && LegalPositions.Count > 1 && newPos == LegalPositions[1])
-            EnableEnPassant();
-        else
-            DisableEnPassant();
+        private void EnableEnPassant()
+        {
+            enPassantSquare = LegalPositions[0];
 
-        if (LegalAttacks.Contains(newPos))
-            board.TakePiece(newPos);
+            board.EnPassantSquares.Add(this.enPassantSquare, this);
+        }
 
-        Square newSquare = board.squares[newPos.x, newPos.y];
+        private void DisableEnPassant()
+        {
+            enPassantSquare = new Vector2Int(-1, -1);
 
-        transform.parent = newSquare.transform;
+            board.EnPassantSquares.Remove(this.enPassantSquare);
+        }
 
-        newSquare.piece = this;
+        [Button]
+        public override bool MoveToPosition(Vector2Int newPos)
+        {
+            if (!LegalPositions.Contains(newPos) && !LegalAttacks.Contains(newPos)) return false;
 
-        square.piece = null;
+            if (!hasMoved && LegalPositions.Count > 1 && newPos == LegalPositions[1])
+                EnableEnPassant();
+            else
+                DisableEnPassant();
 
-        square = newSquare;
+            if (LegalAttacks.Contains(newPos))
+                board.TakePiece(newPos);
 
-        currentPosition = square.coordinate;
+            Square newSquare = board.squares[newPos.x, newPos.y];
 
-        hasMoved = true;
+            transform.parent = newSquare.transform;
 
-        board.boardUpdate.Invoke();
+            newSquare.piece = this;
 
-        return true;
+            square.piece = null;
+
+            square = newSquare;
+
+            currentPosition = square.coordinate;
+
+            hasMoved = true;
+
+            board.boardUpdate.Invoke();
+
+            return true;
+        }
     }
 }

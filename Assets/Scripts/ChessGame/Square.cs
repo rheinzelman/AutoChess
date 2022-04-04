@@ -1,83 +1,88 @@
+using AutoChess.ChessPieces;
+using AutoChess.ManagerComponents;
 using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Square : MonoBehaviour
+namespace AutoChess.ChessPieces
 {
-    public BoardManager board;
-
-    public Vector2Int coordinate = Vector2Int.zero;
-
-    public ChessPiece piece;
-
-    public bool HasPiece()
+    public class Square : MonoBehaviour
     {
-        return piece != null;
-    }
+        public BoardManager board;
 
-    private void InitializePiece(GameObject newPiece, PieceColor color)
-    {
-        newPiece.transform.parent = transform;
+        public Vector2Int coordinate = Vector2Int.zero;
 
-        piece = newPiece.GetComponent<ChessPiece>();//newPiece.AddComponent<Pawn>();
+        public ChessPiece piece;
 
-        piece.board = board;
+        public bool HasPiece()
+        {
+            return piece != null;
+        }
 
-        piece.square = this;
+        private void InitializePiece(GameObject newPiece, PieceColor color)
+        {
+            newPiece.transform.parent = transform;
 
-        piece.pieceColor = color;
+            piece = newPiece.GetComponent<ChessPiece>();//newPiece.AddComponent<Pawn>();
 
-        piece.currentPosition = coordinate;
+            piece.board = board;
 
-        board.boardUpdate.Invoke();
-    }
+            piece.square = this;
 
-    [Button]
-    public void AddPawn(PieceColor color)
-    {
-        if (piece != null) return;
+            piece.pieceColor = color;
 
-        InitializePiece(new GameObject("Pawn", typeof(Pawn)), color);
-    }
+            piece.currentPosition = coordinate;
 
-    [Button]
-    public void AddBishop(PieceColor color)
-    {
-        if (piece != null) return;
+            board.boardUpdate.Invoke();
+        }
 
-        InitializePiece(new GameObject("Bishop", typeof(Bishop)), color);
-    }
+        [Button]
+        public void AddPawn(PieceColor color)
+        {
+            if (piece != null) return;
 
-    [Button]
-    public void AddKnight(PieceColor color)
-    {
-        if (piece != null) return;
+            InitializePiece(new GameObject("Pawn", typeof(Pawn)), color);
+        }
 
-        InitializePiece(new GameObject("Knight", typeof(Knight)), color);
-    }
+        [Button]
+        public void AddBishop(PieceColor color)
+        {
+            if (piece != null) return;
 
-    [Button]
-    public void AddRook(PieceColor color)
-    {
-        if (piece != null) return;
+            InitializePiece(new GameObject("Bishop", typeof(Bishop)), color);
+        }
 
-        InitializePiece(new GameObject("Rook", typeof(Rook)), color);
-    }
+        [Button]
+        public void AddKnight(PieceColor color)
+        {
+            if (piece != null) return;
 
-    [Button]
-    public void AddKing(PieceColor color)
-    {
-        if (piece != null) return;
+            InitializePiece(new GameObject("Knight", typeof(Knight)), color);
+        }
 
-        InitializePiece(new GameObject("King", typeof(King)), color);
-    }
+        [Button]
+        public void AddRook(PieceColor color)
+        {
+            if (piece != null) return;
 
-    [Button]
-    public void AddQueen(PieceColor color)
-    {
-        if (piece != null) return;
+            InitializePiece(new GameObject("Rook", typeof(Rook)), color);
+        }
 
-        InitializePiece(new GameObject("Queen", typeof(Queen)), color);
+        [Button]
+        public void AddKing(PieceColor color)
+        {
+            if (piece != null) return;
+
+            InitializePiece(new GameObject("King", typeof(King)), color);
+        }
+
+        [Button]
+        public void AddQueen(PieceColor color)
+        {
+            if (piece != null) return;
+
+            InitializePiece(new GameObject("Queen", typeof(Queen)), color);
+        }
     }
 }
