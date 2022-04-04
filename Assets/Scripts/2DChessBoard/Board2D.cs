@@ -95,7 +95,7 @@ public class Board2D : MonoBehaviour {
     //Every frame
     private void Update()
     {
-
+        /*
         if (boardConnected)
         {
             HighlightSquares();
@@ -134,17 +134,22 @@ public class Board2D : MonoBehaviour {
                 }
                    
             }
-        }
+        }*/
 
         
 
-        /*if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
 
             //Debug.Log(fenTest.getCurrentFEN(chessManager.board_state));
-            Debug.Log(stockfishTest.GetMove(fenTest.getCurrentFEN(chessManager.board_state)));
+            mainDriver.test();
 
-        }*/
+        }
+
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+           
+        }
 
 
         if (!currentCamera)
@@ -180,7 +185,9 @@ public class Board2D : MonoBehaviour {
             {
                 HighlightLegalTiles(selectedPiece, false);
                 HighlightTile(selectedPiece.x, selectedPiece.y, false);
-                MovePiece(selectedPiece, hitPosition);
+                string UCIMove = MovePiece(selectedPiece, hitPosition);
+                Debug.Log(UCIMove);
+                mainDriver.performStandardMove(UCIMove.Substring(0,2), UCIMove.Substring(2,2));
                 selectedPiece = deselectValue;
             }
             //else if we select a piece with the opposite team, destroy opponent piece
@@ -368,14 +375,14 @@ public class Board2D : MonoBehaviour {
 
     public string MovePiece(Vector2Int initial_tile, Vector2Int final_tile)
     {
-        string returnString = string.Format("From: X = {0}, Y = {1} -- To: X = {2}, Y = {3}", initial_tile.x, initial_tile.y, final_tile.x, final_tile.y);
+        string returnString = string.Format("{0}{1}{2}{3}", initial_tile.x, initial_tile.y, final_tile.x, final_tile.y);
 
         if (!boardManager.MovePiece(initial_tile, final_tile)) return "Illegal move! - " + returnString;
 
         //DestroyPiece(final_tile);
         //TransferPiece(initial_tile, final_tile);
 
-        return returnString;
+        return ConvertToUCI(returnString);
     }
 
     public void UpdateBoardState(Vector2Int initial_tile, Vector2Int final_tile)

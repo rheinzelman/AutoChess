@@ -188,8 +188,8 @@ namespace IODriverNamespace
             GRBLDict.Add("h7", "X280Y46");
             GRBLDict.Add("h8", "X282Y9");
 
-            GRBLDict.Add("MAGON", "");
-            GRBLDict.Add("MAGOFF", "");
+            GRBLDict.Add("MAGON", "M62P 0");
+            GRBLDict.Add("MAGOFF", "M63P 0");
 
         }
 
@@ -338,7 +338,7 @@ namespace IODriverNamespace
             return Sensor;
         }
 
-        public void performtandardMove(string square1, string square2)
+        public void performStandardMove(string square1, string square2)
         {
             moveCoreXY(square1);
             activateMagnet(true);
@@ -402,7 +402,9 @@ namespace IODriverNamespace
 
         public void moveCoreXY(string square)
         {
-            //sp.WriteLine(GRBLDict[square]);
+            sp.Open();
+            sp.WriteLine(GRBLDict[square]);
+            sp.Open();
         }
 
         public void activateMagnet(bool activated)
@@ -414,6 +416,13 @@ namespace IODriverNamespace
             {
                 sp.WriteLine(GRBLDict["MAGOFF"]);
             }*/
+        }
+
+        public void test()
+        {
+            sp.Open();
+            sp.WriteLine("$H");
+            sp.Close();
         }
 
     }
