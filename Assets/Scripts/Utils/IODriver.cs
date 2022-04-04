@@ -299,35 +299,6 @@ namespace IODriverNamespace
             return move;
 
         }
-
-        /*public void OpenConnection()
-        {
-            if (sp != null)
-            {
-                if (sp.IsOpen)
-                {
-                    sp.Close();
-                    print("closing Port, Port was already open");
-                }
-                else
-                {
-                    sp.Open();
-                    sp.WriteTimeout = 200;
-                    sp.ReadTimeout = 200;
-                }
-            }
-            else
-            {
-                if (sp.IsOpen)
-                {
-                    print("Port Is already Open");
-                }
-                else
-                {
-                    print("Port == null");
-                }
-            }
-        }*/
             
         public static string ReadArray()
         {
@@ -423,7 +394,7 @@ namespace IODriverNamespace
             }
         }
 
-        public void test()
+        public void homeCoreXY()
         {
             sp.Open();
             sp.WriteLine("$H");
