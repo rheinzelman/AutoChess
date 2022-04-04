@@ -138,13 +138,13 @@ public class Board2D : MonoBehaviour {
 
         
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        /*if (Input.GetKeyDown(KeyCode.Space))
         {
 
             //Debug.Log(fenTest.getCurrentFEN(chessManager.board_state));
             Debug.Log(stockfishTest.GetMove(fenTest.getCurrentFEN(chessManager.board_state)));
 
-        }
+        }*/
 
 
         if (!currentCamera)

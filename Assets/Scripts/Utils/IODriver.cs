@@ -10,7 +10,7 @@ namespace IODriverNamespace
     public class IODriver : MonoBehaviour
     {
 
-        public static SerialPort sp;// = new SerialPort("COM3", 115200);
+        public static SerialPort sp = new SerialPort("COM3", 115200);
 
         private string initial_state;
         private string current_state;
@@ -247,7 +247,7 @@ namespace IODriverNamespace
             if(sum == 2) {
                 return 1;
             }
-            else if(sum == 1 && ){
+            else if(sum == 1){
                 return 2;
             }
             else
