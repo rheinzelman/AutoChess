@@ -9,7 +9,6 @@ using StockfishHandlerNamespace;
 using AutoChess;
 using AutoChess.ManagerComponents;
 using AutoChess.ChessPieces;
-
 public class Board2D : MonoBehaviour {
 
     // Prefabs
@@ -26,10 +25,6 @@ public class Board2D : MonoBehaviour {
     [SerializeField] private Material lightMat;
     [SerializeField] private Material darkMat;
     [SerializeField] private Material hoverMat;
-
-    //Recorded Games
-    [Header("Recorded Games")]
-    [SerializeField] private TextAsset[] recordedGames;
 
     //[Header("Sounds")]
 
@@ -98,7 +93,7 @@ public class Board2D : MonoBehaviour {
         stockfishTest = gameObject.AddComponent<StockfishHandler>();
         fenTest = gameObject.AddComponent<FENHandler>();
 
-        PlayGameFromFile(recordedGames[0]);
+        //PlayGameFromFile(recordedGames[0]);
 
     }
 
@@ -218,7 +213,6 @@ public class Board2D : MonoBehaviour {
                 HighlightTile(selectedPiece.x, selectedPiece.y, false);
                 string UCIMove = MovePiece(selectedPiece, hitPosition);
                 Debug.Log(UCIMove);
-                //mainDriver.performStandardMove(UCIMove.Substring(0,2), UCIMove.Substring(2,2));
                 selectedPiece = deselectValue;
             }
             //else if we select a piece with the opposite team, destroy opponent piece
@@ -392,10 +386,14 @@ public class Board2D : MonoBehaviour {
     {
         string returnString = string.Format("{0}{1}{2}{3}", initial_tile.x, initial_tile.y, final_tile.x, final_tile.y);
 
+        print(initial_tile + ", " + final_tile);
+
         if (!boardManager.MovePiece(initial_tile, final_tile)) return "Illegal move! - " + returnString;
 
         //DestroyPiece(final_tile);
         //TransferPiece(initial_tile, final_tile);
+
+        if(boardConnected) mainDriver.performStandardMove(initial_tile.x + "" + initial_tile.y, final_tile.x + "" + final_tile.y);
 
         return ConvertToUCI(returnString);
     }
