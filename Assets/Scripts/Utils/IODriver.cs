@@ -345,8 +345,6 @@ namespace IODriverNamespace
 
                 rookSquare = ((char)((int)square1[0] - 4)).ToString() + square1[1];
                 rookDestination = ((char)((int)square2[0] + 1)).ToString() + square2[1];
-              
-
 
             }
 
