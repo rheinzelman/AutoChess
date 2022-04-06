@@ -194,7 +194,11 @@ namespace IODriverNamespace
 
             // CASTLING HALF ROWS
             GRBLDict.Add("e1hh","");
+            GRBLDict.Add("g1hh","");
+            GRBLDict.Add("c1hh","");
             GRBLDict.Add("e8hh","");
+            GRBLDict.Add("g8hh","");
+            GRBLDict.Add("c8hh","");
 
         }
 
@@ -322,12 +326,62 @@ namespace IODriverNamespace
             activateMagnet(false);
         }
 
+        public void performCastling(string square1, string square2)
+        {
+
+            string intermediarySquare;
+            string rookSquare;
+            string rookDestination;
+
+            if (moveDirection(square1, square2))
+            {
+
+                rookSquare = ((char)((int)square1[0] + 3)).ToString() + square1[1];
+                rookDestination = ((char)((int)square2[0] - 1)).ToString() + square2[1];
+                
+            }
+            else
+            {
+
+                rookSquare = ((char)((int)square1[0] - 4)).ToString() + square1[1];
+                rookDestination = ((char)((int)square2[0] + 1)).ToString() + square2[1];
+              
+
+
+            }
+
+            // move the rook
+            moveCoreXY(rookSquare);
+            activateMagnet(true);
+            moveCoreXY(rookDestination);
+            activateMagnet(false);
+
+            // move the king
+            moveCoreXY(square1);
+            activateMagnet(true);
+
+            square1 += "hh";
+            intermediarySquare = square2[0].ToString();
+            intermediarySquare += square1[1].ToString() + "hh";
+
+            moveCoreXY(square1);
+            moveCoreXY(intermediarySquare);
+            moveCoreXY(square2);
+            activateMagnet(false);
+
+        }
+
+        public void performLongCastling()
+        {
+
+        }
+
         public void performKnightMove(string square1, string square2)
         {
 
             string intermediarySquare;
 
-            if(knightDirection(square1, square2) == true)
+            if(moveDirection(square1, square2) == true)
             {
                 
                 moveCoreXY(square1);
@@ -363,8 +417,8 @@ namespace IODriverNamespace
 
         }
 
-        // returns true if square2 is to the right of square1, false if to the left
-        private bool knightDirection(string square1, string square2)
+        // returns true if the move moves the piece to the right
+        private bool moveDirection(string square1, string square2)
         {
             if (square1[0] < square2[0])
             {
