@@ -390,10 +390,15 @@ public class Board2D : MonoBehaviour {
 
         if (!boardManager.MovePiece(initial_tile, final_tile)) return "Illegal move! - " + returnString;
 
+        //finish this tomorrow...
+        string UCIMove = ConvertToUCI(returnString);
+        if(/*boardManager.GetPieceAt(final_tile).type == knight*/true)
+        {
+            mainDriver.performKnightMove(UCIMove.Substring(0, 2), UCIMove.Substring(2,2);
+        }
+
         //DestroyPiece(final_tile);
         //TransferPiece(initial_tile, final_tile);
-
-        if(boardConnected) mainDriver.performStandardMove(initial_tile.x + "" + initial_tile.y, final_tile.x + "" + final_tile.y);
 
         return ConvertToUCI(returnString);
     }
