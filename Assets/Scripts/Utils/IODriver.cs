@@ -47,6 +47,7 @@ namespace IODriverNamespace
 
             // GRBL COORDINATE DICTIONARY
             // h notates a half square position, used for knights
+            // hh notates a half square position above the given square, used for castling
 
             // A COLS
 
@@ -190,6 +191,10 @@ namespace IODriverNamespace
 
             GRBLDict.Add("MAGON", "M62P 0");
             GRBLDict.Add("MAGOFF", "M63P 0");
+
+            // CASTLING HALF ROWS
+            GRBLDict.Add("e1hh","");
+            GRBLDict.Add("e8hh","");
 
         }
 
