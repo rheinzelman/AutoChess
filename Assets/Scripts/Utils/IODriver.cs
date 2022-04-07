@@ -230,7 +230,7 @@ namespace IODriverNamespace
         {
             string board_state = ReadArray();
 
-            if(board_state[64] == 1)
+            if((int)board_state[64] - '0' == 1)
             {
                 return true;
             }
@@ -269,16 +269,18 @@ namespace IODriverNamespace
         public int[,] getDifferenceArray(int[,] initial, int[,] final)
         {
 
+            int[,] returnArray = new int[8, 8];
+
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
                 {
                     //subtract initial and final board states
-                    final[i, j] = final[i, j] - initial[i, j];
+                    returnArray[i, j] = final[i, j] - initial[i, j];
                 }
             }
 
-            return final;
+            return returnArray;
             
         }
 

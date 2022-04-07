@@ -29,7 +29,7 @@ public class Board2D : MonoBehaviour {
     //[Header("Sounds")]
 
     //IO
-    bool boardConnected = false;
+    bool boardConnected = true;
     IODriver mainDriver;
     private int[,] initial_bs;
     private int[,] final_bs;
@@ -55,7 +55,7 @@ public class Board2D : MonoBehaviour {
     //private ChessPiece2D selectedPiece = null;
     private Vector2Int deselectValue = Vector2Int.one * -1;
     private Vector2Int selectedPiece = Vector2Int.one * -1;
-    private Vector2Int capturedPiece;
+    private Vector2Int capturedPiece = Vector2Int.one * -1;
 
     //Unity
     private Camera currentCamera;
@@ -77,7 +77,7 @@ public class Board2D : MonoBehaviour {
     {
         //IO Diver initialization, initial board state is recorded when game is initialized 
         mainDriver = gameObject.AddComponent<IODriver>();
-        //initial_bs = mainDriver.boardToArray();
+        initial_bs = mainDriver.boardToArray();
 
         chessPieces = new ChessPiece2D[TILE_COUNT_Y, TILE_COUNT_X];
         tiles = new GameObject[TILE_COUNT_Y, TILE_COUNT_X];
@@ -113,11 +113,27 @@ public class Board2D : MonoBehaviour {
                 //grab the final board state
                 final_bs = mainDriver.boardToArray();
 
+                /*for(int i = 0; i < 8; i++)
+                {
+                    for( int j = 0; j < 8; j++)
+                    {
+                        print(i + ", " + j + ": " + final_bs[i,j]);
+                    }
+                }*/
+
+                /*for (int i = 0; i < 8; i++)
+                {
+                    for (int j = 0; j < 8; j++)
+                    {
+                        print(i + ", " + j + ": " + initial_bs[i, j]);
+                    }
+                }*/
+
                 //compare initial and final board state
                 int [,] difference_array = mainDriver.getDifferenceArray(initial_bs, final_bs);
 
                 //if there was a piece moved to an empty space and a piece was previously moved to the capture square
-                if (mainDriver.checkDifference(difference_array) == 1 && capturedPiece != Vector2Int.zero)
+                if (capturedPiece != (Vector2Int.one * -1))
                 {
                     for(int i = 0; i < 8; i++)
                     {
@@ -127,7 +143,8 @@ public class Board2D : MonoBehaviour {
                             {
                                 print("piece captured");
                                 MovePiece(new Vector2Int(i, j), capturedPiece);
-                                capturedPiece = Vector2Int.zero;
+                                capturedPiece = Vector2Int.one * -1;
+                                initial_bs = final_bs;
                             }
                         }
                     }
@@ -138,11 +155,11 @@ public class Board2D : MonoBehaviour {
                     print("piece moved to empty square");
                     List<Vector2Int> physical_move = mainDriver.getMoveFromDifferenceArray(difference_array);
                     MovePiece(physical_move[0], physical_move[1]);
+                    initial_bs = final_bs;
                 }
                 //if a piece was moved to the capture square and the difference array notes that only one piece was moved
-                else if(mainDriver.checkDifference(difference_array) == 2 && mainDriver.capturedPiece() == true)
+                else if(mainDriver.capturedPiece() == true)
                 {
-
                     for(int i = 0; i < 8; i++)
                     {
                         for(int j = 0; j < 8; j++)
@@ -163,13 +180,18 @@ public class Board2D : MonoBehaviour {
                 {
                     print("unknown board read error");
                 }
-                   
+
+                print("captured: " + mainDriver.capturedPiece());
+                print("captured Piece: " + capturedPiece.x + ", " + capturedPiece.y);
+
             }
 
             if (Input.GetKeyDown(KeyCode.H))
             {
                 mainDriver.homeCoreXY();
             }
+
+           
 
         }
 
@@ -392,10 +414,8 @@ public class Board2D : MonoBehaviour {
 
         //finish this tomorrow...
         string UCIMove = ConvertToUCI(returnString);
-        if(/*boardManager.GetPieceAt(final_tile).type == knight*/true)
-        {
-            mainDriver.performKnightMove(UCIMove.Substring(0, 2), UCIMove.Substring(2,2);
-        }
+        mainDriver.performKnightMove(UCIMove.Substring(0, 2), UCIMove.Substring(2,2));
+        
 
         //DestroyPiece(final_tile);
         //TransferPiece(initial_tile, final_tile);
