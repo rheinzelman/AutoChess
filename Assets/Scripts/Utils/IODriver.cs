@@ -60,14 +60,14 @@ namespace IODriverNamespace
             GRBLDict.Add("a7", "X25Y47");
             GRBLDict.Add("a8", "X25Y10");
 
-            GRBLDict.Add("a1h", "");
-            GRBLDict.Add("a2h", "");
-            GRBLDict.Add("a3h", "");
-            GRBLDict.Add("a4h", "");
-            GRBLDict.Add("a5h", "");
-            GRBLDict.Add("a6h", "");
-            GRBLDict.Add("a7h", "");
-            GRBLDict.Add("a8h", "");
+            GRBLDict.Add("a1h", "X44Y265");
+            GRBLDict.Add("a2h", "X44Y227");
+            GRBLDict.Add("a3h", "X44Y192");
+            GRBLDict.Add("a4h", "X44Y152");
+            GRBLDict.Add("a5h", "X44Y115");
+            GRBLDict.Add("a6h", "X44Y80");
+            GRBLDict.Add("a7h", "X44Y47");
+            GRBLDict.Add("a8h", "X44Y10");
             
             // B COLS
 
@@ -80,14 +80,14 @@ namespace IODriverNamespace
             GRBLDict.Add("b7", "X62Y45");
             GRBLDict.Add("b8", "X62Y7");
 
-            GRBLDict.Add("b1h", "");
-            GRBLDict.Add("b2h", "");
-            GRBLDict.Add("b3h", "");
-            GRBLDict.Add("b4h", "");
-            GRBLDict.Add("b5h", "");
-            GRBLDict.Add("b6h", "");
-            GRBLDict.Add("b7h", "");
-            GRBLDict.Add("b8h", "");
+            GRBLDict.Add("b1h", "X80Y268");
+            GRBLDict.Add("b2h", "X80Y230");
+            GRBLDict.Add("b3h", "X80Y192");
+            GRBLDict.Add("b4h", "X80Y154");
+            GRBLDict.Add("b5h", "X80Y121");
+            GRBLDict.Add("b6h", "X80Y83");
+            GRBLDict.Add("b7h", "X80Y45");
+            GRBLDict.Add("b8h", "X80Y7");
 
             // C COLS
 
@@ -100,14 +100,14 @@ namespace IODriverNamespace
             GRBLDict.Add("c7", "X96Y43");
             GRBLDict.Add("c8", "X97Y7");
 
-            GRBLDict.Add("c1h", "");
-            GRBLDict.Add("c2h", "");
-            GRBLDict.Add("c3h", "");
-            GRBLDict.Add("c4h", "");
-            GRBLDict.Add("c5h", "");
-            GRBLDict.Add("c6h", "");
-            GRBLDict.Add("c7h", "");
-            GRBLDict.Add("c8h", "");
+            GRBLDict.Add("c1h", "X116Y262");
+            GRBLDict.Add("c2h", "X116Y224");
+            GRBLDict.Add("c3h", "X116Y190");
+            GRBLDict.Add("c4h", "X116Y154");
+            GRBLDict.Add("c5h", "X116Y117");
+            GRBLDict.Add("c6h", "X116Y81");
+            GRBLDict.Add("c7h", "X116Y43");
+            GRBLDict.Add("c8h", "X116Y7");
 
             // D COLS
 
@@ -120,14 +120,14 @@ namespace IODriverNamespace
             GRBLDict.Add("d7", "X133.5Y43");
             GRBLDict.Add("d8", "X133Y7");
            
-            GRBLDict.Add("d1h", "");
-            GRBLDict.Add("d2h", "");
-            GRBLDict.Add("d3h", "");
-            GRBLDict.Add("d4h", "");
-            GRBLDict.Add("d5h", "");
-            GRBLDict.Add("d6h", "");
-            GRBLDict.Add("d7h", "");
-            GRBLDict.Add("d8h", "");
+            GRBLDict.Add("d1h", "X151Y261");
+            GRBLDict.Add("d2h", "X151Y226");
+            GRBLDict.Add("d3h", "X151Y189");
+            GRBLDict.Add("d4h", "X151Y152");
+            GRBLDict.Add("d5h", "X151Y116");
+            GRBLDict.Add("d6h", "X151Y81");
+            GRBLDict.Add("d7h", "X151Y43");
+            GRBLDict.Add("d8h", "X151Y7");
 
             // E COLS
 
@@ -140,14 +140,14 @@ namespace IODriverNamespace
             GRBLDict.Add("e7", "X168Y45");
             GRBLDict.Add("e8", "X168Y8");
 
-            GRBLDict.Add("e1h", "");
-            GRBLDict.Add("e2h", "");
-            GRBLDict.Add("e3h", "");
-            GRBLDict.Add("e4h", "");
-            GRBLDict.Add("e5h", "");
-            GRBLDict.Add("e6h", "");
-            GRBLDict.Add("e7h", "");
-            GRBLDict.Add("e8h", "");
+            GRBLDict.Add("e1h", "X188Y261");
+            GRBLDict.Add("e2h", "X188Y226");
+            GRBLDict.Add("e3h", "X188Y190");
+            GRBLDict.Add("e4h", "X188Y154");
+            GRBLDict.Add("e5h", "X188Y117");
+            GRBLDict.Add("e6h", "X188Y80");
+            GRBLDict.Add("e7h", "X188Y45");
+            GRBLDict.Add("e8h", "X188Y8");
 
             // F COLS
 
@@ -160,14 +160,14 @@ namespace IODriverNamespace
             GRBLDict.Add("f7", "X205Y45");
             GRBLDict.Add("f8", "X205Y8");
 
-            GRBLDict.Add("f1h", "");
-            GRBLDict.Add("f2h", "");
-            GRBLDict.Add("f3h", "");
-            GRBLDict.Add("f4h", "");
-            GRBLDict.Add("f5h", "");
-            GRBLDict.Add("f6h", "");
-            GRBLDict.Add("f7h", "");
-            GRBLDict.Add("f8h", "");
+            GRBLDict.Add("f1h", "X224Y262");
+            GRBLDict.Add("f2h", "X224Y226");
+            GRBLDict.Add("f3h", "X224Y189");
+            GRBLDict.Add("f4h", "X224Y154");
+            GRBLDict.Add("f5h", "X224Y119");
+            GRBLDict.Add("f6h", "X224Y82");
+            GRBLDict.Add("f7h", "X224Y45");
+            GRBLDict.Add("f8h", "X224Y8");
 
             // G COLS
 
@@ -179,6 +179,15 @@ namespace IODriverNamespace
             GRBLDict.Add("g6", "X240Y78");
             GRBLDict.Add("g7", "X240Y43");
             GRBLDict.Add("g8", "X240Y6");
+
+            GRBLDict.Add("g1h", "X261Y262");
+            GRBLDict.Add("g2h", "X261Y224");
+            GRBLDict.Add("g3h", "X261Y188");
+            GRBLDict.Add("g4h", "X261Y151");
+            GRBLDict.Add("g5h", "X261Y114");
+            GRBLDict.Add("g6h", "X261Y78");
+            GRBLDict.Add("g7h", "X261Y43");
+            GRBLDict.Add("g8h", "X261Y6");
 
             GRBLDict.Add("h1", "X280Y262");
             GRBLDict.Add("h2", "X280Y227");
@@ -193,11 +202,11 @@ namespace IODriverNamespace
             GRBLDict.Add("MAGOFF", "M63P 0");
 
             // CASTLING HALF ROWS
-            GRBLDict.Add("e1hh","");
-            GRBLDict.Add("g1hh","");
-            GRBLDict.Add("c1hh","");
-            GRBLDict.Add("e8hh","");
-            GRBLDict.Add("g8hh","");
+            GRBLDict.Add("e1hh", "X167Y245");
+            GRBLDict.Add("g1hh", "X241Y243");
+            GRBLDict.Add("c1hh", "X96Y243");
+            GRBLDict.Add("e8hh", "X168Y25");
+            GRBLDict.Add("g8hh", "X240Y25");
             GRBLDict.Add("c8hh","");
 
         }
