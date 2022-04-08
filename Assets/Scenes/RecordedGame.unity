@@ -825,7 +825,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1256480364}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.39063337
+  m_Size: 0.39063334
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1167,6 +1167,7 @@ GameObject:
   - component: {fileID: 1633040983}
   - component: {fileID: 1633040982}
   - component: {fileID: 1633040981}
+  - component: {fileID: 1633040985}
   m_Layer: 0
   m_Name: Board2D
   m_TagString: Untagged
@@ -1216,8 +1217,6 @@ MonoBehaviour:
   lightMat: {fileID: 2100000, guid: 18ee2b0f9577a0742aa4b237b7b20c63, type: 2}
   darkMat: {fileID: 2100000, guid: b6a5e8d40d7cd904bb0e4dfe155dc8ff, type: 2}
   hoverMat: {fileID: 2100000, guid: c1015775fb2d34549a4b3d7a943829ed, type: 2}
-  recordedGames:
-  - {fileID: 4900000, guid: 43d04f6f59ae6bb4bba6e1df927ce041, type: 3}
   TILE_COUNT_X: 8
   TILE_COUNT_Y: 8
   stockfishTest: {fileID: 0}
@@ -1272,6 +1271,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1633040985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1633040980}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44c592f76f1922f4cbe05b067acedecc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameFile: {fileID: 4900000, guid: 43d04f6f59ae6bb4bba6e1df927ce041, type: 3}
 --- !u!1 &1715007826
 GameObject:
   m_ObjectHideFlags: 0
@@ -1350,7 +1362,6 @@ MonoBehaviour:
   lightMat: {fileID: 2100000, guid: 18ee2b0f9577a0742aa4b237b7b20c63, type: 2}
   darkMat: {fileID: 2100000, guid: b6a5e8d40d7cd904bb0e4dfe155dc8ff, type: 2}
   hoverMat: {fileID: 2100000, guid: c1015775fb2d34549a4b3d7a943829ed, type: 2}
-  recordedGames: []
   TILE_COUNT_X: 8
   TILE_COUNT_Y: 8
   stockfishTest: {fileID: 0}
@@ -1826,7 +1837,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 294144280}
   m_HandleRect: {fileID: 294144279}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
