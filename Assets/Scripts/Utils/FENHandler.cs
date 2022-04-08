@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-namespace FENNamespace
+namespace AutoChess.Utility.FENHandler
 {
-    public class FENHandler : MonoBehaviour
+    public class FENHandler// : MonoBehaviour
     {
         public string board_FEN;
         private string board_state;

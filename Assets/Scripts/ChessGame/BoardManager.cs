@@ -1,4 +1,5 @@
 using AutoChess.ChessPieces;
+using AutoChess.Utility.FENHandler;
 using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
@@ -36,23 +37,41 @@ namespace AutoChess.ManagerComponents
         private King BlackKing;
 
         // Board Managers!
-        public ChessManager chessManager;
+        public GameManager gameManager;
         public Board2D board2D;
+
+        // FEN Utilities
+        private string DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        public char[,] board_state;
+        public FENHandler FENObject = null;
 
         // Unity events
         public UnityEvent boardUpdate = new UnityEvent();
+        public UnityEvent boardRefresh = new UnityEvent();
         public PieceEvent pieceCreated = new PieceEvent();
         public PieceEvent pieceRemoved = new PieceEvent();
         public PieceMoveEvent pieceMoved = new PieceMoveEvent();
+
+        private void Awake()
+        {
+            ProcessFEN(DEFAULT_FEN);
+        }
 
         void Start()
         {
             SetupSquares();
 
-            chessManager = GetComponentInParent<ChessManager>();
+            gameManager = GetComponentInParent<GameManager>();
 
-            InitializePiecesFromArray(chessManager.board_state);
+            InitializePiecesFromArray(FENObject.getArray());
         }
+
+        private void ProcessFEN(string FENInput)
+        {
+            FENObject = new FENHandler(FENInput);
+            board_state = FENObject.getArray();
+        }
+
         private void SetupSquares()
         {
             squares = new Square[horizontalSquares, verticalSquares];

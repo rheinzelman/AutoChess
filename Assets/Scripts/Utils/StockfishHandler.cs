@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Security;
 using UnityEngine;
-using FENNamespace;
 
 namespace StockfishHandlerNamespace
 {

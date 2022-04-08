@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 namespace AutoChess.PlayerInput
 {
-    public interface IPlayerInputInterface
+    public interface IHandleInputInterface
     {
         public PlayerColor playerColor { get; set; }
         public bool bTurnActive { get; set; }

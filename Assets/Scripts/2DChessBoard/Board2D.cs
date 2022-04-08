@@ -3,12 +3,13 @@ using UnityEngine.UI;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using FENNamespace;
 using IODriverNamespace;
 using StockfishHandlerNamespace;
 using AutoChess;
 using AutoChess.ManagerComponents;
 using AutoChess.ChessPieces;
+using AutoChess.Utility.FENHandler;
+using AutoChess.PlayerInput;
 
 public class Board2D : MonoBehaviour {
 
@@ -67,10 +68,13 @@ public class Board2D : MonoBehaviour {
 
     [Header("Board Settings")]
 
-    //ager
-    public ChessManager chessManager;
+    //Managers
     public BoardManager boardManager;
     public GameManager gameManager;
+
+    //Input Handlers
+    BaseInputHandler whiteInput;
+    BaseInputHandler blackInput;
 
 
     // On Startup
@@ -84,6 +88,9 @@ public class Board2D : MonoBehaviour {
         mainDriver = gameObject.AddComponent<IODriver>();
         //initial_bs = mainDriver.boardToArray();
 
+        boardManager ??= GetComponent<BoardManager>();
+        gameManager = boardManager.gameManager;
+
         chessPieces = new ChessPiece2D[TILE_COUNT_Y, TILE_COUNT_X];
         tiles = new GameObject[TILE_COUNT_Y, TILE_COUNT_X];
         chessPieces = new ChessPiece2D[TILE_COUNT_X, TILE_COUNT_Y];
@@ -96,7 +103,7 @@ public class Board2D : MonoBehaviour {
         boardManager.pieceMoved.AddListener(TransferPiece);
 
         stockfishTest = gameObject.AddComponent<StockfishHandler>();
-        fenTest = gameObject.AddComponent<FENHandler>();
+        //fenTest = new FENHandler();//gameObject.AddComponent<FENHandler>();
 
         PlayGameFromFile(recordedGames[0]);
 
@@ -105,90 +112,19 @@ public class Board2D : MonoBehaviour {
     //Every frame
     private void Update()
     {
-        
-        if (boardConnected)
-        {
-
-            HighlightSquares();
-
-            //when spacebar is pressed, attempt to grab physical board state changes and represent virtually
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-
-                //grab the final board state
-                final_bs = mainDriver.boardToArray();
-
-                //compare initial and final board state
-                int [,] difference_array = mainDriver.getDifferenceArray(initial_bs, final_bs);
-
-                //if there was a piece moved to an empty space and a piece was previously moved to the capture square
-                if (mainDriver.checkDifference(difference_array) == 1 && capturedPiece != Vector2Int.zero)
-                {
-                    for(int i = 0; i < 8; i++)
-                    {
-                        for(int j = 0; j < 8; j++)
-                        {
-                            if(difference_array[i,j] == -1)
-                            {
-                                print("piece captured");
-                                MovePiece(new Vector2Int(i, j), capturedPiece);
-                                capturedPiece = Vector2Int.zero;
-                            }
-                        }
-                    }
-                }
-                //if there was a piece moved to an empty space
-                else if (mainDriver.checkDifference(difference_array) == 1)
-                {
-                    print("piece moved to empty square");
-                    List<Vector2Int> physical_move = mainDriver.getMoveFromDifferenceArray(difference_array);
-                    MovePiece(physical_move[0], physical_move[1]);
-                }
-                //if a piece was moved to the capture square and the difference array notes that only one piece was moved
-                else if(mainDriver.checkDifference(difference_array) == 2 && mainDriver.capturedPiece() == true)
-                {
-
-                    for(int i = 0; i < 8; i++)
-                    {
-                        for(int j = 0; j < 8; j++)
-                        {
-                            if(difference_array[i,j] != 0)
-                            {
-                                print("peice moved to capture square");
-                                capturedPiece = new Vector2Int(i, j);
-                            }
-                        }
-                    }
-
-                } else if(mainDriver.checkDifference(difference_array) == 0)
-                {
-                    print("checkDifference error, move pieces back");
-                }
-                else
-                {
-                    print("unknown board read error");
-                }
-                   
-            }
-
-            if (Input.GetKeyDown(KeyCode.H))
-            {
-                mainDriver.homeCoreXY();
-            }
-
-        }
-
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            Debug.Log(stockfishTest.GetMove(fenTest.getCurrentFEN(chessManager.board_state)));
-        }
-
         if (!currentCamera)
         {
             currentCamera = Camera.main;
             return;
         }
 
+        ProcessBoardInput();
+        ProcessStockfishInput();
+        ProcessSelectionRaycast();
+    }
+
+    private void ProcessSelectionRaycast()
+    {
         RaycastHit info;
         Ray ray = currentCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out info, 100, LayerMask.GetMask("Tile")) && Input.GetMouseButtonDown(0))
@@ -231,11 +167,92 @@ public class Board2D : MonoBehaviour {
                 selectedPiece = deselectValue;
             }
             // If no piece is selected, exit the function
-            if (selectedPiece == deselectValue) return ;
+            if (selectedPiece == deselectValue) return;
+        }
+    }
 
+    private void ProcessStockfishInput()
+    {
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            Debug.Log(stockfishTest.GetMove(boardManager.FENObject.getCurrentFEN(boardManager.board_state)));
+        }
+    }
+
+    private void ProcessBoardInput()
+    {
+        if (boardConnected)
+        {
+
+            HighlightSquares();
+
+            //when spacebar is pressed, attempt to grab physical board state changes and represent virtually
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+
+                //grab the final board state
+                final_bs = mainDriver.boardToArray();
+
+                //compare initial and final board state
+                int[,] difference_array = mainDriver.getDifferenceArray(initial_bs, final_bs);
+
+                //if there was a piece moved to an empty space and a piece was previously moved to the capture square
+                if (mainDriver.checkDifference(difference_array) == 1 && capturedPiece != Vector2Int.zero)
+                {
+                    for (int i = 0; i < 8; i++)
+                    {
+                        for (int j = 0; j < 8; j++)
+                        {
+                            if (difference_array[i, j] == -1)
+                            {
+                                print("piece captured");
+                                MovePiece(new Vector2Int(i, j), capturedPiece);
+                                capturedPiece = Vector2Int.zero;
+                            }
+                        }
+                    }
+                }
+                //if there was a piece moved to an empty space
+                else if (mainDriver.checkDifference(difference_array) == 1)
+                {
+                    print("piece moved to empty square");
+                    List<Vector2Int> physical_move = mainDriver.getMoveFromDifferenceArray(difference_array);
+                    MovePiece(physical_move[0], physical_move[1]);
+                }
+                //if a piece was moved to the capture square and the difference array notes that only one piece was moved
+                else if (mainDriver.checkDifference(difference_array) == 2 && mainDriver.capturedPiece() == true)
+                {
+
+                    for (int i = 0; i < 8; i++)
+                    {
+                        for (int j = 0; j < 8; j++)
+                        {
+                            if (difference_array[i, j] != 0)
+                            {
+                                print("peice moved to capture square");
+                                capturedPiece = new Vector2Int(i, j);
+                            }
+                        }
+                    }
+
+                }
+                else if (mainDriver.checkDifference(difference_array) == 0)
+                {
+                    print("checkDifference error, move pieces back");
+                }
+                else
+                {
+                    print("unknown board read error");
+                }
+
+            }
+
+            if (Input.GetKeyDown(KeyCode.H))
+            {
+                mainDriver.homeCoreXY();
+            }
 
         }
-
     }
 
     // Set up the tiles 
@@ -270,8 +287,6 @@ public class Board2D : MonoBehaviour {
         return tileObject;
     }
 
-    
-
     // Set up all pieces
     private void DrawPieces()
     {   
@@ -279,9 +294,9 @@ public class Board2D : MonoBehaviour {
         {
             for (int x = 0; x < TILE_COUNT_X; x++)
             {
-                if(chessManager.board_state[x,y] != '-')
+                if(boardManager.board_state[x,y] != '-')
                 {
-                    char temp = chessManager.board_state[x, y];
+                    char temp = boardManager.board_state[x, y];
                     chessPieces[x,y] = DrawSinglePiece((ChessPieceType)(int)Enum.Parse(typeof(ChessPieceType), Char.ToString(Char.ToLower(temp))), temp);
                     chessPieces[x,y].transform.position = new Vector3(x - TILE_OFFSET_X , 7 - y - TILE_OFFSET_Y, 0);
                     chessPieces[x,y].row = y;
@@ -394,17 +409,14 @@ public class Board2D : MonoBehaviour {
 
         if (!boardManager.MovePiece(initial_tile, final_tile)) return "Illegal move! - " + returnString;
 
-        //DestroyPiece(final_tile);
-        //TransferPiece(initial_tile, final_tile);
-
         return ConvertToUCI(returnString);
     }
 
     public void UpdateBoardState(Vector2Int initial_tile, Vector2Int final_tile)
     {
-        char temp = chessManager.board_state[initial_tile.x, initial_tile.y];
-        chessManager.board_state[initial_tile.x, initial_tile.y] = '-';
-        chessManager.board_state[final_tile.x, final_tile.y] = temp;
+        char temp = boardManager.board_state[initial_tile.x, initial_tile.y];
+        boardManager.board_state[initial_tile.x, initial_tile.y] = '-';
+        boardManager.board_state[final_tile.x, final_tile.y] = temp;
     }
 
     public void DestroyPieceObject(Vector2Int tile)

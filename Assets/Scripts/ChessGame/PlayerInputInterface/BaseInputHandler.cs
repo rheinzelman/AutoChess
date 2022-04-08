@@ -5,10 +5,10 @@ using UnityEngine.Events;
 
 namespace AutoChess.PlayerInput
 {
-    public class BasePlayerInput : MonoBehaviour, IPlayerInputInterface
+    public class BaseInputHandler : MonoBehaviour, IHandleInputInterface
     {
         [Header("Game Manager")]
-        [SerializeField] private GameManager gameManager;
+        public GameManager gameManager;
 
         [Header("Events")]
         public UnityEvent OnTurnStart = new UnityEvent();

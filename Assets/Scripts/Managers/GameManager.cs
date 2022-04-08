@@ -30,12 +30,12 @@ namespace AutoChess
 
     public class MoveEventData
     {
-        public BasePlayerInput sender;
+        public BaseInputHandler sender;
         public string args;
     }
 
     [System.Serializable]
-    public class PlayerTurnEvent : UnityEvent<PlayerColor, BasePlayerInput> { }
+    public class PlayerTurnEvent : UnityEvent<PlayerColor, BaseInputHandler> { }
 
     public class GameManager : MonoBehaviour
     {
@@ -49,8 +49,15 @@ namespace AutoChess
 
         [Header("Internal Components")]
         [SerializeField] private BoardManager boardManager;
-        [SerializeField] private BasePlayerInput whiteInputHandler;
-        [SerializeField] private BasePlayerInput blackInputHandler;
+        [SerializeField] private BaseInputHandler whiteInputHandler;
+        [SerializeField] private BaseInputHandler blackInputHandler;
+
+        private void Start()
+        {
+            boardManager ??= GetComponent<BoardManager>();
+            whiteInputHandler.gameManager = this;
+            blackInputHandler.gameManager = this;
+        }
 
         public bool PerformMove(Vector2Int from, Vector2Int to, MoveEventData eventData)
         {
@@ -70,7 +77,7 @@ namespace AutoChess
             else
                 playerTurn = PlayerColor.White;
 
-            BasePlayerInput activeInput = (playerTurn == PlayerColor.White ? whiteInputHandler : blackInputHandler);
+            BaseInputHandler activeInput = (playerTurn == PlayerColor.White ? whiteInputHandler : blackInputHandler);
 
             whiteInputHandler.AlternateTurn();
             blackInputHandler.AlternateTurn();
