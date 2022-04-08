@@ -104,30 +104,30 @@ public class Board2D : MonoBehaviour {
         if (boardConnected)
         {
 
-            HighlightSquares();
+            //HighlightSquares();
 
             //when spacebar is pressed, attempt to grab physical board state changes and represent virtually
-            if (Input.GetKeyDown(KeyCode.Space))
+           /* if (Input.GetKeyDown(KeyCode.Space))
             {
 
                 //grab the final board state
                 final_bs = mainDriver.boardToArray();
 
-                /*for(int i = 0; i < 8; i++)
+                or(int i = 0; i < 8; i++)
                 {
                     for( int j = 0; j < 8; j++)
                     {
                         print(i + ", " + j + ": " + final_bs[i,j]);
                     }
-                }*/
+                }
 
-                /*for (int i = 0; i < 8; i++)
+                for (int i = 0; i < 8; i++)
                 {
                     for (int j = 0; j < 8; j++)
                     {
                         print(i + ", " + j + ": " + initial_bs[i, j]);
                     }
-                }*/
+                }
 
                 //compare initial and final board state
                 int [,] difference_array = mainDriver.getDifferenceArray(initial_bs, final_bs);
@@ -181,7 +181,7 @@ public class Board2D : MonoBehaviour {
                     print("unknown board read error");
                 }
 
-            }
+            }*/
 
             if (Input.GetKeyDown(KeyCode.H))
             {
@@ -384,7 +384,7 @@ public class Board2D : MonoBehaviour {
     {
 
         string returnValue = "";
-        string letters = "abcdefg";
+        string letters = "abcdefgh";
 
         for(int i = 0; i < unconverted_string.Length; i++)
         {
