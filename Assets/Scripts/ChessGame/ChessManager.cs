@@ -14,7 +14,7 @@ public class ChessManager : MonoBehaviour
     public int verticalSquares = 8;
 
     // Board code from Ray
-    private string DEFAULT_FEN = "8/8/8/8/8/8/8/4K2R";
+    private string DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
     public char[,] board_state;
 
     private void Awake()

@@ -421,6 +421,7 @@ namespace IODriverNamespace
             string intermediarySquare;
             string rookSquare;
             string rookDestination;
+            string kingDestination;
 
             if (moveDirection(square1, square2))
             {
@@ -428,23 +429,25 @@ namespace IODriverNamespace
                 rookSquare = ((char)((int)square1[0] + 3)).ToString() + square1[1];
                 rookDestination = ((char)((int)square1[0] + 1)).ToString() + square2[1];
 
-                print("rookSquare: " + rookSquare);
-                print("rookDest: " + rookDestination);
-
                 intermediarySquare = ((char)((int)square2[0] + 1)).ToString();
                 intermediarySquare += square1[1].ToString() + "hh";
 
-
+                kingDestination = ((char)((int)square2[0] + 1)).ToString() + square2[1].ToString();
 
             }
             else
             {
 
                 rookSquare = ((char)((int)square1[0] - 4)).ToString() + square1[1];
-                rookDestination = ((char)((int)square2[0] + 1)).ToString() + square2[1];
+                rookDestination = ((char)((int)square1[0] - 1)).ToString() + square2[1];
 
-                intermediarySquare = ((char)((int)square2[0] + 1)).ToString();
-                intermediarySquare += square1[1].ToString() + "hh";
+                kingDestination = ((char)((int)square2[0] - 1)).ToString() + square2[1].ToString();
+
+                intermediarySquare = kingDestination[0].ToString() + square1[1].ToString() + "hh";
+
+                print("rookSquare: " + rookSquare);
+                print("rookDest: " + rookDestination);
+                print("kingDest: " + kingDestination);
 
 
             }
@@ -460,7 +463,6 @@ namespace IODriverNamespace
             activateMagnet(true);
 
             square1 += "hh";
-            string kingDestination = ((char)((int)square2[0] + 1)).ToString() + square2[1].ToString();
 
             print("square1: " + square1);
             print("intermediary: " + intermediarySquare);
