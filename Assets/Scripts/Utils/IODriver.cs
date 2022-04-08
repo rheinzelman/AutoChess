@@ -426,14 +426,26 @@ namespace IODriverNamespace
             {
 
                 rookSquare = ((char)((int)square1[0] + 3)).ToString() + square1[1];
-                rookDestination = ((char)((int)square2[0] - 1)).ToString() + square2[1];
-                
+                rookDestination = ((char)((int)square1[0] + 1)).ToString() + square2[1];
+
+                print("rookSquare: " + rookSquare);
+                print("rookDest: " + rookDestination);
+
+                intermediarySquare = ((char)((int)square2[0] + 1)).ToString();
+                intermediarySquare += square1[1].ToString() + "hh";
+
+
+
             }
             else
             {
 
                 rookSquare = ((char)((int)square1[0] - 4)).ToString() + square1[1];
                 rookDestination = ((char)((int)square2[0] + 1)).ToString() + square2[1];
+
+                intermediarySquare = ((char)((int)square2[0] + 1)).ToString();
+                intermediarySquare += square1[1].ToString() + "hh";
+
 
             }
 
@@ -448,18 +460,16 @@ namespace IODriverNamespace
             activateMagnet(true);
 
             square1 += "hh";
-            intermediarySquare = square2[0].ToString();
-            intermediarySquare += square1[1].ToString() + "hh";
+            string kingDestination = ((char)((int)square2[0] + 1)).ToString() + square2[1].ToString();
+
+            print("square1: " + square1);
+            print("intermediary: " + intermediarySquare);
+            print("square2: " + square2);
 
             moveCoreXY(square1);
             moveCoreXY(intermediarySquare);
-            moveCoreXY(square2);
+            moveCoreXY(kingDestination);
             activateMagnet(false);
-
-        }
-
-        public void performLongCastling()
-        {
 
         }
 

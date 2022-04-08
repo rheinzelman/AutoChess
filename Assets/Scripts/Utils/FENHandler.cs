@@ -21,9 +21,9 @@ namespace FENNamespace
 
             //split: 0 - board state, 1 - turn designation, 2 - castling availability, 3 - en passant squares
             this.board_state = split[0];
-            this.turn = split[1];
-            this.castling = split[2];
-            this.passant = split[3];
+            //this.turn = split[1];
+            //this.castling = split[2];
+            //this.passant = split[3];
         }
 
         public char[,] getArray()
