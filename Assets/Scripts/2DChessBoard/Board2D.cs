@@ -488,13 +488,18 @@ public class Board2D : MonoBehaviour {
     {
         ChessPiece chessPiece = boardManager.GetPieceAt(square);
 
-        chessPiece.FindLegalPositions();
-        
+        //chessPiece.FindLegalPositions();
+
+        List<Vector2Int> legalMoves = new List<Vector2Int>();
+        legalMoves.AddRange(chessPiece.LegalPositions);
+        legalMoves.AddRange(chessPiece.LegalAttacks);
+
         if (highlight)
         {
-            for (int i = 0; i < chessPiece.LegalPositions.Count; i++)
+            foreach (Vector2Int pos in legalMoves)
             {
-                GameObject tileObject = Instantiate(legalTilePrefab, new Vector3(chessPiece.LegalPositions[i].x + 0.5f, TILE_COUNT_Y - chessPiece.LegalPositions[i].y - 0.5f, 0), Quaternion.identity);
+                if (!chessPiece.CanMoveToPosition(pos)) continue;
+                GameObject tileObject = Instantiate(legalTilePrefab, new Vector3(pos.x + 0.5f, TILE_COUNT_Y - pos.y - 0.5f, 0), Quaternion.identity);
                 tileObject.tag = "legalTile";
             }
         }

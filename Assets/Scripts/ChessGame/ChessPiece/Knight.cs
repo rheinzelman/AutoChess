@@ -9,7 +9,6 @@ namespace AutoChess.ChessPieces
     {
         private List<Vector2Int> possibleMoves = new List<Vector2Int>();
 
-        [Button]
         public override void FindLegalPositions()
         {
             //Clear lists
@@ -52,7 +51,7 @@ namespace AutoChess.ChessPieces
         public override bool MoveToPosition(Vector2Int newPos)
         {
             //if position does not exist in legal positions or attacks then it is not a legal move
-            if (!LegalPositions.Contains(newPos) && !LegalAttacks.Contains(newPos)) return false;
+            if (!CanMoveToPosition(newPos)) return false;
 
             //take piece if move is an attack
             if (LegalAttacks.Contains(newPos))
@@ -65,7 +64,7 @@ namespace AutoChess.ChessPieces
             square.piece = null;
             square = newSquare;
             currentPosition = square.coordinate;
-            board.boardUpdate.Invoke();
+            //board.boardUpdate.Invoke();
             //move was successfull
             return true;
         }

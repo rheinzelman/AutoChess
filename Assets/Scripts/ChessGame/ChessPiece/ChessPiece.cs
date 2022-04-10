@@ -1,4 +1,5 @@
 using AutoChess.ManagerComponents;
+using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,7 +14,7 @@ namespace AutoChess.ChessPieces
 
         public List<Vector2Int> LegalAttacks = new List<Vector2Int>();
 
-        public List<Vector2Int> BlockedSquares = new List<Vector2Int>();
+        public List<Vector2Int> BlockedMoves = new List<Vector2Int>();
 
         public PieceColor pieceColor;
 
@@ -23,16 +24,54 @@ namespace AutoChess.ChessPieces
 
         public static Vector2Int errorSquare = new Vector2Int(-1, -1);
 
-        protected virtual void Start()
+        void Start()
         {
-            board.boardUpdate.AddListener(FindLegalPositions);
+            board.boardUpdate.AddListener(_FindLegalPositions);
+            board.pieceTryMove.AddListener(TryMoveUpdate);
+            board.boardRefresh.AddListener(OnBoardRefresh);
+
+            _FindLegalPositions();
         }
 
-        public virtual void FindLegalPositions()
+        [Button]
+        private void FindBlockedMoves()
+        {
+            List<Vector2Int> allMoves = new List<Vector2Int>();
+            allMoves.AddRange(LegalPositions);
+            allMoves.AddRange(LegalAttacks);
+
+            foreach (Vector2Int pos in allMoves)
+                board.TryMovePiece(currentPosition, pos);
+        }
+
+        private void TryMoveUpdate(ChessPiece piece)
+        {
+            if (piece == this) return;
+
+            _FindLegalPositions();
+        }
+
+        private void OnBoardRefresh()
+        {
+            BlockedMoves.Clear();
+
+            _FindLegalPositions();
+
+            FindBlockedMoves();
+        }
+
+        [Button]
+        private void _FindLegalPositions()
         {
             LegalPositions.Clear();
             LegalAttacks.Clear();
+
+            if (square.piece != this) return;
+
+            FindLegalPositions();
         }
+
+        public abstract void FindLegalPositions();
 
         public void ForceMoveToPosition(Vector2Int newPos)
         {
@@ -53,7 +92,7 @@ namespace AutoChess.ChessPieces
 
         public bool CanMoveToPosition(Vector2Int newPosition)
         {
-            return !BlockedSquares.Contains(newPosition) && LegalAttacks.Contains(newPosition) || LegalPositions.Contains(newPosition);
+            return !BlockedMoves.Contains(newPosition) && (LegalAttacks.Contains(newPosition) || LegalPositions.Contains(newPosition));
         }
     }
 }

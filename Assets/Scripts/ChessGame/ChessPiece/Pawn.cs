@@ -14,11 +14,8 @@ namespace AutoChess.ChessPieces
         [SerializeField]
         private bool hasMoved = false;
 
-        [Button]
         public override void FindLegalPositions()
         {
-            base.FindLegalPositions();
-
             if (!hasMoved)
                 CheckDoubleMove();
             else

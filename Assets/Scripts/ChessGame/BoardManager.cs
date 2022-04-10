@@ -14,6 +14,8 @@ namespace AutoChess.ManagerComponents
     public class PieceEvent : UnityEvent<Vector2Int> { }
     [System.Serializable]
     public class PieceMoveEvent : UnityEvent<Vector2Int, Vector2Int> { }
+    [System.Serializable]
+    public class PieceTryEvent : UnityEvent<ChessPiece> { }
 
     public class BoardManager : MonoBehaviour
     {
@@ -32,10 +34,11 @@ namespace AutoChess.ManagerComponents
         public List<char> Graveyard = new List<char>();
 
         // Kings of both sides
-        [SerializeField]
-        private King WhiteKing;
-        [SerializeField]
-        private King BlackKing;
+        [SerializeField] private King WhiteKing;
+        [SerializeField] private King BlackKing;
+
+        // End Game Conditions
+        private King kingInCheck;
 
         // Board Managers
         public GameManager gameManager;
@@ -52,14 +55,24 @@ namespace AutoChess.ManagerComponents
         public PieceEvent pieceCreated = new PieceEvent();
         public PieceEvent pieceRemoved = new PieceEvent();
         public PieceMoveEvent pieceMoved = new PieceMoveEvent();
+        public PieceTryEvent pieceTryMove = new PieceTryEvent();
 
-        public static Dictionary<string, char> pieceToChar = new Dictionary<string, char> {
-            { "Pawn", 'p' },
-            { "Knight", 'n' },
-            { "Bishop", 'b' },
-            { "Rook", 'r' },
-            { "Queen", 'q' },
-            { "King", 'k' }
+        public static Dictionary<char, Type> charToPieceType = new Dictionary<char, Type> {
+            { 'p', typeof(Pawn) },
+            { 'n', typeof(Knight) },
+            { 'b', typeof(Bishop) },
+            { 'r', typeof(Rook) },
+            { 'q', typeof(Queen) },
+            { 'k', typeof(King) }
+        };
+
+        public static Dictionary<Type, char> pieceTypeToChar = new Dictionary<Type, char> {
+            { typeof(Pawn), 'p' },
+            { typeof(Knight), 'n' },
+            { typeof(Bishop), 'b' },
+            { typeof(Rook), 'r' },
+            { typeof(Queen), 'q' },
+            { typeof(King), 'k' }
         };
 
         private void Awake()
@@ -71,9 +84,11 @@ namespace AutoChess.ManagerComponents
         {
             SetupSquares();
 
-            gameManager = GetComponentInParent<GameManager>();
+            gameManager = GameManager.instance;
 
             InitializePiecesFromArray(FENObject.getArray());
+
+            boardRefresh.AddListener(UpdateBoardState);
         }
 
         private void ProcessFEN(string FENInput)
@@ -142,6 +157,11 @@ namespace AutoChess.ManagerComponents
             }
         }
 
+        public void CheckVictoryConditions()
+        {
+
+        }
+
         public bool MovePiece(Vector2Int from, Vector2Int to, string eventDataArgs = null)
         {
             ChessPiece piece = GetPieceAt(from);
@@ -151,6 +171,8 @@ namespace AutoChess.ManagerComponents
             if (!piece || !piece.MoveToPosition(to)) return false;
 
             pieceMoved.Invoke(from, to);
+
+            boardRefresh.Invoke();
 
             return true;
         }
@@ -172,9 +194,40 @@ namespace AutoChess.ManagerComponents
             if (fromPiece == null) return;
 
             if (toPiece != null)
-                squares[to.x, to.y].piece = null;
+                toPiece.square.piece = null;
 
             ForceMovePiece(from, to);
+
+            pieceTryMove.Invoke(fromPiece);
+
+            if (CheckForCheck(fromPiece.pieceColor))
+                fromPiece.BlockedMoves.Add(to);
+
+            ForceMovePiece(to, from);
+
+            if (toPiece != null)
+                toPiece.square.piece = toPiece;
+        }
+
+        private bool CheckForCheck(PieceColor color)
+        {
+            if (color == PieceColor.White)
+                return FindChecks(BlackPieces, WhiteKing);
+            else
+                return FindChecks(WhitePieces, BlackKing);
+        }
+
+        private bool FindChecks(List<ChessPiece> pieceList, King kingToCheck)
+        {
+            foreach (ChessPiece piece in pieceList)
+                foreach (Vector2Int pos in piece.LegalAttacks)
+                    if (pos == kingToCheck.currentPosition)
+                    {
+                        print("Legal Attack from " + piece.name + " at " + pos);
+                        return true;
+                    }
+
+            return false;
         }
 
         public void TakePiece(Vector2Int pos)
@@ -193,7 +246,7 @@ namespace AutoChess.ManagerComponents
             else
                 RemovePiece(pos);
 
-            boardUpdate.Invoke();
+            //boardUpdate.Invoke();
         }
         private void RemovePiece(Vector2Int pos)
         {
@@ -211,7 +264,6 @@ namespace AutoChess.ManagerComponents
                 Debug.LogError("Piece does not exist at " + pos + '!');
                 return;
             }
-                
 
             Destroy(piece.gameObject);
 
@@ -227,73 +279,27 @@ namespace AutoChess.ManagerComponents
 
         private void InitializePieceFromChar(int x, int y, char type)
         {
+            if (type == '-') return;
+
+            Type pieceType = charToPieceType[char.ToLower(type)];
             Vector2Int piecePos = new Vector2Int(x, y);
+            PieceColor color = char.IsUpper(type) ? PieceColor.White : PieceColor.Black;
 
-            if (type == 'p')
-                AddPawn(piecePos, PieceColor.Black);
-
-            if (type == 'P')
-                AddPawn(piecePos, PieceColor.White);
-
-            if (type == 'n')
-                AddKnight(piecePos, PieceColor.Black);
-
-            if (type == 'N')
-                AddKnight(piecePos, PieceColor.White);
-
-            if (type == 'b')
-                AddBishop(piecePos, PieceColor.Black);
-
-            if (type == 'B')
-                AddBishop(piecePos, PieceColor.White);
-
-            if (type == 'r')
-                AddRook(piecePos, PieceColor.Black);
-
-            if (type == 'R')
-                AddRook(piecePos, PieceColor.White);
-
-            if (type == 'q')
-                AddQueen(piecePos, PieceColor.Black);
-
-            if (type == 'Q')
-                AddQueen(piecePos, PieceColor.White);
-
-            if (type == 'k')
-                AddKing(piecePos, PieceColor.Black);
-
-            if (type == 'K')
-                AddKing(piecePos, PieceColor.White);
+            AddPiece(pieceType, piecePos, color);
         }
 
         private char ConvertPieceToFen(Vector2Int pos)
         {
             char type = '-';
+
             ChessPiece piece = GetPieceAt(pos);
 
             if (piece == null) return type;
 
-            switch (piece)
-            {
-                case Pawn p:
-                    type = 'p';
-                    break;
-                case Knight p:
-                    type = 'n';
-                    break;
-                case Bishop p:
-                    type = 'b';
-                    break;
-                case Rook p:
-                    type = 'r';
-                    break;
-                case Queen p:
-                    type = 'q';
-                    break;
-                case King p:
-                    type = 'k';
-                    break;
-            }
+            type = pieceTypeToChar[piece.GetType()];
+
+            if (piece.pieceColor == PieceColor.White)
+                type = char.ToUpper(type);
 
             return type;
         }
@@ -314,26 +320,30 @@ namespace AutoChess.ManagerComponents
 
             sq.piece.currentPosition = pos;
 
-            if (color == PieceColor.White)
-            {
-                WhitePieces.Add(newPiece.GetComponent<ChessPiece>());
-
-                if (sq.piece is King)
-                    WhiteKing = sq.piece as King;
-            }
-            else
-            {
-                BlackPieces.Add(newPiece.GetComponent<ChessPiece>());
-
-                if (sq.piece is King)
-                    BlackKing = sq.piece as King;
-            }
+            AddToLists(sq.piece, color);
 
             pieceCreated.Invoke(pos);
 
             boardUpdate.Invoke();
         }
 
+        private void AddToLists(ChessPiece piece, PieceColor color)
+        {
+            if (color == PieceColor.White)
+            {
+                WhitePieces.Add(piece);
+
+                if (piece is King)
+                    WhiteKing = piece as King;
+            }
+            else
+            {
+                BlackPieces.Add(piece);
+
+                if (piece is King)
+                    BlackKing = piece as King;
+            }
+        }
         private void UpdateBoardState()
         {
             char[,] newState = new char[8, 8];
@@ -344,51 +354,11 @@ namespace AutoChess.ManagerComponents
         }
 
         [Button]
-        public void AddPawn(Vector2Int pos, PieceColor color)
+        public void AddPiece(Type type, Vector2Int pos, PieceColor color)
         {
             if (squares[pos.x, pos.y].piece != null) return;
 
-            InitializePiece(new GameObject("Pawn", typeof(Pawn)), pos, color);
-        }
-
-        [Button]
-        public void AddBishop(Vector2Int pos, PieceColor color)
-        {
-            if (squares[pos.x, pos.y].piece != null) return;
-
-            InitializePiece(new GameObject("Bishop", typeof(Bishop)), pos, color);
-        }
-
-        [Button]
-        public void AddKnight(Vector2Int pos, PieceColor color)
-        {
-            if (squares[pos.x, pos.y].piece != null) return;
-
-            InitializePiece(new GameObject("Knight", typeof(Knight)), pos, color);
-        }
-
-        [Button]
-        public void AddRook(Vector2Int pos, PieceColor color)
-        {
-            if (squares[pos.x, pos.y].piece != null) return;
-
-            InitializePiece(new GameObject("Rook", typeof(Rook)), pos, color);
-        }
-
-        [Button]
-        public void AddKing(Vector2Int pos, PieceColor color)
-        {
-            if (squares[pos.x, pos.y].piece != null) return;
-
-            InitializePiece(new GameObject("King", typeof(King)), pos, color);
-        }
-
-        [Button]
-        public void AddQueen(Vector2Int pos, PieceColor color)
-        {
-            if (squares[pos.x, pos.y].piece != null) return;
-
-            InitializePiece(new GameObject("Queen", typeof(Queen)), pos, color);
+            InitializePiece(new GameObject(type.Name, type), pos, color);
         }
     }
 }
