@@ -1,6 +1,7 @@
 using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 namespace AutoChess.ChessPieces
@@ -8,7 +9,7 @@ namespace AutoChess.ChessPieces
     public class Pawn : ChessPiece
     {
         [SerializeField]
-        private Vector2Int enPassantSquare = new Vector2Int(-1, -1);
+        private Vector2Int enPassantSquare = errorSquare;
 
         [SerializeField]
         private bool hasMoved = false;
@@ -60,7 +61,7 @@ namespace AutoChess.ChessPieces
 
         private bool CheckForEnPassantAt(Vector2Int pos)
         {
-            if (!board.EnPassantSquares.ContainsKey(pos) || board.EnPassantSquares[pos].pieceColor == pieceColor) return false;
+            if (board.EnPassantSquare == null || board.EnPassantSquare.Item1 != pos || board.EnPassantSquare.Item2.pieceColor == pieceColor) return false;
 
             return true;
         }
@@ -121,24 +122,28 @@ namespace AutoChess.ChessPieces
         {
             enPassantSquare = LegalPositions[0];
 
-            board.EnPassantSquares.Add(this.enPassantSquare, this);
+            board.EnPassantSquare = new Tuple<Vector2Int, ChessPiece>(enPassantSquare, this);
+
+            print("En Passant set at: " +  enPassantSquare);
         }
 
         private void DisableEnPassant()
         {
-            enPassantSquare = new Vector2Int(-1, -1);
+            enPassantSquare = errorSquare;
 
-            board.EnPassantSquares.Remove(this.enPassantSquare);
+            board.EnPassantSquare = null;
+
+            print("En Passant removed");
         }
 
         [Button]
         public override bool MoveToPosition(Vector2Int newPos)
         {
-            if (!LegalPositions.Contains(newPos) && !LegalAttacks.Contains(newPos)) return false;
+            if (!CanMoveToPosition(newPos)) return false;
 
             if (!hasMoved && LegalPositions.Count > 1 && newPos == LegalPositions[1])
                 EnableEnPassant();
-            else
+            else if (enPassantSquare != errorSquare)
                 DisableEnPassant();
 
             if (LegalAttacks.Contains(newPos))
@@ -157,8 +162,6 @@ namespace AutoChess.ChessPieces
             currentPosition = square.coordinate;
 
             hasMoved = true;
-
-            board.boardUpdate.Invoke();
 
             return true;
         }

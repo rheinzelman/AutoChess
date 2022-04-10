@@ -97,7 +97,7 @@ public class Board2D : MonoBehaviour {
 
         SetupTiles();
         DrawPieces();
-        DrawCoords();
+        //DrawCoords();
 
         boardManager.pieceRemoved.AddListener(DestroyPieceObject);
         boardManager.pieceMoved.AddListener(TransferPiece);
@@ -407,6 +407,8 @@ public class Board2D : MonoBehaviour {
     {
         string returnString = string.Format("{0}{1}{2}{3}", initial_tile.x, initial_tile.y, final_tile.x, final_tile.y);
 
+        print("From: " + initial_tile + ", To: " + final_tile);
+
         if (!boardManager.MovePiece(initial_tile, final_tile)) return "Illegal move! - " + returnString;
 
         return ConvertToUCI(returnString);
@@ -523,5 +525,4 @@ public class Board2D : MonoBehaviour {
         }
 
     }
-
 }

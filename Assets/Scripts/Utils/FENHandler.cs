@@ -58,7 +58,7 @@ namespace AutoChess.Utility.FENHandler
             return result;
         }
 
-        // Convert the board state portion of the FEN to an 8x8 array
+        //Convert the board state portion of the FEN to an 8x8 array
         //public char[,] getArray()
         //{
 
@@ -93,15 +93,11 @@ namespace AutoChess.Utility.FENHandler
         //                arrayIndex++;
         //                arrayRow = arrayIndex % 8;
         //                arrayCol = (int)Math.Floor((double)(arrayIndex / 8));
-
         //            }
-
         //        }
-
         //    }
 
         //    return result;
-
         //}
 
         public char[,] BoolToChar(string bool_string)

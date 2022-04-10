@@ -39,6 +39,8 @@ namespace AutoChess
 
     public class GameManager : MonoBehaviour
     {
+        public static GameManager instance;
+
         [Header("Game State")]
         [SerializeField] private PlayerColor playerTurn = PlayerColor.White;
         [SerializeField] private bool gameOver = false;
@@ -54,6 +56,8 @@ namespace AutoChess
 
         private void Start()
         {
+            instance = this;  
+
             boardManager ??= GetComponent<BoardManager>();
             whiteInputHandler.gameManager = this;
             blackInputHandler.gameManager = this;

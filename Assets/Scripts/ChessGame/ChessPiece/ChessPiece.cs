@@ -13,19 +13,19 @@ namespace AutoChess.ChessPieces
 
         public List<Vector2Int> LegalAttacks = new List<Vector2Int>();
 
+        public List<Vector2Int> BlockedSquares = new List<Vector2Int>();
+
         public PieceColor pieceColor;
 
         public BoardManager board;
 
         public Square square;
 
-        public char fenCode;
+        public static Vector2Int errorSquare = new Vector2Int(-1, -1);
 
         protected virtual void Start()
         {
             board.boardUpdate.AddListener(FindLegalPositions);
-
-            FindLegalPositions();
         }
 
         public virtual void FindLegalPositions()
@@ -34,11 +34,26 @@ namespace AutoChess.ChessPieces
             LegalAttacks.Clear();
         }
 
+        public void ForceMoveToPosition(Vector2Int newPos)
+        {
+            Square newSquare = board.squares[newPos.x, newPos.y];
+
+            transform.parent = newSquare.transform;
+
+            newSquare.piece = this;
+
+            square.piece = null;
+
+            square = newSquare;
+
+            currentPosition = square.coordinate;
+        }
+
         public abstract bool MoveToPosition(Vector2Int newPos);
 
         public bool CanMoveToPosition(Vector2Int newPosition)
         {
-            return LegalPositions.Contains(newPosition);
+            return !BlockedSquares.Contains(newPosition) && LegalAttacks.Contains(newPosition) || LegalPositions.Contains(newPosition);
         }
     }
 }
