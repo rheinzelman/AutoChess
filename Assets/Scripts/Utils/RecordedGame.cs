@@ -71,7 +71,7 @@ namespace RecordedGameNamespace
         public void NextMove()
         {
             Vector2Int[] move = futureMoves.Peek();
-            this.GetComponent<Board2D>().MovePiece(move[0], move[1]);
+            this.GetComponent<Board2D>().MovePiece(move[0], move[1], true);
             pastMoves.Push(futureMoves.Pop());
         }
 
@@ -79,7 +79,7 @@ namespace RecordedGameNamespace
         public void PreviousMove()
         {
             Vector2Int[] move = pastMoves.Peek();
-            this.GetComponent<Board2D>().MovePiece(move[0], move[1]);
+            this.GetComponent<Board2D>().MovePiece(move[0], move[1], true);
             futureMoves.Push(pastMoves.Pop());  
         }
 

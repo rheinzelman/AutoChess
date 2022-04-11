@@ -142,7 +142,7 @@ public class Board2D : MonoBehaviour {
                             if(difference_array[i,j] == -1)
                             {
                                 print("piece captured");
-                                MovePiece(new Vector2Int(i, j), capturedPiece);
+                                MovePiece(new Vector2Int(i, j), capturedPiece, false);
                                 capturedPiece = Vector2Int.one * -1;
                                 initial_bs = final_bs;
                             }
@@ -154,7 +154,7 @@ public class Board2D : MonoBehaviour {
                 {
                     print("piece moved to empty square");
                     List<Vector2Int> physical_move = mainDriver.getMoveFromDifferenceArray(difference_array);
-                    MovePiece(physical_move[0], physical_move[1]);
+                    MovePiece(physical_move[0], physical_move[1], false);
                     initial_bs = final_bs;
                 }
                 //if a piece was moved to the capture square and the difference array notes that only one piece was moved
@@ -230,7 +230,7 @@ public class Board2D : MonoBehaviour {
             {
                 HighlightLegalTiles(selectedPiece, false);
                 HighlightTile(selectedPiece.x, selectedPiece.y, false);
-                string UCIMove = MovePiece(selectedPiece, hitPosition);
+                string UCIMove = MovePiece(selectedPiece, hitPosition, true);
                 Debug.Log(UCIMove);
                 selectedPiece = deselectValue;
             }
@@ -240,7 +240,7 @@ public class Board2D : MonoBehaviour {
             {
                 HighlightLegalTiles(selectedPiece, false);
                 HighlightTile(selectedPiece.x, selectedPiece.y, false);
-                MovePiece(selectedPiece, hitPosition);
+                MovePiece(selectedPiece, hitPosition, true);
                 selectedPiece = deselectValue;
             }
             // If no piece is selected, exit the function
@@ -401,7 +401,7 @@ public class Board2D : MonoBehaviour {
         return returnValue;
     }
 
-    public string MovePiece(Vector2Int initial_tile, Vector2Int final_tile)
+    public string MovePiece(Vector2Int initial_tile, Vector2Int final_tile, bool physcial_move)
     {
         string returnString = string.Format("{0}{1}{2}{3}", initial_tile.x, initial_tile.y, final_tile.x, final_tile.y);
 
@@ -409,16 +409,20 @@ public class Board2D : MonoBehaviour {
 
         string UCIMove = ConvertToUCI(returnString);
 
-        if (boardManager.GetPieceAt(final_tile) is Knight)
+        if (physcial_move && boardConnected)
         {
-            mainDriver.performKnightMove(UCIMove.Substring(0, 2), UCIMove.Substring(2, 2));
-        } else if (boardManager.GetPieceAt(final_tile) is King)
-        {
-            mainDriver.performCastling(UCIMove.Substring(0, 2), UCIMove.Substring(2, 2));
-        }
-        else
-        {
-            mainDriver.performStandardMove(UCIMove.Substring(0, 2), UCIMove.Substring(2, 2));
+            if (boardManager.GetPieceAt(final_tile) is Knight)
+            {
+                mainDriver.performKnightMove(UCIMove.Substring(0, 2), UCIMove.Substring(2, 2));
+            }
+            else if (boardManager.GetPieceAt(final_tile) is King)
+            {
+                mainDriver.performCastling(UCIMove.Substring(0, 2), UCIMove.Substring(2, 2));
+            }
+            else
+            {
+                mainDriver.performStandardMove(UCIMove.Substring(0, 2), UCIMove.Substring(2, 2));
+            }
         }
 
         //DestroyPiece(final_tile);
