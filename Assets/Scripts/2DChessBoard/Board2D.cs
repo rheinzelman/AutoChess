@@ -29,7 +29,7 @@ public class Board2D : MonoBehaviour {
     //[Header("Sounds")]
 
     //IO
-    bool boardConnected = true;
+    bool boardConnected = false;
     IODriver mainDriver;
     private int[,] initial_bs;
     private int[,] final_bs;
@@ -76,8 +76,8 @@ public class Board2D : MonoBehaviour {
     private void Start()
     {
         //IO Diver initialization, initial board state is recorded when game is initialized 
-        mainDriver = gameObject.AddComponent<IODriver>();
-        initial_bs = mainDriver.boardToArray();
+        //mainDriver = gameObject.AddComponent<IODriver>();
+        //initial_bs = mainDriver.boardToArray();
 
         chessPieces = new ChessPiece2D[TILE_COUNT_Y, TILE_COUNT_X];
         tiles = new GameObject[TILE_COUNT_Y, TILE_COUNT_X];
@@ -104,16 +104,16 @@ public class Board2D : MonoBehaviour {
         if (boardConnected)
         {
 
-            //HighlightSquares();
+            HighlightSquares();
 
             //when spacebar is pressed, attempt to grab physical board state changes and represent virtually
-           /* if (Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.Space))
             {
 
                 //grab the final board state
                 final_bs = mainDriver.boardToArray();
 
-                or(int i = 0; i < 8; i++)
+                for(int i = 0; i < 8; i++)
                 {
                     for( int j = 0; j < 8; j++)
                     {
@@ -181,7 +181,7 @@ public class Board2D : MonoBehaviour {
                     print("unknown board read error");
                 }
 
-            }*/
+            }
 
             if (Input.GetKeyDown(KeyCode.H))
             {
