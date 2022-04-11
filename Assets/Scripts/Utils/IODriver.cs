@@ -42,6 +42,20 @@ namespace IODriverNamespace
 
         public Dictionary<string, string> GRBLDict = new Dictionary<string, string>();
 
+        int takenCount = 0;
+
+        string[] captureSquares =
+        {
+                "cap1",
+                "cap2",
+                "cap3",
+                "cap4",
+                "cap5",
+                "cap6",
+                "cap7",
+                "cap8"
+            };
+
         private void Start()
         {
 
@@ -283,7 +297,14 @@ namespace IODriverNamespace
 
             // TAKEN PIECES
 
-            
+            GRBLDict.Add("cap1", "");
+            GRBLDict.Add("cap2", "");
+            GRBLDict.Add("cap3", "");
+            GRBLDict.Add("cap4", "");
+            GRBLDict.Add("cap5", "");
+            GRBLDict.Add("cap6", "");
+            GRBLDict.Add("cap7", "");
+            GRBLDict.Add("cap8", "");
 
             
 
@@ -565,6 +586,18 @@ namespace IODriverNamespace
             moveCoreXY(square2);
             activateMagnet(false);
 
+        }
+
+        public void performCapture(string square1)
+        {
+            moveCoreXY(square1);
+            activateMagnet(true);
+            moveCoreXY(captureSquares[takenCount]);
+            takenCount++;
+            if(takenCount == 8)
+            {
+                takenCount = 0;
+            }
         }
 
         // returns true if the move moves the piece to the right
