@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using AutoChess.ManagerComponents;
 using AutoChess.Utility.FENHandler;
 
 public class ChessManager : MonoBehaviour

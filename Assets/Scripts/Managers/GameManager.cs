@@ -1,7 +1,7 @@
-using AutoChess.ManagerComponents;
 using AutoChess.PlayerInput;
 using System.Collections;
 using System.Collections.Generic;
+using ChessGame;
 using UnityEngine;
 using UnityEngine.Events;
 

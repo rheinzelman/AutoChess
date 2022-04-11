@@ -1,20 +1,16 @@
-using Sirenix.OdinInspector;
-using System.Collections;
-using System.Collections.Generic;
 using System;
+using AutoChess;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace AutoChess.ChessPieces
+namespace ChessGame.ChessPiece
 {
-    public class Pawn : ChessPiece
+    public class Pawn : BaseChessPiece
     {
-        [SerializeField]
-        private Vector2Int enPassantSquare = errorSquare;
+        [SerializeField] private Vector2Int enPassantSquare = ErrorSquare;
+        [SerializeField] private bool hasMoved = false;
 
-        [SerializeField]
-        private bool hasMoved = false;
-
-        public override void FindLegalPositions()
+        protected override void FindLegalPositions()
         {
             if (!hasMoved)
                 CheckDoubleMove();
@@ -45,10 +41,10 @@ namespace AutoChess.ChessPieces
         private void FindAttacksAtDiagonals(Vector2Int pos1, Vector2Int pos2)
         {
             if (CheckForAttackAt(pos1) || CheckForEnPassantAt(pos1))
-                LegalAttacks.Add(pos1);
+                legalAttacks.Add(pos1);
 
             if (CheckForAttackAt(pos2) || CheckForEnPassantAt(pos2))
-                LegalAttacks.Add(pos2);
+                legalAttacks.Add(pos2);
         }
 
         private bool CheckForAttackAt(Vector2Int pos)
@@ -58,7 +54,7 @@ namespace AutoChess.ChessPieces
 
         private bool CheckForEnPassantAt(Vector2Int pos)
         {
-            if (board.EnPassantSquare == null || board.EnPassantSquare.Item1 != pos || board.EnPassantSquare.Item2.pieceColor == pieceColor) return false;
+            if (board.enPassantSquare == null || board.enPassantSquare.Item1 != pos || board.enPassantSquare.Item2.pieceColor == pieceColor) return false;
 
             return true;
         }
@@ -71,13 +67,13 @@ namespace AutoChess.ChessPieces
 
                 if (!board.IsValidCoordinate(pos1) || board.HasPieceAt(pos1)) return;
 
-                LegalPositions.Add(pos1);
+                legalPositions.Add(pos1);
 
                 Vector2Int pos2 = new Vector2Int(currentPosition.x, currentPosition.y + 2);
 
                 if (!board.IsValidCoordinate(pos2) || board.HasPieceAt(pos2)) return;
 
-                LegalPositions.Add(pos2);
+                legalPositions.Add(pos2);
             }
             else
             {
@@ -85,13 +81,13 @@ namespace AutoChess.ChessPieces
 
                 if (!board.IsValidCoordinate(pos1) || board.HasPieceAt(pos1)) return;
 
-                LegalPositions.Add(pos1);
+                legalPositions.Add(pos1);
 
                 Vector2Int pos2 = new Vector2Int(currentPosition.x, currentPosition.y - 2);
 
                 if (!board.IsValidCoordinate(pos2) || board.HasPieceAt(pos2)) return;
 
-                LegalPositions.Add(pos2);
+                legalPositions.Add(pos2);
             }
         }
 
@@ -103,7 +99,7 @@ namespace AutoChess.ChessPieces
 
                 if (!board.IsValidCoordinate(pos) || board.HasPieceAt(pos)) return;
 
-                LegalPositions.Add(pos);
+                legalPositions.Add(pos);
             }
             else
             {
@@ -111,24 +107,24 @@ namespace AutoChess.ChessPieces
 
                 if (!board.IsValidCoordinate(pos) || board.HasPieceAt(pos)) return;
 
-                LegalPositions.Add(pos);
+                legalPositions.Add(pos);
             }
         }
 
         private void EnableEnPassant()
         {
-            enPassantSquare = LegalPositions[0];
+            enPassantSquare = legalPositions[0];
 
-            board.EnPassantSquare = new Tuple<Vector2Int, ChessPiece>(enPassantSquare, this);
+            board.enPassantSquare = new Tuple<Vector2Int, BaseChessPiece>(enPassantSquare, this);
 
             print("En Passant set at: " +  enPassantSquare);
         }
 
         private void DisableEnPassant()
         {
-            enPassantSquare = errorSquare;
+            enPassantSquare = ErrorSquare;
 
-            board.EnPassantSquare = null;
+            board.enPassantSquare = null;
 
             print("En Passant removed");
         }
@@ -138,15 +134,15 @@ namespace AutoChess.ChessPieces
         {
             if (!CanMoveToPosition(newPos)) return false;
 
-            if (!hasMoved && LegalPositions.Count > 1 && newPos == LegalPositions[1])
+            if (!hasMoved && legalPositions.Count > 1 && newPos == legalPositions[1])
                 EnableEnPassant();
-            else if (enPassantSquare != errorSquare)
+            else if (enPassantSquare != ErrorSquare)
                 DisableEnPassant();
 
-            if (LegalAttacks.Contains(newPos))
+            if (legalAttacks.Contains(newPos))
                 board.TakePiece(newPos);
 
-            Square newSquare = board.squares[newPos.x, newPos.y];
+            Square newSquare = board.Squares[newPos.x, newPos.y];
 
             transform.parent = newSquare.transform;
 

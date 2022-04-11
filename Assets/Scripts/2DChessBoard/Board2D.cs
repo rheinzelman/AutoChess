@@ -6,10 +6,10 @@ using System.IO;
 using IODriverNamespace;
 using StockfishHandlerNamespace;
 using AutoChess;
-using AutoChess.ManagerComponents;
-using AutoChess.ChessPieces;
 using AutoChess.Utility.FENHandler;
 using AutoChess.PlayerInput;
+using ChessGame;
+using ChessGame.ChessPiece;
 
 public class Board2D : MonoBehaviour {
 
@@ -127,55 +127,120 @@ public class Board2D : MonoBehaviour {
     {
         RaycastHit info;
         Ray ray = currentCamera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out info, 100, LayerMask.GetMask("Tile")) && Input.GetMouseButtonDown(0))
+        if (!Input.GetMouseButtonDown(0)) return;
+
+        Physics.Raycast(ray, out info, 100, LayerMask.GetMask("Tile"));
+            
+        // Get the indexes of the tile i've hit
+        Vector2Int hitPosition = GetTileIndex(info.transform.gameObject);
+
+        if (boardManager.HasPieceAt(hitPosition) && selectedPiece == deselectValue)
         {
-
-            // Get the indexes of the tile i've hit
-            Vector2Int hitPosition = GetTileIndex(info.transform.gameObject);
-
-            //if we click a tile that has a piece
-            if (chessPieces[hitPosition.x, hitPosition.y] && selectedPiece == deselectValue)
-            {
-                selectedPiece = new Vector2Int(hitPosition.x, hitPosition.y);
-                HighlightLegalTiles(selectedPiece, true);
-                HighlightTile(hitPosition.x, hitPosition.y, true);
-            }
-            //else if we select the same piece again, deselect
-            else if (hitPosition == selectedPiece)
-            {
-                HighlightLegalTiles(selectedPiece, false);
-                HighlightTile(hitPosition.x, hitPosition.y, false);
-                selectedPiece = deselectValue;
-            }
-            //If we have selected a piece and we are then selecting an empty tile 
-            else if (selectedPiece != deselectValue && chessPieces[hitPosition.x, hitPosition.y] == null)
-            {
-                HighlightLegalTiles(selectedPiece, false);
-                HighlightTile(selectedPiece.x, selectedPiece.y, false);
-                string UCIMove = MovePiece(selectedPiece, hitPosition);
-                Debug.Log(UCIMove);
-                //mainDriver.performStandardMove(UCIMove.Substring(0,2), UCIMove.Substring(2,2));
-                selectedPiece = deselectValue;
-            }
-            //else if we select a piece with the opposite team, destroy opponent piece
-
-            else if (selectedPiece != deselectValue && chessPieces[hitPosition.x, hitPosition.y] != null && chessPieces[hitPosition.x, hitPosition.y].team != chessPieces[selectedPiece.x, selectedPiece.y].team)
-            {
-                HighlightLegalTiles(selectedPiece, false);
-                HighlightTile(selectedPiece.x, selectedPiece.y, false);
-                MovePiece(selectedPiece, hitPosition);
-                selectedPiece = deselectValue;
-            }
-            // If no piece is selected, exit the function
-            if (selectedPiece == deselectValue) return;
+            selectedPiece = hitPosition;
+            HighlightLegalTiles(selectedPiece, true);
+            HighlightTile(hitPosition.x, hitPosition.y, true);
         }
+
+        // //if we click a tile that has a piece
+        // if (chessPieces[hitPosition.x, hitPosition.y] && selectedPiece == deselectValue)
+        // {
+        //     selectedPiece = new Vector2Int(hitPosition.x, hitPosition.y);
+        //     HighlightLegalTiles(selectedPiece, true);
+        //     HighlightTile(hitPosition.x, hitPosition.y, true);
+        // }
+        
+        
+        
+        //else if we select the same piece again, deselect
+        else if (hitPosition == selectedPiece)
+        {
+            UnhighlightLegalTiles();
+            HighlightTile(hitPosition.x, hitPosition.y, false);
+            selectedPiece = deselectValue;
+        }
+
+        else if (hitPosition != selectedPiece && selectedPiece != deselectValue)
+        {
+            if (!MovePiece(selectedPiece, hitPosition)) return;
+            UnhighlightLegalTiles();
+            HighlightTile(selectedPiece.x, selectedPiece.y, false);
+            selectedPiece = deselectValue;
+        }
+
+        //If we have selected a piece and we are then selecting an empty tile 
+        // else if (selectedPiece != deselectValue && chessPieces[hitPosition.x, hitPosition.y] == null)
+        // {
+        //     HighlightLegalTiles(selectedPiece, false);
+        //     HighlightTile(selectedPiece.x, selectedPiece.y, false);
+        //     string UCIMove = MovePiece(selectedPiece, hitPosition);
+        //     Debug.Log(UCIMove);
+        //     //mainDriver.performStandardMove(UCIMove.Substring(0,2), UCIMove.Substring(2,2));
+        //     selectedPiece = deselectValue;
+        // }
+        //else if we select a piece with the opposite team, destroy opponent piece
+
+        // else if (selectedPiece != deselectValue && chessPieces[hitPosition.x, hitPosition.y] != null && chessPieces[hitPosition.x, hitPosition.y].team != chessPieces[selectedPiece.x, selectedPiece.y].team)
+        // {
+        //     HighlightLegalTiles(selectedPiece, false);
+        //     HighlightTile(selectedPiece.x, selectedPiece.y, false);
+        //     MovePiece(selectedPiece, hitPosition);
+        //     selectedPiece = deselectValue;
+        // }
+        
+        // If no piece is selected, exit the function
+        // if (selectedPiece == deselectValue) return;
+
+        // RaycastHit info;
+        // Ray ray = currentCamera.ScreenPointToRay(Input.mousePosition);
+        // if (Physics.Raycast(ray, out info, 100, LayerMask.GetMask("Tile")) && Input.GetMouseButtonDown(0))
+        // {
+        //
+        //     // Get the indexes of the tile i've hit
+        //     Vector2Int hitPosition = GetTileIndex(info.transform.gameObject);
+        //
+        //     //if we click a tile that has a piece
+        //     if (chessPieces[hitPosition.x, hitPosition.y] && selectedPiece == deselectValue)
+        //     {
+        //         selectedPiece = new Vector2Int(hitPosition.x, hitPosition.y);
+        //         HighlightLegalTiles(selectedPiece, true);
+        //         HighlightTile(hitPosition.x, hitPosition.y, true);
+        //     }
+        //     //else if we select the same piece again, deselect
+        //     else if (hitPosition == selectedPiece)
+        //     {
+        //         HighlightLegalTiles(selectedPiece, false);
+        //         HighlightTile(hitPosition.x, hitPosition.y, false);
+        //         selectedPiece = deselectValue;
+        //     }
+        //     //If we have selected a piece and we are then selecting an empty tile 
+        //     else if (selectedPiece != deselectValue && chessPieces[hitPosition.x, hitPosition.y] == null)
+        //     {
+        //         HighlightLegalTiles(selectedPiece, false);
+        //         HighlightTile(selectedPiece.x, selectedPiece.y, false);
+        //         string UCIMove = MovePiece(selectedPiece, hitPosition);
+        //         Debug.Log(UCIMove);
+        //         //mainDriver.performStandardMove(UCIMove.Substring(0,2), UCIMove.Substring(2,2));
+        //         selectedPiece = deselectValue;
+        //     }
+        //     //else if we select a piece with the opposite team, destroy opponent piece
+        //
+        //     else if (selectedPiece != deselectValue && chessPieces[hitPosition.x, hitPosition.y] != null && chessPieces[hitPosition.x, hitPosition.y].team != chessPieces[selectedPiece.x, selectedPiece.y].team)
+        //     {
+        //         HighlightLegalTiles(selectedPiece, false);
+        //         HighlightTile(selectedPiece.x, selectedPiece.y, false);
+        //         MovePiece(selectedPiece, hitPosition);
+        //         selectedPiece = deselectValue;
+        //     }
+        //     // If no piece is selected, exit the function
+        //     if (selectedPiece == deselectValue) return;
+        // }
     }
 
     private void ProcessStockfishInput()
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            Debug.Log(stockfishTest.GetMove(boardManager.FENObject.getCurrentFEN(boardManager.board_state)));
+            Debug.Log(stockfishTest.GetMove(boardManager.FenObject.getCurrentFEN(boardManager.BoardState)));
         }
     }
 
@@ -294,9 +359,9 @@ public class Board2D : MonoBehaviour {
         {
             for (int x = 0; x < TILE_COUNT_X; x++)
             {
-                if(boardManager.board_state[x,y] != '-')
+                if(boardManager.BoardState[x,y] != '-')
                 {
-                    char temp = boardManager.board_state[x, y];
+                    char temp = boardManager.BoardState[x, y];
                     chessPieces[x,y] = DrawSinglePiece((ChessPieceType)(int)Enum.Parse(typeof(ChessPieceType), Char.ToString(Char.ToLower(temp))), temp);
                     chessPieces[x,y].transform.position = new Vector3(x - TILE_OFFSET_X , 7 - y - TILE_OFFSET_Y, 0);
                     chessPieces[x,y].row = y;
@@ -403,22 +468,33 @@ public class Board2D : MonoBehaviour {
         return returnValue;
     }
 
-    public string MovePiece(Vector2Int initial_tile, Vector2Int final_tile)
+    // public string MovePiece(Vector2Int initial_tile, Vector2Int final_tile)
+    // {
+    //     string returnString = string.Format("{0}{1}{2}{3}", initial_tile.x, initial_tile.y, final_tile.x, final_tile.y);
+    //
+    //     print("From: " + initial_tile + ", To: " + final_tile);
+    //
+    //     if (!boardManager.MovePiece(initial_tile, final_tile)) return "Illegal move! - " + returnString;
+    //
+    //     return ConvertToUCI(returnString);
+    // }
+    
+    public bool MovePiece(Vector2Int initial_tile, Vector2Int final_tile)
     {
-        string returnString = string.Format("{0}{1}{2}{3}", initial_tile.x, initial_tile.y, final_tile.x, final_tile.y);
-
         print("From: " + initial_tile + ", To: " + final_tile);
 
-        if (!boardManager.MovePiece(initial_tile, final_tile)) return "Illegal move! - " + returnString;
-
-        return ConvertToUCI(returnString);
+        if (boardManager.MovePiece(initial_tile, final_tile)) return true;
+        
+        Debug.Log("Illegal move! - " + initial_tile + " -> " + final_tile);
+        
+        return false;
     }
 
     public void UpdateBoardState(Vector2Int initial_tile, Vector2Int final_tile)
     {
-        char temp = boardManager.board_state[initial_tile.x, initial_tile.y];
-        boardManager.board_state[initial_tile.x, initial_tile.y] = '-';
-        boardManager.board_state[final_tile.x, final_tile.y] = temp;
+        char temp = boardManager.BoardState[initial_tile.x, initial_tile.y];
+        boardManager.BoardState[initial_tile.x, initial_tile.y] = '-';
+        boardManager.BoardState[final_tile.x, final_tile.y] = temp;
     }
 
     public void DestroyPieceObject(Vector2Int tile)
@@ -439,24 +515,14 @@ public class Board2D : MonoBehaviour {
     // highlight a single tile
     private GameObject HighlightTile(int row, int col, bool color)
     {
-
         GameObject selectedTile = tiles[row, col];
+        var selectedTileMeshRenderer = selectedTile.GetComponent<MeshRenderer>();
 
         if (color == true)
-        {
-            selectedTile.GetComponent<MeshRenderer>().material = hoverMat;
-        }
+            selectedTileMeshRenderer.material = hoverMat;
         else
-        {
-            if (selectedTile.tag == "lightMat")
-            {
-                selectedTile.GetComponent<MeshRenderer>().material = lightMat;
-            }
-            else
-            {
-                selectedTile.GetComponent<MeshRenderer>().material = darkMat;
-            }
-        }
+            selectedTileMeshRenderer.material = selectedTile.CompareTag("lightMat") ? lightMat : darkMat;
+        
         return tiles[row, col];
     }
 
@@ -484,35 +550,63 @@ public class Board2D : MonoBehaviour {
     }
 
     // add a dot highlight to squares with legal moves for the given piece
-    private void HighlightLegalTiles(Vector2Int square, bool highlight)
+    private void HighlightLegalTiles(Vector2Int square)
     {
-        ChessPiece chessPiece = boardManager.GetPieceAt(square);
+        BaseChessPiece baseChessPiece = boardManager.GetPieceAt(square);
 
-        //chessPiece.FindLegalPositions();
+        if (baseChessPiece == null) return;
 
         List<Vector2Int> legalMoves = new List<Vector2Int>();
-        legalMoves.AddRange(chessPiece.LegalPositions);
-        legalMoves.AddRange(chessPiece.LegalAttacks);
+        legalMoves.AddRange(baseChessPiece.legalPositions);
+        legalMoves.AddRange(baseChessPiece.legalAttacks);
+            
+        foreach (Vector2Int pos in legalMoves)
+        {
+            if (!baseChessPiece.CanMoveToPosition(pos)) continue;
+            GameObject tileObject = Instantiate(legalTilePrefab, new Vector3(pos.x + 0.5f, TILE_COUNT_Y - pos.y - 0.5f, 0), Quaternion.identity);
+            tileObject.tag = "legalTile";
+        }
+    }
 
+    private void UnhighlightLegalTiles()
+    {
+        foreach(GameObject tile in GameObject.FindGameObjectsWithTag("legalTile"))
+            GameObject.Destroy(tile);
+    }
+    
+    
+    private void HighlightLegalTiles(Vector2Int square, bool highlight)
+    {
         if (highlight)
-        {
-            foreach (Vector2Int pos in legalMoves)
-            {
-                if (!chessPiece.CanMoveToPosition(pos)) continue;
-                GameObject tileObject = Instantiate(legalTilePrefab, new Vector3(pos.x + 0.5f, TILE_COUNT_Y - pos.y - 0.5f, 0), Quaternion.identity);
-                tileObject.tag = "legalTile";
-            }
-        }
+            HighlightLegalTiles(square);
         else
-        {
-            GameObject[] legalTiles = GameObject.FindGameObjectsWithTag("legalTile");
-            foreach(GameObject tile in legalTiles)
-            {
-                GameObject.Destroy(tile);
-            }
-        }
+            UnhighlightLegalTiles();
         
-
+        // ChessPiece chessPiece = boardManager.GetPieceAt(square);
+        //
+        // //chessPiece.FindLegalPositions();
+        //
+        // List<Vector2Int> legalMoves = new List<Vector2Int>();
+        // legalMoves.AddRange(chessPiece.legalPositions);
+        // legalMoves.AddRange(chessPiece.legalAttacks);
+        //
+        // if (highlight)
+        // {
+        //     foreach (Vector2Int pos in legalMoves)
+        //     {
+        //         if (!chessPiece.CanMoveToPosition(pos)) continue;
+        //         GameObject tileObject = Instantiate(legalTilePrefab, new Vector3(pos.x + 0.5f, TILE_COUNT_Y - pos.y - 0.5f, 0), Quaternion.identity);
+        //         tileObject.tag = "legalTile";
+        //     }
+        // }
+        // else
+        // {
+        //     GameObject[] legalTiles = GameObject.FindGameObjectsWithTag("legalTile");
+        //     foreach(GameObject tile in legalTiles)
+        //     {
+        //         GameObject.Destroy(tile);
+        //     }
+        // }
     }
 
     public void PlayGameFromFile(TextAsset gameFile) 

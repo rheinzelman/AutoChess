@@ -1,11 +1,9 @@
-using AutoChess.ChessPieces;
-using AutoChess.ManagerComponents;
+using AutoChess;
+using ChessGame.ChessPiece;
 using Sirenix.OdinInspector;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace AutoChess.ChessPieces
+namespace ChessGame
 {
     public class Square : MonoBehaviour
     {
@@ -13,7 +11,7 @@ namespace AutoChess.ChessPieces
 
         public Vector2Int coordinate = Vector2Int.zero;
 
-        public ChessPiece piece;
+        public BaseChessPiece piece;
 
         public bool HasPiece()
         {
@@ -24,7 +22,7 @@ namespace AutoChess.ChessPieces
         {
             newPiece.transform.parent = transform;
 
-            piece = newPiece.GetComponent<ChessPiece>();//newPiece.AddComponent<Pawn>();
+            piece = newPiece.GetComponent<BaseChessPiece>();//newPiece.AddComponent<Pawn>();
 
             piece.board = board;
 
