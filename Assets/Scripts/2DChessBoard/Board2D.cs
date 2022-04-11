@@ -409,13 +409,16 @@ public class Board2D : MonoBehaviour {
 
         string UCIMove = ConvertToUCI(returnString);
 
+        print(UCIMove);
+
         if (physcial_move && boardConnected)
         {
             if (boardManager.GetPieceAt(final_tile) is Knight)
             {
                 mainDriver.performKnightMove(UCIMove.Substring(0, 2), UCIMove.Substring(2, 2));
             }
-            else if (boardManager.GetPieceAt(final_tile) is King)
+            // need to add a check to see if castling is still legal once holden's code is integrated
+            else if (boardManager.GetPieceAt(final_tile) is King && (UCIMove == "e1g1" || UCIMove == "e1c1" || UCIMove == "e8g8" || UCIMove == "e8c8"))
             {
                 mainDriver.performCastling(UCIMove.Substring(0, 2), UCIMove.Substring(2, 2));
             }
