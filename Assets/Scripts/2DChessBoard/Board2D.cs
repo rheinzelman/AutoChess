@@ -9,7 +9,7 @@ using AutoChess;
 using AutoChess.Utility.FENHandler;
 using AutoChess.PlayerInput;
 using ChessGame;
-using ChessGame.ChessPiece;
+using ChessGame.ChessPieces;
 
 public class Board2D : MonoBehaviour {
 
@@ -131,7 +131,7 @@ public class Board2D : MonoBehaviour {
 
         Physics.Raycast(ray, out info, 100, LayerMask.GetMask("Tile"));
             
-        // Get the indexes of the tile i've hit
+        // Get the coordinates of the tile i've hit
         Vector2Int hitPosition = GetTileIndex(info.transform.gameObject);
 
         if (boardManager.HasPieceAt(hitPosition) && selectedPiece == deselectValue)
@@ -148,10 +148,8 @@ public class Board2D : MonoBehaviour {
         //     HighlightLegalTiles(selectedPiece, true);
         //     HighlightTile(hitPosition.x, hitPosition.y, true);
         // }
-        
-        
-        
-        //else if we select the same piece again, deselect
+
+        // else if we select the same piece again, deselect
         else if (hitPosition == selectedPiece)
         {
             UnhighlightLegalTiles();
@@ -248,7 +246,6 @@ public class Board2D : MonoBehaviour {
     {
         if (boardConnected)
         {
-
             HighlightSquares();
 
             //when spacebar is pressed, attempt to grab physical board state changes and represent virtually
@@ -259,16 +256,16 @@ public class Board2D : MonoBehaviour {
                 final_bs = mainDriver.boardToArray();
 
                 //compare initial and final board state
-                int[,] difference_array = mainDriver.getDifferenceArray(initial_bs, final_bs);
+                int[,] differenceArray = mainDriver.getDifferenceArray(initial_bs, final_bs);
 
                 //if there was a piece moved to an empty space and a piece was previously moved to the capture square
-                if (mainDriver.checkDifference(difference_array) == 1 && capturedPiece != Vector2Int.zero)
+                if (mainDriver.checkDifference(differenceArray) == 1 && capturedPiece != Vector2Int.zero)
                 {
                     for (int i = 0; i < 8; i++)
                     {
                         for (int j = 0; j < 8; j++)
                         {
-                            if (difference_array[i, j] == -1)
+                            if (differenceArray[i, j] == -1)
                             {
                                 print("piece captured");
                                 MovePiece(new Vector2Int(i, j), capturedPiece);
@@ -278,21 +275,21 @@ public class Board2D : MonoBehaviour {
                     }
                 }
                 //if there was a piece moved to an empty space
-                else if (mainDriver.checkDifference(difference_array) == 1)
+                else if (mainDriver.checkDifference(differenceArray) == 1)
                 {
                     print("piece moved to empty square");
-                    List<Vector2Int> physical_move = mainDriver.getMoveFromDifferenceArray(difference_array);
+                    List<Vector2Int> physical_move = mainDriver.getMoveFromDifferenceArray(differenceArray);
                     MovePiece(physical_move[0], physical_move[1]);
                 }
                 //if a piece was moved to the capture square and the difference array notes that only one piece was moved
-                else if (mainDriver.checkDifference(difference_array) == 2 && mainDriver.capturedPiece() == true)
+                else if (mainDriver.checkDifference(differenceArray) == 2 && mainDriver.capturedPiece() == true)
                 {
 
                     for (int i = 0; i < 8; i++)
                     {
                         for (int j = 0; j < 8; j++)
                         {
-                            if (difference_array[i, j] != 0)
+                            if (differenceArray[i, j] != 0)
                             {
                                 print("peice moved to capture square");
                                 capturedPiece = new Vector2Int(i, j);
@@ -301,7 +298,7 @@ public class Board2D : MonoBehaviour {
                     }
 
                 }
-                else if (mainDriver.checkDifference(difference_array) == 0)
+                else if (mainDriver.checkDifference(differenceArray) == 0)
                 {
                     print("checkDifference error, move pieces back");
                 }
@@ -530,14 +527,14 @@ public class Board2D : MonoBehaviour {
     private void HighlightSquares()
     {
         //grab the board state 
-        int[,] physical_board_state = mainDriver.boardToArray();
+        int[,] physicalBoardState = mainDriver.boardToArray();
 
         //highlight squares that have pieces on them (will be removed when hardware is more sturdy)
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
             {
-                if (physical_board_state[i, j] == 1)
+                if (physicalBoardState[i, j] == 1)
                 {
                     HighlightTile(i, j, true);
                 }

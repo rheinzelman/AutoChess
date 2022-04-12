@@ -3,7 +3,7 @@ using AutoChess;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace ChessGame.ChessPiece
+namespace ChessGame.ChessPieces
 {
     public abstract class BaseChessPiece : MonoBehaviour
     {

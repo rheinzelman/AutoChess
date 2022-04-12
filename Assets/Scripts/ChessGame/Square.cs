@@ -1,5 +1,5 @@
 using AutoChess;
-using ChessGame.ChessPiece;
+using ChessGame.ChessPieces;
 using Sirenix.OdinInspector;
 using UnityEngine;
 

@@ -1,21 +1,23 @@
 using System.Collections.Generic;
-using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace ChessGame.ChessPiece
+namespace ChessGame.ChessPieces
 {
-    public class Knight : BaseChessPiece
+    public class King : BaseChessPiece
     {
+        public bool hasMoved = false;
+        public List<Vector2Int> availableCastles = new List<Vector2Int>();
+        
         private List<Vector2Int> squaresToCheck = new List<Vector2Int>()
         {
-            new Vector2Int(-1, 2),
-            new Vector2Int(1, 2),
-            new Vector2Int(2, 1),
-            new Vector2Int(2, -1),
-            new Vector2Int(1, -2),
-            new Vector2Int(-1, -2),
-            new Vector2Int(-2, -1),
-            new Vector2Int(-2, 1)
+            new Vector2Int(0, 1),
+            new Vector2Int(1, 1),
+            new Vector2Int(1, 0),
+            new Vector2Int(1, -1),
+            new Vector2Int(0, -1),
+            new Vector2Int(-1, -1),
+            new Vector2Int(-1, 0),
+            new Vector2Int(-1, 1)
         };
 
         protected override void FindLegalPositions()

@@ -1,11 +1,8 @@
 using AutoChess.PlayerInput;
-using System.Collections;
-using System.Collections.Generic;
-using ChessGame;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace AutoChess
+namespace ChessGame
 {
     public enum PlayerColor
     {
@@ -16,7 +13,7 @@ namespace AutoChess
 
     public enum EndState
     {
-        Stalemate,
+        Draw,
         WhiteWin,
         BlackWin
     }
@@ -32,6 +29,11 @@ namespace AutoChess
     {
         public BaseInputHandler sender;
         public string args;
+
+        public MoveEventData(BaseInputHandler sender)
+        {
+            this.sender = sender;
+        }
     }
 
     [System.Serializable]
@@ -39,7 +41,7 @@ namespace AutoChess
 
     public class GameManager : MonoBehaviour
     {
-        public static GameManager instance;
+        public static GameManager Instance;
 
         [Header("Game State")]
         [SerializeField] private PlayerColor playerTurn = PlayerColor.White;
@@ -56,7 +58,7 @@ namespace AutoChess
 
         private void Start()
         {
-            instance = this;  
+            Instance = this;  
 
             boardManager ??= GetComponent<BoardManager>();
             whiteInputHandler.gameManager = this;
@@ -67,7 +69,7 @@ namespace AutoChess
         {
             if (playerTurn != eventData.sender.playerColor || !boardManager.GetPieceAt(from) || boardManager.GetPieceAt(to).pieceColor != (PieceColor) eventData.sender.playerColor) return false;
 
-            bool bMoveSuccess = boardManager.MovePiece(to, from, eventData.args);
+            var bMoveSuccess = boardManager.MovePiece(to, from, eventData.args);
 
             if (bMoveSuccess) SwapTurns();
 

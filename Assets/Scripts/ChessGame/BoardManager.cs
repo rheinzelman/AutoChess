@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoChess;
 using AutoChess.Utility.FENHandler;
-using ChessGame.ChessPiece;
+using ChessGame.ChessPieces;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Events;
@@ -86,7 +86,7 @@ namespace ChessGame
         {
             SetupSquares();
 
-            gameManager = GameManager.instance;
+            gameManager = GameManager.Instance;
 
             InitializePiecesFromArray(FenObject.getArray());
 
