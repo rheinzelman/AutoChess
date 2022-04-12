@@ -11,11 +11,9 @@ public class ChessManager : MonoBehaviour
     //// Chess Settings
     //public int horizontalSquares = 8;
     //public int verticalSquares = 8;
-
     //// Board code from Ray
     //private string DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     //public char[,] board_state;
-
     //private void Awake()
     //{
     //    FENHandler FENObject = new FENHandler(DEFAULT_FEN);
