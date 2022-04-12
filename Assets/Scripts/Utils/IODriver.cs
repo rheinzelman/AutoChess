@@ -424,6 +424,7 @@ namespace IODriverNamespace
             moveCoreXY(square1);
             activateMagnet(true);
             moveCoreXY(square2);
+            moveCoreXYCoords(overShoot(square2, moveCardinalDirection(square1, square2)));
             activateMagnet(false);
         }
 
@@ -464,6 +465,7 @@ namespace IODriverNamespace
             moveCoreXY(rookSquare);
             activateMagnet(true);
             moveCoreXY(rookDestination);
+            moveCoreXYCoords(overShoot(rookDestination, moveCardinalDirection(rookSquare, rookDestination)));
             activateMagnet(false);
 
             // move the king
@@ -475,6 +477,7 @@ namespace IODriverNamespace
             moveCoreXY(square1);
             moveCoreXY(intermediarySquare);
             moveCoreXY(kingDestination);
+            moveCoreXYCoords(overShoot(kingDestination, moveCardinalDirection(intermediarySquare, kingDestination)));
             activateMagnet(false);
 
         }
@@ -565,6 +568,7 @@ namespace IODriverNamespace
             moveCoreXY(square1);
             moveCoreXY(intermediarySquare);
             moveCoreXY(square2);
+            moveCoreXYCoords(overShoot(square2, moveCardinalDirection(intermediarySquare, square2)));
             activateMagnet(false);
 
         }
@@ -729,8 +733,14 @@ namespace IODriverNamespace
         public void moveCoreXY(string square)
         {
             sp.Open();
-            print("square: " + square);
             sp.WriteLine(GRBLDict[square]);
+            sp.Close();
+        }
+
+        public void moveCoreXYCoords(string coords)
+        {
+            sp.Open();
+            sp.WriteLine(coords);
             sp.Close();
         }
 

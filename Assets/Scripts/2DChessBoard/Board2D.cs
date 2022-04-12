@@ -105,14 +105,6 @@ public class Board2D : MonoBehaviour {
     private void Update()
     {
 
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            print("up" + mainDriver.overShoot("a1", 1));
-            print("right" + mainDriver.overShoot("a1", 2));
-            print("down" + mainDriver.overShoot("a1", 3));
-            print("left" + mainDriver.overShoot("a1", 4));
-        }
-
         if (boardConnected)
         {
 
