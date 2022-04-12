@@ -45,6 +45,9 @@ public class Board2D : MonoBehaviour {
     private GameObject[,] tiles;
     private ChessPiece2D[,] chessPieces;
 
+    //move history
+    public List<string> moveHistory;
+
     //stockfish test
     public StockfishHandler stockfishTest;
 
@@ -52,7 +55,6 @@ public class Board2D : MonoBehaviour {
     public FENHandler fenTest;
 
     //Piece Movement
-    //private ChessPiece2D selectedPiece = null;
     private Vector2Int deselectValue = Vector2Int.one * -1;
     private Vector2Int selectedPiece = Vector2Int.one * -1;
     private Vector2Int capturedPiece = Vector2Int.one * -1;
@@ -62,16 +64,10 @@ public class Board2D : MonoBehaviour {
 
     [Header("Board Settings")]
 
-    //ager
+    // Manager
     public ChessManager chessManager;
     public BoardManager boardManager;
     public GameManager gameManager;
-
-
-    // On Startup
-    private void Awake() {
-
-    }
 
     private void Start()
     {
@@ -104,6 +100,11 @@ public class Board2D : MonoBehaviour {
     //Every frame
     private void Update()
     {
+
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            OutputMoveHistory(moveHistory);
+        }
 
         if (boardConnected)
         {
@@ -450,8 +451,7 @@ public class Board2D : MonoBehaviour {
             }
         }
 
-        //DestroyPiece(final_tile);
-        //TransferPiece(initial_tile, final_tile);
+        AddMoveHistory(UCIMove);
 
         return ConvertToUCI(returnString);
     }
@@ -565,6 +565,31 @@ public class Board2D : MonoBehaviour {
             print(from + " " + to);
             //MovePiece(from, to);
         }
+
+    }
+
+    public void AddMoveHistory(string move)
+    {
+        moveHistory.Add(move);
+    }
+
+    public void OutputMoveHistory(List<string> moves)
+    {
+
+        string fileName = DateTime.Now.ToString();
+        fileName = fileName.Replace(':', '_');
+        fileName = fileName.Replace('/', '_');
+
+        string path = "Assets/RecordedMatches/player_saved/";
+
+        var outputFile = File.CreateText( path + fileName + ".txt");
+
+        foreach(var move in moves)
+        {
+            outputFile.Write(move + " ");
+        }
+
+        outputFile.Close();
 
     }
 
