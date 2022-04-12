@@ -412,9 +412,16 @@ public class Board2D : MonoBehaviour {
             capture = true;
         }
 
-        if (!boardManager.MovePiece(initial_tile, final_tile)) return "Illegal move! - " + returnString;
-
         string UCIMove = ConvertToUCI(returnString);
+
+        print(UCIMove);
+
+        if (UCIMove == "e1g1" || UCIMove == "e1c1" || UCIMove == "e8g8" || UCIMove == "e8c8")
+        {
+            mainDriver.performCastling(UCIMove.Substring(0, 2), UCIMove.Substring(2, 2));
+        }
+
+        if (!boardManager.MovePiece(initial_tile, final_tile)) return "Illegal move! - " + returnString;
 
         if (physcial_move && boardConnected)
         {
@@ -429,7 +436,7 @@ public class Board2D : MonoBehaviour {
                 mainDriver.performKnightMove(UCIMove.Substring(0, 2), UCIMove.Substring(2, 2));
             }
             // need to add a check to see if castling is still legal once holden's code is integrated
-            else if (boardManager.GetPieceAt(final_tile) is King && (UCIMove == "e1g1" || UCIMove == "e1c1" || UCIMove == "e8g8" || UCIMove == "e8c8"))
+            else if (UCIMove == "e1g1" || UCIMove == "e1c1" || UCIMove == "e8g8" || UCIMove == "e8c8")
             {
                 mainDriver.performCastling(UCIMove.Substring(0, 2), UCIMove.Substring(2, 2));
             }

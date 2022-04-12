@@ -457,7 +457,7 @@ namespace IODriverNamespace
 
                 kingDestination = ((char)((int)square2[0] - 1)).ToString() + square2[1].ToString();
 
-                intermediarySquare = kingDestination[0].ToString() + square1[1].ToString() + "hh";
+                intermediarySquare = ((char)((int)kingDestination[0] + 1)).ToString() + square1[1].ToString() + "hh";
 
 
             }
@@ -649,6 +649,7 @@ namespace IODriverNamespace
         public void moveCoreXY(string square)
         {
             sp.Open();
+            print("square: " + square);
             sp.WriteLine(GRBLDict[square]);
             sp.Close();
         }
