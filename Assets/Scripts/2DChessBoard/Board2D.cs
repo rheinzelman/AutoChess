@@ -9,7 +9,6 @@ using StockfishHandlerNamespace;
 using AutoChess;
 using AutoChess.ManagerComponents;
 using AutoChess.ChessPieces;
-
 public class Board2D : MonoBehaviour {
 
     // Prefabs
@@ -27,14 +26,10 @@ public class Board2D : MonoBehaviour {
     [SerializeField] private Material darkMat;
     [SerializeField] private Material hoverMat;
 
-    //Recorded Games
-    [Header("Recorded Games")]
-    [SerializeField] private TextAsset[] recordedGames;
-
     //[Header("Sounds")]
 
     //IO
-    bool boardConnected = false;
+    bool boardConnected = true;
     IODriver mainDriver;
     private int[,] initial_bs;
     private int[,] final_bs;
@@ -60,7 +55,7 @@ public class Board2D : MonoBehaviour {
     //private ChessPiece2D selectedPiece = null;
     private Vector2Int deselectValue = Vector2Int.one * -1;
     private Vector2Int selectedPiece = Vector2Int.one * -1;
-    private Vector2Int capturedPiece;
+    private Vector2Int capturedPiece = Vector2Int.one * -1;
 
     //Unity
     private Camera currentCamera;
@@ -82,7 +77,7 @@ public class Board2D : MonoBehaviour {
     {
         //IO Diver initialization, initial board state is recorded when game is initialized 
         mainDriver = gameObject.AddComponent<IODriver>();
-        //initial_bs = mainDriver.boardToArray();
+        initial_bs = mainDriver.boardToArray();
 
         chessPieces = new ChessPiece2D[TILE_COUNT_Y, TILE_COUNT_X];
         tiles = new GameObject[TILE_COUNT_Y, TILE_COUNT_X];
@@ -98,7 +93,7 @@ public class Board2D : MonoBehaviour {
         stockfishTest = gameObject.AddComponent<StockfishHandler>();
         fenTest = gameObject.AddComponent<FENHandler>();
 
-        PlayGameFromFile(recordedGames[0]);
+        //PlayGameFromFile(recordedGames[0]);
 
     }
 
@@ -109,7 +104,7 @@ public class Board2D : MonoBehaviour {
         if (boardConnected)
         {
 
-            HighlightSquares();
+            //HighlightSquares();
 
             //when spacebar is pressed, attempt to grab physical board state changes and represent virtually
             if (Input.GetKeyDown(KeyCode.Space))
@@ -118,11 +113,27 @@ public class Board2D : MonoBehaviour {
                 //grab the final board state
                 final_bs = mainDriver.boardToArray();
 
+                for(int i = 0; i < 8; i++)
+                {
+                    for( int j = 0; j < 8; j++)
+                    {
+                        print(i + ", " + j + ": " + final_bs[i,j]);
+                    }
+                }
+
+                for (int i = 0; i < 8; i++)
+                {
+                    for (int j = 0; j < 8; j++)
+                    {
+                        print(i + ", " + j + ": " + initial_bs[i, j]);
+                    }
+                }
+
                 //compare initial and final board state
                 int [,] difference_array = mainDriver.getDifferenceArray(initial_bs, final_bs);
 
                 //if there was a piece moved to an empty space and a piece was previously moved to the capture square
-                if (mainDriver.checkDifference(difference_array) == 1 && capturedPiece != Vector2Int.zero)
+                if (capturedPiece != (Vector2Int.one * -1))
                 {
                     for(int i = 0; i < 8; i++)
                     {
@@ -131,8 +142,9 @@ public class Board2D : MonoBehaviour {
                             if(difference_array[i,j] == -1)
                             {
                                 print("piece captured");
-                                MovePiece(new Vector2Int(i, j), capturedPiece);
-                                capturedPiece = Vector2Int.zero;
+                                MovePiece(new Vector2Int(i, j), capturedPiece, false);
+                                capturedPiece = Vector2Int.one * -1;
+                                initial_bs = final_bs;
                             }
                         }
                     }
@@ -142,12 +154,12 @@ public class Board2D : MonoBehaviour {
                 {
                     print("piece moved to empty square");
                     List<Vector2Int> physical_move = mainDriver.getMoveFromDifferenceArray(difference_array);
-                    MovePiece(physical_move[0], physical_move[1]);
+                    MovePiece(physical_move[0], physical_move[1], false);
+                    initial_bs = final_bs;
                 }
                 //if a piece was moved to the capture square and the difference array notes that only one piece was moved
-                else if(mainDriver.checkDifference(difference_array) == 2 && mainDriver.capturedPiece() == true)
+                else if(mainDriver.capturedPiece() == true)
                 {
-
                     for(int i = 0; i < 8; i++)
                     {
                         for(int j = 0; j < 8; j++)
@@ -168,13 +180,15 @@ public class Board2D : MonoBehaviour {
                 {
                     print("unknown board read error");
                 }
-                   
+
             }
 
             if (Input.GetKeyDown(KeyCode.H))
             {
                 mainDriver.homeCoreXY();
             }
+
+           
 
         }
 
@@ -216,9 +230,8 @@ public class Board2D : MonoBehaviour {
             {
                 HighlightLegalTiles(selectedPiece, false);
                 HighlightTile(selectedPiece.x, selectedPiece.y, false);
-                string UCIMove = MovePiece(selectedPiece, hitPosition);
+                string UCIMove = MovePiece(selectedPiece, hitPosition, true);
                 Debug.Log(UCIMove);
-                //mainDriver.performStandardMove(UCIMove.Substring(0,2), UCIMove.Substring(2,2));
                 selectedPiece = deselectValue;
             }
             //else if we select a piece with the opposite team, destroy opponent piece
@@ -227,7 +240,7 @@ public class Board2D : MonoBehaviour {
             {
                 HighlightLegalTiles(selectedPiece, false);
                 HighlightTile(selectedPiece.x, selectedPiece.y, false);
-                MovePiece(selectedPiece, hitPosition);
+                MovePiece(selectedPiece, hitPosition, true);
                 selectedPiece = deselectValue;
             }
             // If no piece is selected, exit the function
@@ -371,7 +384,7 @@ public class Board2D : MonoBehaviour {
     {
 
         string returnValue = "";
-        string letters = "abcdefg";
+        string letters = "abcdefgh";
 
         for(int i = 0; i < unconverted_string.Length; i++)
         {
@@ -388,11 +401,43 @@ public class Board2D : MonoBehaviour {
         return returnValue;
     }
 
-    public string MovePiece(Vector2Int initial_tile, Vector2Int final_tile)
+    public string MovePiece(Vector2Int initial_tile, Vector2Int final_tile, bool physcial_move)
     {
         string returnString = string.Format("{0}{1}{2}{3}", initial_tile.x, initial_tile.y, final_tile.x, final_tile.y);
 
+        bool capture = false;
+
+        if(boardManager.GetPieceAt(final_tile) != null)
+        {
+            capture = true;
+        }
+
         if (!boardManager.MovePiece(initial_tile, final_tile)) return "Illegal move! - " + returnString;
+
+        string UCIMove = ConvertToUCI(returnString);
+
+        if (physcial_move && boardConnected)
+        {
+
+            if(capture == true)
+            {
+                mainDriver.performCapture(UCIMove.Substring(2,2));
+            }
+
+            if (boardManager.GetPieceAt(final_tile) is Knight)
+            {
+                mainDriver.performKnightMove(UCIMove.Substring(0, 2), UCIMove.Substring(2, 2));
+            }
+            // need to add a check to see if castling is still legal once holden's code is integrated
+            else if (boardManager.GetPieceAt(final_tile) is King && (UCIMove == "e1g1" || UCIMove == "e1c1" || UCIMove == "e8g8" || UCIMove == "e8c8"))
+            {
+                mainDriver.performCastling(UCIMove.Substring(0, 2), UCIMove.Substring(2, 2));
+            }
+            else
+            {
+                mainDriver.performStandardMove(UCIMove.Substring(0, 2), UCIMove.Substring(2, 2));
+            }
+        }
 
         //DestroyPiece(final_tile);
         //TransferPiece(initial_tile, final_tile);
