@@ -33,6 +33,7 @@ public class Board2D : MonoBehaviour {
     IODriver mainDriver;
     private int[,] initial_bs;
     private int[,] final_bs;
+    private int[,] physical_board_state;
 
     //Board
     [HideInInspector] public int TILE_COUNT_X = 8;
@@ -76,7 +77,16 @@ public class Board2D : MonoBehaviour {
 
         if (boardConnected)
         {
-            initial_bs = mainDriver.boardToArray();
+            initial_bs = new int[,] {
+                { 1, 1, 1, 1, 1, 1, 1, 1 },
+                { 1, 1, 1, 1, 1, 1, 1, 1 },
+                { 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 0, 0, 0, 0, 0, 0, 0, 0 },
+                { 1, 1, 1, 1, 1, 1, 1, 1 },
+                { 1, 1, 1, 1, 1, 1, 1, 1 },
+            };
         }
 
         chessPieces = new ChessPiece2D[TILE_COUNT_Y, TILE_COUNT_X];
@@ -109,14 +119,17 @@ public class Board2D : MonoBehaviour {
         if (boardConnected)
         {
 
-            //HighlightSquares();
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                HighlightSquares();
+            }
 
             //when spacebar is pressed, attempt to grab physical board state changes and represent virtually
             if (Input.GetKeyDown(KeyCode.Space))
             {
 
                 //grab the final board state
-                final_bs = mainDriver.boardToArray();
+                final_bs = physical_board_state;
 
                 for(int i = 0; i < 8; i++)
                 {
@@ -197,7 +210,7 @@ public class Board2D : MonoBehaviour {
 
         }
 
-        if (Input.GetKeyDown(KeyCode.A))
+        if (Input.GetKeyDown(KeyCode.B))
         {
             Debug.Log(stockfishTest.GetMove(fenTest.getCurrentFEN(chessManager.board_state)));
         }
@@ -506,7 +519,7 @@ public class Board2D : MonoBehaviour {
     private void HighlightSquares()
     {
         //grab the board state 
-        int[,] physical_board_state = mainDriver.boardToArray();
+        physical_board_state = mainDriver.boardToArray();
 
         //highlight squares that have pieces on them (will be removed when hardware is more sturdy)
         for (int i = 0; i < 8; i++)
