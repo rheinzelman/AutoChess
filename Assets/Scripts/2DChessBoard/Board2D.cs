@@ -29,7 +29,7 @@ public class Board2D : MonoBehaviour {
     //[Header("Sounds")]
 
     //IO
-    bool boardConnected = false;
+    bool boardConnected = true;
     IODriver mainDriver;
     private int[,] initial_bs;
     private int[,] final_bs;
@@ -76,8 +76,8 @@ public class Board2D : MonoBehaviour {
     private void Start()
     {
         //IO Diver initialization, initial board state is recorded when game is initialized 
-        //mainDriver = gameObject.AddComponent<IODriver>();
-        //initial_bs = mainDriver.boardToArray();
+        mainDriver = gameObject.AddComponent<IODriver>();
+        initial_bs = mainDriver.boardToArray();
 
         chessPieces = new ChessPiece2D[TILE_COUNT_Y, TILE_COUNT_X];
         tiles = new GameObject[TILE_COUNT_Y, TILE_COUNT_X];
@@ -104,7 +104,7 @@ public class Board2D : MonoBehaviour {
         if (boardConnected)
         {
 
-            HighlightSquares();
+            //HighlightSquares();
 
             //when spacebar is pressed, attempt to grab physical board state changes and represent virtually
             if (Input.GetKeyDown(KeyCode.Space))
@@ -405,14 +405,25 @@ public class Board2D : MonoBehaviour {
     {
         string returnString = string.Format("{0}{1}{2}{3}", initial_tile.x, initial_tile.y, final_tile.x, final_tile.y);
 
+        bool capture = false;
+
+        if(boardManager.GetPieceAt(final_tile) != null)
+        {
+            capture = true;
+        }
+
         if (!boardManager.MovePiece(initial_tile, final_tile)) return "Illegal move! - " + returnString;
 
         string UCIMove = ConvertToUCI(returnString);
 
-        print(UCIMove);
-
         if (physcial_move && boardConnected)
         {
+
+            if(capture == true)
+            {
+                mainDriver.performCapture(UCIMove.Substring(2,2));
+            }
+
             if (boardManager.GetPieceAt(final_tile) is Knight)
             {
                 mainDriver.performKnightMove(UCIMove.Substring(0, 2), UCIMove.Substring(2, 2));

@@ -30,7 +30,6 @@ namespace RecordedGameNamespace
             for(int i = movesStrings.Length - 1; i >= 0; i--)
             {
                 string convertedMove = toVector2IntString(movesStrings[i]);
-                print(convertedMove);
                 Vector2Int[] moveVector = new Vector2Int[2];
                 moveVector[0] = new Vector2Int(convertedMove[0] - '0', convertedMove[1] - '0');
                 moveVector[1] = new Vector2Int(convertedMove[2] - '0', convertedMove[3] - '0');

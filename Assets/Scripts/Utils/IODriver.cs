@@ -57,6 +57,7 @@ namespace IODriverNamespace
 
             // V COLS
 
+            GRBLDict.Add("z1v", "X0Y241.5");
             GRBLDict.Add("a1v", "X29Y241.5");
             GRBLDict.Add("b1v", "X65Y241.5");
             GRBLDict.Add("c1v", "X101Y241.5");
@@ -66,6 +67,7 @@ namespace IODriverNamespace
             GRBLDict.Add("g1v", "X244.5Y241.5");
             GRBLDict.Add("h1v", "X281.5Y241.5");
 
+            GRBLDict.Add("z2v", "X0Y204");
             GRBLDict.Add("a2v", "X29Y204");
             GRBLDict.Add("b2v", "X65Y204");
             GRBLDict.Add("c2v", "X101Y204");
@@ -75,6 +77,7 @@ namespace IODriverNamespace
             GRBLDict.Add("g2v", "245.5XY204");
             GRBLDict.Add("h2v", "281.5XY204");
 
+            GRBLDict.Add("z3v", "X0Y167.5");
             GRBLDict.Add("a3v", "X29Y167.5");
             GRBLDict.Add("b3v", "X65Y167.5");
             GRBLDict.Add("c3v", "X101Y167.5");
@@ -84,6 +87,7 @@ namespace IODriverNamespace
             GRBLDict.Add("g3v", "X245.5Y167.5");
             GRBLDict.Add("h3v", "X281.5Y167.5");
 
+            GRBLDict.Add("z4v", "X0Y131.5");
             GRBLDict.Add("a4v", "X29Y131.5");
             GRBLDict.Add("b4v", "X65Y131.5");
             GRBLDict.Add("c4v", "X101Y131.5");
@@ -93,6 +97,7 @@ namespace IODriverNamespace
             GRBLDict.Add("g4v", "X245.5Y131.5");
             GRBLDict.Add("h4v", "X281.5Y131.5");
 
+            GRBLDict.Add("z5v", "X0Y95.5");
             GRBLDict.Add("a5v", "X29Y95.5");
             GRBLDict.Add("b5v", "X65Y95.5");
             GRBLDict.Add("c5v", "X101Y95.5");
@@ -102,6 +107,7 @@ namespace IODriverNamespace
             GRBLDict.Add("g5v", "X245.5Y95.5");
             GRBLDict.Add("h5v", "X281.5Y95.5");
 
+            GRBLDict.Add("z6v", "X0Y59.5");
             GRBLDict.Add("a6v", "X29Y59.5");
             GRBLDict.Add("b6v", "X65Y59.5");
             GRBLDict.Add("c6v", "X101Y59.5");
@@ -111,6 +117,7 @@ namespace IODriverNamespace
             GRBLDict.Add("g6v", "X245.5Y59.5");
             GRBLDict.Add("h6v", "X281.5Y59.5");
 
+            GRBLDict.Add("z7v", "X0Y23.5");
             GRBLDict.Add("a7v", "X29Y23.5");
             GRBLDict.Add("b7v", "X65Y23.5");
             GRBLDict.Add("c7v", "X101Y23.5");
@@ -289,16 +296,10 @@ namespace IODriverNamespace
 
             // TAKEN PIECES
 
-            GRBLDict.Add("cap1", "");
-            GRBLDict.Add("cap2", "");
-            GRBLDict.Add("cap3", "");
-            GRBLDict.Add("cap4", "");
-            GRBLDict.Add("cap5", "");
-            GRBLDict.Add("cap6", "");
-            GRBLDict.Add("cap7", "");
-            GRBLDict.Add("cap8", "");
-
-            
+            GRBLDict.Add("cap1", "X0Y74");
+            GRBLDict.Add("cap2", "X0Y110");
+            GRBLDict.Add("cap3", "X0Y146");
+            GRBLDict.Add("cap4", "X0Y182");
 
         }
 
@@ -458,10 +459,6 @@ namespace IODriverNamespace
 
                 intermediarySquare = kingDestination[0].ToString() + square1[1].ToString() + "hh";
 
-                print("rookSquare: " + rookSquare);
-                print("rookDest: " + rookDestination);
-                print("kingDest: " + kingDestination);
-
 
             }
 
@@ -476,10 +473,6 @@ namespace IODriverNamespace
             activateMagnet(true);
 
             square1 += "hh";
-
-            print("square1: " + square1);
-            print("intermediary: " + intermediarySquare);
-            print("square2: " + square2);
 
             moveCoreXY(square1);
             moveCoreXY(intermediarySquare);
@@ -525,7 +518,6 @@ namespace IODriverNamespace
                         char row = square2[1];
                         char col = square1[0];
                         square1 = col.ToString() + row.ToString() + "v";
-                        print(square1);
                         intermediarySquare = square2 + "v";
                         
 
@@ -565,7 +557,6 @@ namespace IODriverNamespace
                         char row = square2[1];
                         char col = square1[0];
                         square1 = col.ToString() + row.ToString() + "v";
-                        print(square1);
                         intermediarySquare = square2 + "v";
                     }
                     
@@ -582,12 +573,35 @@ namespace IODriverNamespace
 
         public void performCapture(string square1)
         {
+
+            string intermediarySquare1;
+            string intermediarySquare2;
+
             moveCoreXY(square1);
             activateMagnet(true);
-            moveCoreXY(captureSquares[takenCount]);
-            takenCount++;
-            if(takenCount == 8)
+
+            if(square1[1] <= '7')
             {
+                intermediarySquare1 = square1.ToString() + "v";
+            }
+            else
+            {
+                intermediarySquare1 = (square1[0] - 1).ToString() + "v";
+            }
+
+            intermediarySquare2 = "z" + square1[1].ToString() + "v";
+
+            print("intermediary1: " + intermediarySquare1 + ", intermediary2: " + intermediarySquare2);
+
+            moveCoreXY(intermediarySquare1);
+            moveCoreXY(intermediarySquare2);
+
+            moveCoreXY(captureSquares[takenCount]);
+            activateMagnet(false);
+            takenCount++;
+            if(takenCount == 4)
+            {
+                print("remove captured pieces");
                 takenCount = 0;
             }
         }
