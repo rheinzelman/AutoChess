@@ -29,7 +29,7 @@ public class Board2D : MonoBehaviour {
     //[Header("Sounds")]
 
     //IO
-    bool boardConnected = true;
+    bool boardConnected = false;
     IODriver mainDriver;
     private int[,] initial_bs;
     private int[,] final_bs;
@@ -77,7 +77,11 @@ public class Board2D : MonoBehaviour {
     {
         //IO Diver initialization, initial board state is recorded when game is initialized 
         mainDriver = gameObject.AddComponent<IODriver>();
-        initial_bs = mainDriver.boardToArray();
+
+        if (boardConnected)
+        {
+            initial_bs = mainDriver.boardToArray();
+        }
 
         chessPieces = new ChessPiece2D[TILE_COUNT_Y, TILE_COUNT_X];
         tiles = new GameObject[TILE_COUNT_Y, TILE_COUNT_X];
@@ -100,7 +104,15 @@ public class Board2D : MonoBehaviour {
     //Every frame
     private void Update()
     {
-        
+
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            print("up" + mainDriver.overShoot("a1", 1));
+            print("right" + mainDriver.overShoot("a1", 2));
+            print("down" + mainDriver.overShoot("a1", 3));
+            print("left" + mainDriver.overShoot("a1", 4));
+        }
+
         if (boardConnected)
         {
 

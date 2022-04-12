@@ -1,9 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 using System;
 using System.IO.Ports;
-using BoardDriverNamespace;
 
 namespace IODriverNamespace
 {
@@ -29,8 +28,7 @@ namespace IODriverNamespace
         };
 
         // physical board parameters
-        int step;
-        float[,] positionArray;
+        int overShootAmount = 5;
 
         public Dictionary<string, string> GRBLDict = new Dictionary<string, string>();
 
@@ -606,19 +604,52 @@ namespace IODriverNamespace
             }
         }
 
-        // returns true if the move moves the piece to the right
-        private bool moveDirection(string square1, string square2)
+        // move the piece a little extra in a given direction to account for board friction
+        public string overShoot(string square, int direction)
         {
-            if (square1[0] < square2[0])
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
+            string coords = GRBLDict[square];
 
+            string[] newCoords = new string[2];
+
+            int x = 0;
+
+            foreach (char c in coords)
+            {
+                if (Char.IsNumber(c) || c == '.')
+                {
+                    newCoords[x] += c;
+                } else if(c == 'Y')
+                {
+                    x++;
+                }
+            }
+
+            float xInt = float.Parse(newCoords[0]);
+            float yInt = float.Parse(newCoords[1]);
+
+            if(direction == 1)
+            {
+                yInt -= overShootAmount;
+            } else if(direction == 2)
+            {
+                xInt += overShootAmount;
+            } else if(direction == 3)
+            {
+                yInt += overShootAmount;
+            } else if (direction == 4)
+            {
+                xInt -= overShootAmount;
+            } else if (direction == -1)
+            {
+                print("overShoot error");
+            }   
+
+            string returnCoords = "X" + xInt.ToString() + "Y" + yInt.ToString();
+
+            return returnCoords;
+
+        }
+        
         private bool knightUpwardsMove(string square1, string square2)
         {
             if(square1[1] - square2[1] < 0)
@@ -644,6 +675,55 @@ namespace IODriverNamespace
             }
 
             
+        }
+
+        // returns true if the move moves the piece to the right
+        private bool moveDirection(string square1, string square2)
+        {
+            if (square1[0] < square2[0])
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private int moveCardinalDirection(string square1, string square2)
+        {
+            char col1 = square1[0];
+            char col2 = square2[0];
+            char row1 = square1[1];
+            char row2 = square2[1];
+
+            // right
+            if ((int)col1 - (int)col2 < 0)
+            {
+                return 2;
+            }
+            // left
+            else if ((int)col1 - (int)col2 > 0)
+            {
+                return 4;
+            }
+            // up
+            else if (row1 - row2 < 0)
+            {
+                return 1;
+            }
+            // down
+            else if (row1 - row2 > 0)
+            {
+                return 3;
+            }
+            else
+            {
+                return -1;
+            }
+
+
+
         }
 
         public void moveCoreXY(string square)
