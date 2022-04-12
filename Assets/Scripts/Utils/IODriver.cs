@@ -455,9 +455,9 @@ namespace IODriverNamespace
                 rookSquare = ((char)((int)square1[0] - 4)).ToString() + square1[1];
                 rookDestination = ((char)((int)square1[0] - 1)).ToString() + square2[1];
 
-                kingDestination = ((char)((int)square2[0] - 1)).ToString() + square2[1].ToString();
+                kingDestination = ((char)((int)square2[0])).ToString() + square2[1].ToString();
 
-                intermediarySquare = ((char)((int)kingDestination[0] + 1)).ToString() + square1[1].ToString() + "hh";
+                intermediarySquare = ((char)((int)kingDestination[0])).ToString() + square1[1].ToString() + "hh";
 
 
             }
