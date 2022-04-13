@@ -486,6 +486,8 @@ namespace IODriverNamespace
 
             string intermediarySquare;
 
+            int overShootDirection;
+
             moveCoreXY(square1);
             activateMagnet(true);
 
@@ -502,15 +504,16 @@ namespace IODriverNamespace
                     square1 += "h";
                     intermediarySquare = square1[0].ToString();
                     intermediarySquare += square2[1].ToString() + "h";
+                    overShootDirection = 2;
                 }
                 else
                 {
-
                     if(knightUpwardsMove(square1, square2) == true)
                     {   
                         square1 += "v";
                         intermediarySquare = square2[0].ToString();
                         intermediarySquare += square1[1].ToString() + "v";
+                        overShootDirection = 1;
                     }
                     else
                     {
@@ -519,7 +522,7 @@ namespace IODriverNamespace
                         char col = square1[0];
                         square1 = col.ToString() + row.ToString() + "v";
                         intermediarySquare = square2 + "v";
-                        
+                        overShootDirection = 3;
 
                     }
 
@@ -538,6 +541,7 @@ namespace IODriverNamespace
                     square1 = ((char)((int)col - 1)).ToString() + row.ToString() + "h";
                     intermediarySquare = square1[0].ToString();
                     intermediarySquare += square2[1].ToString() + "h";
+                    overShootDirection = 4;
                 }
                 else
                 {
@@ -549,7 +553,7 @@ namespace IODriverNamespace
                         square1 += "v";
                         intermediarySquare = square2[0].ToString();
                         intermediarySquare += square1[1].ToString() + "v";
-
+                        overShootDirection = 1;
 
                     }
                     else
@@ -559,6 +563,7 @@ namespace IODriverNamespace
                         char col = square1[0];
                         square1 = col.ToString() + row.ToString() + "v";
                         intermediarySquare = square2 + "v";
+                        overShootDirection = 3;
                     }
                     
                 }
@@ -568,9 +573,7 @@ namespace IODriverNamespace
             moveCoreXY(square1);
             moveCoreXY(intermediarySquare);
             moveCoreXY(square2);
-            print("direction: " + moveCardinalDirection(intermediarySquare, square2));
-            print("inter: " + intermediarySquare );
-            moveCoreXYCoords(overShoot(square2, moveCardinalDirection(intermediarySquare, square2)));
+            moveCoreXYCoords(overShoot(square2, overShootDirection));
             activateMagnet(false);
 
         }
