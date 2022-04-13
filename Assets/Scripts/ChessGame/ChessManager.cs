@@ -4,6 +4,22 @@ using UnityEngine;
 using FENNamespace;
 using AutoChess.ManagerComponents;
 
+/*
+
+default
+rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR
+
+knight example 
+8/q1k5/5p2/1n4p1/4b3/2BPR3/1P2N1K1/8
+
+castling example
+rnbqkb1r/pppp1ppp/8/4p3/2B1n3/5N2/PPPP1PPP/RNBQK2R
+
+
+
+
+*/
+
 public class ChessManager : MonoBehaviour
 {
     private BoardManager board;

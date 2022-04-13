@@ -25,6 +25,7 @@ public class Board2D : MonoBehaviour {
     [SerializeField] private Material lightMat;
     [SerializeField] private Material darkMat;
     [SerializeField] private Material hoverMat;
+    [SerializeField] private Material hoverTile;
 
     //[Header("Sounds")]
 
@@ -499,7 +500,7 @@ public class Board2D : MonoBehaviour {
 
         if (color == true)
         {
-            selectedTile.GetComponent<MeshRenderer>().material = hoverMat;
+            selectedTile.GetComponent<MeshRenderer>().material = hoverTile;
         }
         else
         {
