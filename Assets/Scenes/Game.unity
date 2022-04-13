@@ -997,7 +997,7 @@ GameObject:
   - component: {fileID: 913268867}
   - component: {fileID: 913268868}
   m_Layer: 0
-  m_Name: Board
+  m_Name: Board2D
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1045,11 +1045,11 @@ MonoBehaviour:
   lightMat: {fileID: 2100000, guid: 18ee2b0f9577a0742aa4b237b7b20c63, type: 2}
   darkMat: {fileID: 2100000, guid: b6a5e8d40d7cd904bb0e4dfe155dc8ff, type: 2}
   hoverMat: {fileID: 2100000, guid: c1015775fb2d34549a4b3d7a943829ed, type: 2}
-  TILE_COUNT_X: 8
-  TILE_COUNT_Y: 8
-  stockfishTest: {fileID: 0}
-  whiteInput: {fileID: 0}
-  blackInput: {fileID: 1025094683}
+  tileCountX: 8
+  tileCountY: 8
+  whiteInput: {fileID: 811294989}
+  blackInput: {fileID: 0}
+  verboseDebug: 0
 --- !u!1 &991691332
 GameObject:
   m_ObjectHideFlags: 0
@@ -1847,7 +1847,7 @@ GameObject:
   - component: {fileID: 1633040981}
   - component: {fileID: 1633040983}
   m_Layer: 0
-  m_Name: Board2D
+  m_Name: Board
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1874,6 +1874,11 @@ MonoBehaviour:
   boardManager: {fileID: 0}
   whiteInputHandler: {fileID: 811294989}
   blackInputHandler: {fileID: 1025094683}
+  startWithVerboseDebug: 1
+  verboseDebug: 1
+  onVerboseDebugChanged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &1633040983
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1894,7 +1899,6 @@ MonoBehaviour:
   whiteKing: {fileID: 0}
   blackKing: {fileID: 0}
   gameManager: {fileID: 0}
-  board2D: {fileID: 0}
   boardUpdate:
     m_PersistentCalls:
       m_Calls: []
@@ -1913,6 +1917,7 @@ MonoBehaviour:
   pieceTryMove:
     m_PersistentCalls:
       m_Calls: []
+  verboseDebug: 0
 --- !u!4 &1633040984
 Transform:
   m_ObjectHideFlags: 0
@@ -2005,11 +2010,11 @@ MonoBehaviour:
   lightMat: {fileID: 2100000, guid: 18ee2b0f9577a0742aa4b237b7b20c63, type: 2}
   darkMat: {fileID: 2100000, guid: b6a5e8d40d7cd904bb0e4dfe155dc8ff, type: 2}
   hoverMat: {fileID: 2100000, guid: c1015775fb2d34549a4b3d7a943829ed, type: 2}
-  TILE_COUNT_X: 8
-  TILE_COUNT_Y: 8
-  stockfishTest: {fileID: 0}
+  tileCountX: 8
+  tileCountY: 8
   whiteInput: {fileID: 0}
   blackInput: {fileID: 0}
+  verboseDebug: 0
 --- !u!4 &1743844324
 Transform:
   m_ObjectHideFlags: 0
