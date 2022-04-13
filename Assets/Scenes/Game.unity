@@ -804,20 +804,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 811294987}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 48dedc7d4cdf2294b8e5528b42fad4fe, type: 3}
+  m_Script: {fileID: 11500000, guid: 2ac5aa9770e58c84da6baadda2f90538, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameManager: {fileID: 0}
-  OnTurnStart:
+  onTurnStart:
     m_PersistentCalls:
       m_Calls: []
-  OnTurnFinished:
+  onTurnFinished:
     m_PersistentCalls:
       m_Calls: []
-  OnMoveSent:
+  onMoveSent:
     m_PersistentCalls:
       m_Calls: []
-  OnMoveReceived:
+  onMoveReceived:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &869196378
@@ -976,7 +975,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -70.859985}
+  m_AnchoredPosition: {x: 0, y: -70.85986}
   m_SizeDelta: {x: 540, y: 179.6}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &873809086
@@ -1046,13 +1045,11 @@ MonoBehaviour:
   lightMat: {fileID: 2100000, guid: 18ee2b0f9577a0742aa4b237b7b20c63, type: 2}
   darkMat: {fileID: 2100000, guid: b6a5e8d40d7cd904bb0e4dfe155dc8ff, type: 2}
   hoverMat: {fileID: 2100000, guid: c1015775fb2d34549a4b3d7a943829ed, type: 2}
-  recordedGames:
-  - {fileID: 4900000, guid: 43d04f6f59ae6bb4bba6e1df927ce041, type: 3}
   TILE_COUNT_X: 8
   TILE_COUNT_Y: 8
   stockfishTest: {fileID: 0}
-  boardManager: {fileID: 1633040983}
-  gameManager: {fileID: 0}
+  whiteInput: {fileID: 0}
+  blackInput: {fileID: 1025094683}
 --- !u!1 &991691332
 GameObject:
   m_ObjectHideFlags: 0
@@ -1289,17 +1286,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ac5aa9770e58c84da6baadda2f90538, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameManager: {fileID: 0}
-  OnTurnStart:
+  onTurnStart:
     m_PersistentCalls:
       m_Calls: []
-  OnTurnFinished:
+  onTurnFinished:
     m_PersistentCalls:
       m_Calls: []
-  OnMoveSent:
+  onMoveSent:
     m_PersistentCalls:
       m_Calls: []
-  OnMoveReceived:
+  onMoveReceived:
     m_PersistentCalls:
       m_Calls: []
 --- !u!4 &1025094684
@@ -1869,12 +1865,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00ca20b03b1cdea468955f7c854918b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerTurn: 1
-  gameOver: 0
-  OnGameOver:
+  onGameOver:
     m_PersistentCalls:
       m_Calls: []
-  OnTurnSwapped:
+  onTurnSwapped:
     m_PersistentCalls:
       m_Calls: []
   boardManager: {fileID: 0}
@@ -1894,11 +1888,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   horizontalSquares: 8
   verticalSquares: 8
-  WhitePieces: []
-  BlackPieces: []
-  Graveyard: 
-  WhiteKing: {fileID: 0}
-  BlackKing: {fileID: 0}
+  whitePieces: []
+  blackPieces: []
+  graveyard: 
+  whiteKing: {fileID: 0}
+  blackKing: {fileID: 0}
   gameManager: {fileID: 0}
   board2D: {fileID: 0}
   boardUpdate:
@@ -1914,6 +1908,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   pieceMoved:
+    m_PersistentCalls:
+      m_Calls: []
+  pieceTryMove:
     m_PersistentCalls:
       m_Calls: []
 --- !u!4 &1633040984
@@ -2008,12 +2005,11 @@ MonoBehaviour:
   lightMat: {fileID: 2100000, guid: 18ee2b0f9577a0742aa4b237b7b20c63, type: 2}
   darkMat: {fileID: 2100000, guid: b6a5e8d40d7cd904bb0e4dfe155dc8ff, type: 2}
   hoverMat: {fileID: 2100000, guid: c1015775fb2d34549a4b3d7a943829ed, type: 2}
-  recordedGames: []
   TILE_COUNT_X: 8
   TILE_COUNT_Y: 8
   stockfishTest: {fileID: 0}
-  boardManager: {fileID: 0}
-  gameManager: {fileID: 0}
+  whiteInput: {fileID: 0}
+  blackInput: {fileID: 0}
 --- !u!4 &1743844324
 Transform:
   m_ObjectHideFlags: 0

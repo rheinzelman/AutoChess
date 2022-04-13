@@ -7,17 +7,19 @@ namespace AutoChess.Utility.FENHandler
 {
     public class FENHandler// : MonoBehaviour
     {
+        public static string DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        
         public string board_FEN;
         private string board_state;
         private string turn;
         private string castling;
         private string passant;
 
-        public FENHandler(string FEN)
+        public FENHandler(string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
         {
 
-            board_FEN = FEN;
-            string[] split = FEN.Split(' ');
+            board_FEN = fen;
+            string[] split = fen.Split(' ');
 
             //split: 0 - board state, 1 - turn designation, 2 - castling availability, 3 - en passant squares
             this.board_state = split[0];
@@ -26,16 +28,16 @@ namespace AutoChess.Utility.FENHandler
             //this.passant = split[3];
         }
 
-        public char[,] getArray()
+        public char[,] GetArray()
         {
             //initialize our 8x8 array to return
-            char[,] result = new char[8, 8];
+            var result = new char[8, 8];
 
             // Initialize x and y
-            int x = 0;
-            int y = 0;
+            var x = 0;
+            var y = 0;
 
-            foreach(char c in board_state)
+            foreach(var c in board_state)
             {
                 // If the character is a '/' then start the next row and skip this iteration
                 if (c == '/')
@@ -50,9 +52,9 @@ namespace AutoChess.Utility.FENHandler
                     result[x++, y] = c;
 
                 // If the character is a digit, place that many '-' in the array
-                if (char.IsDigit(c))
-                    for (int i = 0; i < char.GetNumericValue(c); i++)
-                        result[x++, y] = '-';
+                if (!char.IsDigit(c)) continue;
+                for (var i = 0; i < char.GetNumericValue(c); i++)
+                    result[x++, y] = '-';
             }
 
             return result;

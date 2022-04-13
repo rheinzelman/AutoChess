@@ -24,15 +24,15 @@ namespace ChessGame.ChessPieces
         {
             if (pieceColor == PieceColor.Black)
             {
-                Vector2Int attack1 = new Vector2Int(currentPosition.x + 1, currentPosition.y + 1);
-                Vector2Int attack2 = new Vector2Int(currentPosition.x - 1, currentPosition.y + 1);
+                var attack1 = new Vector2Int(currentPosition.x + 1, currentPosition.y + 1);
+                var attack2 = new Vector2Int(currentPosition.x - 1, currentPosition.y + 1);
 
                 FindAttacksAtDiagonals(attack1, attack2);
             }
             else
             {
-                Vector2Int attack1 = new Vector2Int(currentPosition.x + 1, currentPosition.y - 1);
-                Vector2Int attack2 = new Vector2Int(currentPosition.x - 1, currentPosition.y - 1);
+                var attack1 = new Vector2Int(currentPosition.x + 1, currentPosition.y - 1);
+                var attack2 = new Vector2Int(currentPosition.x - 1, currentPosition.y - 1);
 
                 FindAttacksAtDiagonals(attack1, attack2);
             }
@@ -63,13 +63,13 @@ namespace ChessGame.ChessPieces
         {
             if (pieceColor == PieceColor.Black)
             {
-                Vector2Int pos1 = new Vector2Int(currentPosition.x, currentPosition.y + 1);
+                var pos1 = new Vector2Int(currentPosition.x, currentPosition.y + 1);
 
                 if (!board.IsValidCoordinate(pos1) || board.HasPieceAt(pos1)) return;
 
                 legalPositions.Add(pos1);
 
-                Vector2Int pos2 = new Vector2Int(currentPosition.x, currentPosition.y + 2);
+                var pos2 = new Vector2Int(currentPosition.x, currentPosition.y + 2);
 
                 if (!board.IsValidCoordinate(pos2) || board.HasPieceAt(pos2)) return;
 
@@ -77,13 +77,13 @@ namespace ChessGame.ChessPieces
             }
             else
             {
-                Vector2Int pos1 = new Vector2Int(currentPosition.x, currentPosition.y - 1);
+                var pos1 = new Vector2Int(currentPosition.x, currentPosition.y - 1);
 
                 if (!board.IsValidCoordinate(pos1) || board.HasPieceAt(pos1)) return;
 
                 legalPositions.Add(pos1);
 
-                Vector2Int pos2 = new Vector2Int(currentPosition.x, currentPosition.y - 2);
+                var pos2 = new Vector2Int(currentPosition.x, currentPosition.y - 2);
 
                 if (!board.IsValidCoordinate(pos2) || board.HasPieceAt(pos2)) return;
 
@@ -95,7 +95,7 @@ namespace ChessGame.ChessPieces
         {
             if (pieceColor == PieceColor.Black)
             {
-                Vector2Int pos = new Vector2Int(currentPosition.x, currentPosition.y + 1);
+                var pos = new Vector2Int(currentPosition.x, currentPosition.y + 1);
 
                 if (!board.IsValidCoordinate(pos) || board.HasPieceAt(pos)) return;
 
@@ -103,7 +103,7 @@ namespace ChessGame.ChessPieces
             }
             else
             {
-                Vector2Int pos = new Vector2Int(currentPosition.x, currentPosition.y - 1);
+                var pos = new Vector2Int(currentPosition.x, currentPosition.y - 1);
 
                 if (!board.IsValidCoordinate(pos) || board.HasPieceAt(pos)) return;
 
@@ -117,7 +117,7 @@ namespace ChessGame.ChessPieces
 
             board.enPassantSquare = new Tuple<Vector2Int, BaseChessPiece>(enPassantSquare, this);
 
-            print("En Passant set at: " +  enPassantSquare);
+            //print("En Passant set at: " +  enPassantSquare);
         }
 
         private void DisableEnPassant()
@@ -126,7 +126,7 @@ namespace ChessGame.ChessPieces
 
             board.enPassantSquare = null;
 
-            print("En Passant removed");
+            //print("En Passant removed");
         }
 
         [Button]
@@ -142,7 +142,7 @@ namespace ChessGame.ChessPieces
             if (legalAttacks.Contains(newPos))
                 board.TakePiece(newPos);
 
-            Square newSquare = board.Squares[newPos.x, newPos.y];
+            var newSquare = board.Squares[newPos.x, newPos.y];
 
             transform.parent = newSquare.transform;
 

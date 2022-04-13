@@ -21,6 +21,9 @@ namespace ChessGame
 
     public class BoardManager : MonoBehaviour
     {
+        // BoardManager instance that anything can reference
+        public static BoardManager Instance;
+
         // Square information
         public Square[,] Squares;
         public int horizontalSquares = 8;
@@ -44,10 +47,8 @@ namespace ChessGame
 
         // Board Managers
         public GameManager gameManager;
-        public Board2D board2D;
 
         // FEN Utilities
-        private string DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         public char[,] BoardState;
         public FENHandler FenObject;
 
@@ -77,26 +78,40 @@ namespace ChessGame
             { typeof(King), 'k' }
         };
 
+        [Header("Debug")] 
+        [SerializeField] private bool verboseDebug;
+
         private void Awake()
         {
-            ProcessFEN(DEFAULT_FEN);
+            Instance = this;
         }
 
-        void Start()
+        private void Start()
         {
-            SetupSquares();
-
             gameManager = GameManager.Instance;
 
-            InitializePiecesFromArray(FenObject.getArray());
+            ProcessFEN(FENHandler.DEFAULT_FEN);
+            
+            SetupSquares();
+            
+            InitializePiecesFromArray(FenObject.GetArray());
 
             boardRefresh.AddListener(UpdateBoardState);
+
+            verboseDebug = gameManager.verboseDebug;
+            
+            gameManager.onVerboseDebugChanged.AddListener(SetVerboseDebug);
         }
 
+        private void SetVerboseDebug(bool bEnabled)
+        {
+            verboseDebug = bEnabled;
+        }
+        
         private void ProcessFEN(string FENInput)
         {
             FenObject = new FENHandler(FENInput);
-            BoardState = FenObject.getArray();
+            BoardState = FenObject.GetArray();
         }
 
         // Performs a setup to create all the square objects
@@ -165,7 +180,7 @@ namespace ChessGame
                 if (!sq.HasPiece()) continue;
 
                 var piece = GetPieceAt(sq.coordinate);
-                
+
                 switch (piece.pieceColor)
                 {
                     case PieceColor.White:
@@ -173,6 +188,14 @@ namespace ChessGame
                         break;
                     case PieceColor.Black:
                         blackPieces.Add(GetPieceAt(sq.coordinate));
+                        break;
+                    case PieceColor.Unassigned:
+                        Debug.LogError("Board Manager Error: " + nameof(piece.GetType) + " at " + 
+                                       piece.currentPosition + " has a pieceColor of Unassigned!");
+                        break;
+                    default:
+                        Debug.LogError("Board Manager Error: " + nameof(piece.GetType) + " at " + 
+                                       piece.currentPosition + " has an invalid pieceColor!");
                         break;
                 }
             }
@@ -184,21 +207,35 @@ namespace ChessGame
         }
 
         // Attempts to move a piece at coordinate 'from' to coordinate 'to' and returns true if successful, false otherwise.
-        public bool MovePiece(Vector2Int from, Vector2Int to, string eventDataArgs = null)
+        public bool MovePiece(Vector2Int from, Vector2Int to, MoveEventData moveData)
         {
             var piece = GetPieceAt(from);
 
-            //Debug.Log("BoardManager: MovePiece from: " + from + ", to: " + to);
+            if (verboseDebug)
+                Debug.Log("BoardManager: Attempting to move piece from: " + from + ", to: " + to + '.');
 
-            if (!piece || !piece.MoveToPosition(to)) return false;
+            if (!piece)
+            {
+                Debug.LogError("Board Manager Error: Piece does not exist at " + from + '!');
+                return false;
+            }
 
+            if (!piece.MoveToPosition(to))
+            {
+                if (verboseDebug)
+                    Debug.Log("Board Manager: " + piece.name + " at " + from + "can not move to" + to + '.');
+                
+                return false;
+            }
+
+            if (verboseDebug)
+                Debug.Log("BoardManager: Piece successfully moved from: " + from + ", to: " + to + '.');
+            
             boardUpdate.Invoke();
             
             pieceMoved.Invoke(from, to);
 
             boardRefresh.Invoke();
-
-            //ForceBoardRefresh();
 
             return true;
         }
@@ -207,8 +244,6 @@ namespace ChessGame
         private void ForceMovePiece(Vector2Int from, Vector2Int to)
         {
             var piece = GetPieceAt(from);
-
-            //Debug.Log("BoardManager: ForceMovePiece from: " + from + ", to: " + to);
 
             piece.ForceMoveToPosition(to);
         }
@@ -244,7 +279,7 @@ namespace ChessGame
         }
 
         // Check each piece on the opposing team to see if it puts the kingToCheck in check
-        private bool FindChecks(List<BaseChessPiece> pieceList, King kingToCheck)
+        private bool FindChecks(IEnumerable<BaseChessPiece> pieceList, King kingToCheck)
         {
             return pieceList.SelectMany(piece => piece.legalAttacks.Where(pos => pos == kingToCheck.currentPosition)).Any();
         }
@@ -282,7 +317,9 @@ namespace ChessGame
 
             if (piece == null)
             {
-                Debug.LogError("Piece does not exist at " + pos + '!');
+                if (verboseDebug)
+                    Debug.LogError("Board Manager Error: Can not remove piece at " + pos + 
+                                   "because no piece exists!");
                 return;
             }
 
@@ -371,6 +408,7 @@ namespace ChessGame
         }
 
         // Forces all pieces on the board to perform an update and find new legal positions
+        // If ignorePiece is set, the piece referenced byy ignorePiece will not receive an update
         private void ForceBoardUpdate(BaseChessPiece ignorePiece = null)
         {
             var allPieces = new List<BaseChessPiece>();
