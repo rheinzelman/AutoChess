@@ -8,7 +8,7 @@ namespace IODriverNamespace
     public class IODriver : MonoBehaviour
     {
 
-        public static SerialPort sp = new SerialPort("COM3", 115200);
+        public static SerialPort sp = new SerialPort("COM7", 115200);
 
         private string initial_state;
         private string current_state;
@@ -20,8 +20,8 @@ namespace IODriverNamespace
             { 2, 10, 18, 26, 27, 19, 11 ,3 },
             { 4, 12, 20, 28, 29, 21, 13, 5 },
             { 6, 14, 22, 30, 31, 23, 15, 7 },
-            { 38, 46, 54, 62, 63, 55, 45, 37 },
-            { 36, 44, 52, 60, 61, 53, 45, 35 },
+            { 38, 46, 54, 62, 63, 55, 47, 39 },
+            { 36, 44, 52, 60, 61, 53, 45, 37 },
             { 34, 42, 50, 58, 59, 51, 43, 35 },
             { 32, 40, 48, 56, 57, 49, 41, 33 }
         };
@@ -309,9 +309,9 @@ namespace IODriverNamespace
 
             int arrayIndex = 0;
 
-            for (int i = 0; i < returnArray.GetLength(0); i++)
+            for (int i = 0; i < 8; i++)
             {
-                for (int j = 0; j < returnArray.GetLength(1); j++)
+                for (int j = 0; j < 8; j++)
                 {
                     int arrayRow = keyArray[i, j] % 8;
                     int arrayCol = (int)Math.Floor((double)(keyArray[i, j] / 8));
@@ -529,6 +529,7 @@ namespace IODriverNamespace
             } 
             else
             {
+            
 
                 if(knightTallMove(square1, square2) == true)
                 {
@@ -567,6 +568,8 @@ namespace IODriverNamespace
             moveCoreXY(square1);
             moveCoreXY(intermediarySquare);
             moveCoreXY(square2);
+            print("direction: " + moveCardinalDirection(intermediarySquare, square2));
+            print("inter: " + intermediarySquare );
             moveCoreXYCoords(overShoot(square2, moveCardinalDirection(intermediarySquare, square2)));
             activateMagnet(false);
 
@@ -693,6 +696,8 @@ namespace IODriverNamespace
             }
         }
 
+        // f6h f6
+        // horsey bad
         private int moveCardinalDirection(string square1, string square2)
         {
             char col1 = square1[0];

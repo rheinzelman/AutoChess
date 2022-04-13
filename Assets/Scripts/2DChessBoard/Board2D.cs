@@ -30,7 +30,7 @@ public class Board2D : MonoBehaviour {
     //[Header("Sounds")]
 
     //IO
-    bool boardConnected = false;
+    bool boardConnected = true;
     IODriver mainDriver;
     private int[,] initial_bs;
     private int[,] final_bs;
@@ -78,16 +78,7 @@ public class Board2D : MonoBehaviour {
 
         if (boardConnected)
         {
-            initial_bs = new int[,] {
-                { 1, 1, 1, 1, 1, 1, 1, 1 },
-                { 1, 1, 1, 1, 1, 1, 1, 1 },
-                { 0, 0, 0, 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0, 0, 0, 0 },
-                { 0, 0, 0, 0, 0, 0, 0, 0 },
-                { 1, 1, 1, 1, 1, 1, 1, 1 },
-                { 1, 1, 1, 1, 1, 1, 1, 1 },
-            };
+            initial_bs = mainDriver.boardToArray();
         }
 
         chessPieces = new ChessPiece2D[TILE_COUNT_Y, TILE_COUNT_X];
@@ -122,7 +113,19 @@ public class Board2D : MonoBehaviour {
 
             if (Input.GetKeyDown(KeyCode.A))
             {
+
+                
+
                 HighlightSquares();
+
+                for (int i = 0; i < 8; i++)
+                {
+                    for (int j = 0; j < 8; j++)
+                    {
+                        print(i + ", " + j + ": " + physical_board_state[i, j]);
+                    }
+                }
+
             }
 
             //when spacebar is pressed, attempt to grab physical board state changes and represent virtually
