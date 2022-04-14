@@ -1,16 +1,14 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.IO.Ports;
-using BoardDriverNamespace;
 
 namespace IODriverNamespace
 {
     public class IODriver : MonoBehaviour
     {
 
-        public static SerialPort sp = new SerialPort("COM3", 115200);
+        public static SerialPort sp = new SerialPort("COM7", 115200);
 
         private string initial_state;
         private string current_state;
@@ -22,15 +20,14 @@ namespace IODriverNamespace
             { 2, 10, 18, 26, 27, 19, 11 ,3 },
             { 4, 12, 20, 28, 29, 21, 13, 5 },
             { 6, 14, 22, 30, 31, 23, 15, 7 },
-            { 38, 46, 54, 62, 63, 55, 45, 37 },
-            { 36, 44, 52, 60, 61, 53, 45, 35 },
+            { 38, 46, 54, 62, 63, 55, 47, 39 },
+            { 36, 44, 52, 60, 61, 53, 45, 37 },
             { 34, 42, 50, 58, 59, 51, 43, 35 },
             { 32, 40, 48, 56, 57, 49, 41, 33 }
         };
 
         // physical board parameters
-        int step;
-        float[,] positionArray;
+        int overShootAmount = 5;
 
         public Dictionary<string, string> GRBLDict = new Dictionary<string, string>();
 
@@ -312,9 +309,9 @@ namespace IODriverNamespace
 
             int arrayIndex = 0;
 
-            for (int i = 0; i < returnArray.GetLength(0); i++)
+            for (int i = 0; i < 8; i++)
             {
-                for (int j = 0; j < returnArray.GetLength(1); j++)
+                for (int j = 0; j < 8; j++)
                 {
                     int arrayRow = keyArray[i, j] % 8;
                     int arrayCol = (int)Math.Floor((double)(keyArray[i, j] / 8));
@@ -426,6 +423,7 @@ namespace IODriverNamespace
             moveCoreXY(square1);
             activateMagnet(true);
             moveCoreXY(square2);
+            moveCoreXYCoords(overShoot(square2, moveCardinalDirection(square1, square2)));
             activateMagnet(false);
         }
 
@@ -455,9 +453,9 @@ namespace IODriverNamespace
                 rookSquare = ((char)((int)square1[0] - 4)).ToString() + square1[1];
                 rookDestination = ((char)((int)square1[0] - 1)).ToString() + square2[1];
 
-                kingDestination = ((char)((int)square2[0] - 1)).ToString() + square2[1].ToString();
+                kingDestination = ((char)((int)square2[0])).ToString() + square2[1].ToString();
 
-                intermediarySquare = kingDestination[0].ToString() + square1[1].ToString() + "hh";
+                intermediarySquare = ((char)((int)kingDestination[0])).ToString() + square1[1].ToString() + "hh";
 
 
             }
@@ -466,6 +464,7 @@ namespace IODriverNamespace
             moveCoreXY(rookSquare);
             activateMagnet(true);
             moveCoreXY(rookDestination);
+            moveCoreXYCoords(overShoot(rookDestination, moveCardinalDirection(rookSquare, rookDestination)));
             activateMagnet(false);
 
             // move the king
@@ -477,6 +476,7 @@ namespace IODriverNamespace
             moveCoreXY(square1);
             moveCoreXY(intermediarySquare);
             moveCoreXY(kingDestination);
+            moveCoreXYCoords(overShoot(kingDestination, moveCardinalDirection(intermediarySquare, kingDestination)));
             activateMagnet(false);
 
         }
@@ -485,6 +485,8 @@ namespace IODriverNamespace
         {
 
             string intermediarySquare;
+
+            int overShootDirection;
 
             moveCoreXY(square1);
             activateMagnet(true);
@@ -502,15 +504,16 @@ namespace IODriverNamespace
                     square1 += "h";
                     intermediarySquare = square1[0].ToString();
                     intermediarySquare += square2[1].ToString() + "h";
+                    overShootDirection = 2;
                 }
                 else
                 {
-
                     if(knightUpwardsMove(square1, square2) == true)
                     {   
                         square1 += "v";
                         intermediarySquare = square2[0].ToString();
                         intermediarySquare += square1[1].ToString() + "v";
+                        overShootDirection = 1;
                     }
                     else
                     {
@@ -519,7 +522,7 @@ namespace IODriverNamespace
                         char col = square1[0];
                         square1 = col.ToString() + row.ToString() + "v";
                         intermediarySquare = square2 + "v";
-                        
+                        overShootDirection = 3;
 
                     }
 
@@ -529,6 +532,7 @@ namespace IODriverNamespace
             } 
             else
             {
+            
 
                 if(knightTallMove(square1, square2) == true)
                 {
@@ -537,6 +541,7 @@ namespace IODriverNamespace
                     square1 = ((char)((int)col - 1)).ToString() + row.ToString() + "h";
                     intermediarySquare = square1[0].ToString();
                     intermediarySquare += square2[1].ToString() + "h";
+                    overShootDirection = 4;
                 }
                 else
                 {
@@ -548,7 +553,7 @@ namespace IODriverNamespace
                         square1 += "v";
                         intermediarySquare = square2[0].ToString();
                         intermediarySquare += square1[1].ToString() + "v";
-
+                        overShootDirection = 1;
 
                     }
                     else
@@ -558,6 +563,7 @@ namespace IODriverNamespace
                         char col = square1[0];
                         square1 = col.ToString() + row.ToString() + "v";
                         intermediarySquare = square2 + "v";
+                        overShootDirection = 3;
                     }
                     
                 }
@@ -567,6 +573,7 @@ namespace IODriverNamespace
             moveCoreXY(square1);
             moveCoreXY(intermediarySquare);
             moveCoreXY(square2);
+            moveCoreXYCoords(overShoot(square2, overShootDirection));
             activateMagnet(false);
 
         }
@@ -606,19 +613,52 @@ namespace IODriverNamespace
             }
         }
 
-        // returns true if the move moves the piece to the right
-        private bool moveDirection(string square1, string square2)
+        // move the piece a little extra in a given direction to account for board friction
+        public string overShoot(string square, int direction)
         {
-            if (square1[0] < square2[0])
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
+            string coords = GRBLDict[square];
 
+            string[] newCoords = new string[2];
+
+            int x = 0;
+
+            foreach (char c in coords)
+            {
+                if (Char.IsNumber(c) || c == '.')
+                {
+                    newCoords[x] += c;
+                } else if(c == 'Y')
+                {
+                    x++;
+                }
+            }
+
+            float xInt = float.Parse(newCoords[0]);
+            float yInt = float.Parse(newCoords[1]);
+
+            if(direction == 1)
+            {
+                yInt -= overShootAmount;
+            } else if(direction == 2)
+            {
+                xInt += overShootAmount;
+            } else if(direction == 3)
+            {
+                yInt += overShootAmount;
+            } else if (direction == 4)
+            {
+                xInt -= overShootAmount;
+            } else if (direction == -1)
+            {
+                print("overShoot error");
+            }   
+
+            string returnCoords = "X" + xInt.ToString() + "Y" + yInt.ToString();
+
+            return returnCoords;
+
+        }
+        
         private bool knightUpwardsMove(string square1, string square2)
         {
             if(square1[1] - square2[1] < 0)
@@ -646,10 +686,68 @@ namespace IODriverNamespace
             
         }
 
+        // returns true if the move moves the piece to the right
+        private bool moveDirection(string square1, string square2)
+        {
+            if (square1[0] < square2[0])
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        // f6h f6
+        // horsey bad
+        private int moveCardinalDirection(string square1, string square2)
+        {
+            char col1 = square1[0];
+            char col2 = square2[0];
+            char row1 = square1[1];
+            char row2 = square2[1];
+
+            // right
+            if ((int)col1 - (int)col2 < 0)
+            {
+                return 2;
+            }
+            // left
+            else if ((int)col1 - (int)col2 > 0)
+            {
+                return 4;
+            }
+            // up
+            else if (row1 - row2 < 0)
+            {
+                return 1;
+            }
+            // down
+            else if (row1 - row2 > 0)
+            {
+                return 3;
+            }
+            else
+            {
+                return -1;
+            }
+
+
+
+        }
+
         public void moveCoreXY(string square)
         {
             sp.Open();
             sp.WriteLine(GRBLDict[square]);
+            sp.Close();
+        }
+
+        public void moveCoreXYCoords(string coords)
+        {
+            sp.Open();
+            sp.WriteLine(coords);
             sp.Close();
         }
 
