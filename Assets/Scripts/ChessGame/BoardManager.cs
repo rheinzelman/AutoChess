@@ -395,15 +395,15 @@ namespace ChessGame
             {
                 whitePieces.Add(piece);
 
-                if (piece is King)
-                    whiteKing = piece as King;
+                if (piece is King king)
+                    whiteKing = king;
             }
             else
             {
                 blackPieces.Add(piece);
 
-                if (piece is King)
-                    blackKing = piece as King;
+                if (piece is King king)
+                    blackKing = king;
             }
         }
 
