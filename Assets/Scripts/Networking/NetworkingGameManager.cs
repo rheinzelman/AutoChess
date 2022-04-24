@@ -14,7 +14,7 @@ namespace Com.MyCompany.MyGame
 {
     public class NetworkingGameManager : MonoBehaviourPunCallbacks
     {
-
+        
 
         #region Photon Callbacks
 
@@ -32,7 +32,14 @@ namespace Com.MyCompany.MyGame
 
 
         #region Public Methods
-
+        public GameObject Board;
+        public void Update()
+        {
+            if (PhotonNetwork.CurrentRoom.PlayerCount != 2)
+                Board.SetActive(false);
+            else
+                Board.SetActive(true);
+        }
 
         public void LeaveRoom()
         {

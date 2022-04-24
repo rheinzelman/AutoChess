@@ -146,10 +146,10 @@ namespace AutoChess.ManagerComponents
             }
         }
 
-        [PunRPC]
+        
         public bool MovePiece(Vector2Int from, Vector2Int to, string eventDataArgs = null)
         {
-            PV.RPC("MovePiece", RpcTarget.Others, (from, to, eventDataArgs));
+            //PV.RPC("MovePiece", RpcTarget.Others, (from, to, eventDataArgs));
 
             ChessPiece piece = GetPieceAt(from);
 
@@ -158,10 +158,16 @@ namespace AutoChess.ManagerComponents
             if (!piece || !piece.MoveToPosition(to)) return false;
 
             pieceMoved.Invoke(from, to);
-
+            PV.RPC("MoveOnlinePiece", RpcTarget.Others,(from, to));
             return true;
         }
 
+        [PunRPC]
+        public void MoveOnlinePiece(Vector2Int from, Vector2Int to)
+        {
+            pieceMoved.Invoke(from, to);
+        }
+        
         public void ForceMovePiece(Vector2Int from, Vector2Int to)
         {
             ChessPiece piece = GetPieceAt(from);
