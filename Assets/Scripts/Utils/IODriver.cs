@@ -7,11 +7,12 @@ namespace Utils
 {
     public class IODriver : MonoBehaviour
     {
-        public static SerialPort sp = new SerialPort("COM7", 115200);
+        private static readonly SerialPort SerialPort = new SerialPort("COM7", 115200);
 
         private string _initialState;
         private string _currentState;
 
+        // Mapping that provides translation from physical board readout to 
         private readonly int[,] _keyArray =
         {
             {0, 8, 16, 24, 25, 17, 9, 1},
@@ -24,15 +25,14 @@ namespace Utils
             {32, 40, 48, 56, 57, 49, 41, 33}
         };
 
-        // physical board parameters
+        // Physical board parameters
         private const int OverShootAmount = 5;
 
-        public Dictionary<string, string> GRBLDict = new Dictionary<string, string>
+        // GRBL COORDINATE DICTIONARY
+        // "h" notates a half square position, used for knights
+        // "hh" notates a half square position above the given square, used for castling
+        private readonly Dictionary<string, string> _grblDict = new Dictionary<string, string>
         {
-            // GRBL COORDINATE DICTIONARY
-            // h notates a half square position, used for knights
-            // hh notates a half square position above the given square, used for castling
-
             // V COLS
 
             {"z1v", "X0Y241.5"},
@@ -258,9 +258,6 @@ namespace Utils
             {"h7", "X281.25Y41"},
             {"h8", "X282Y4.5"},
 
-            {"MAGON", "M62P 0"},
-            {"MAGOFF", "M63P 0"},
-
             // CASTLING HALF ROWS
 
             {"e1hh", "X172Y240"},
@@ -275,7 +272,12 @@ namespace Utils
             {"cap1", "X0Y74"},
             {"cap2", "X0Y110"},
             {"cap3", "X0Y146"},
-            {"cap4", "X0Y182"}
+            {"cap4", "X0Y182"},
+
+            // MAGNET
+
+            {"MAGON", "M62P 0"},
+            {"MAGOFF", "M63P 0"}
         };
 
         private int _takenCount;
@@ -371,9 +373,9 @@ namespace Utils
 
         public static string ReadArray()
         {
-            sp.Open();
-            var sensor = sp.ReadLine();
-            sp.Close();
+            SerialPort.Open();
+            var sensor = SerialPort.ReadLine();
+            SerialPort.Close();
 
             return sensor;
         }
@@ -383,7 +385,7 @@ namespace Utils
             MoveCoreXY(square1);
             ActivateMagnet(true);
             MoveCoreXY(square2);
-            MoveCoreXYCoords(OverShoot(square2, moveCardinalDirection(square1, square2)));
+            MoveCoreXYCoords(OverShoot(square2, MoveCardinalDirection(square1, square2)));
             ActivateMagnet(false);
         }
 
@@ -394,7 +396,7 @@ namespace Utils
             string rookDestination;
             string kingDestination;
 
-            if (moveDirection(square1, square2))
+            if (MoveDirection(square1, square2))
             {
                 rookSquare = ((char) (square1[0] + 3)).ToString() + square1[1];
                 rookDestination = ((char) (square1[0] + 1)).ToString() + square2[1];
@@ -418,7 +420,7 @@ namespace Utils
             MoveCoreXY(rookSquare);
             ActivateMagnet(true);
             MoveCoreXY(rookDestination);
-            MoveCoreXYCoords(OverShoot(rookDestination, moveCardinalDirection(rookSquare, rookDestination)));
+            MoveCoreXYCoords(OverShoot(rookDestination, MoveCardinalDirection(rookSquare, rookDestination)));
             ActivateMagnet(false);
 
             // move the king
@@ -430,7 +432,7 @@ namespace Utils
             MoveCoreXY(square1);
             MoveCoreXY(intermediarySquare);
             MoveCoreXY(kingDestination);
-            MoveCoreXYCoords(OverShoot(kingDestination, moveCardinalDirection(intermediarySquare, kingDestination)));
+            MoveCoreXYCoords(OverShoot(kingDestination, MoveCardinalDirection(intermediarySquare, kingDestination)));
             ActivateMagnet(false);
         }
 
@@ -443,14 +445,14 @@ namespace Utils
             MoveCoreXY(square1);
             ActivateMagnet(true);
 
-            if (moveDirection(square1, square2))
+            if (MoveDirection(square1, square2))
             {
                 // if the knight is moving in the right direction
                 // redefine square1 to be a half square to the right
                 // move to intermediary square
                 // move to square2
 
-                if (knightTallMove(square1, square2))
+                if (KnightTallMove(square1, square2))
                 {
                     square1 += "h";
                     intermediarySquare = square1[0].ToString();
@@ -459,7 +461,7 @@ namespace Utils
                 }
                 else
                 {
-                    if (knightUpwardsMove(square1, square2))
+                    if (KnightUpwardsMove(square1, square2))
                     {
                         square1 += "v";
                         intermediarySquare = square2[0].ToString();
@@ -478,7 +480,7 @@ namespace Utils
             }
             else
             {
-                if (knightTallMove(square1, square2))
+                if (KnightTallMove(square1, square2))
                 {
                     var row = square1[1];
                     var col = square1[0];
@@ -489,7 +491,7 @@ namespace Utils
                 }
                 else
                 {
-                    if (knightUpwardsMove(square1, square2))
+                    if (KnightUpwardsMove(square1, square2))
                     {
                         square1 += "v";
                         intermediarySquare = square2[0].ToString();
@@ -547,7 +549,7 @@ namespace Utils
         // move the piece a little extra in a given direction to account for board friction
         public string OverShoot(string square, int direction)
         {
-            var coords = GRBLDict[square];
+            var coords = _grblDict[square];
 
             var newCoords = new string[2];
 
@@ -557,6 +559,8 @@ namespace Utils
                 if (char.IsNumber(c) || c == '.')
                     newCoords[x] += c;
                 else if (c == 'Y') x++;
+
+            //Regex.Split()
 
             var xInt = float.Parse(newCoords[0]);
             var yInt = float.Parse(newCoords[1]);
@@ -585,81 +589,66 @@ namespace Utils
             return returnCoords;
         }
 
-        private bool knightUpwardsMove(string square1, string square2)
+        private bool KnightUpwardsMove(string square1, string square2)
         {
-            if (square1[1] - square2[1] < 0)
-                return true;
-            return false;
+            return square1[1] - square2[1] < 0;
         }
 
         // returns true if the move moves the night longer vertically
-        private bool knightTallMove(string square1, string square2)
+        private bool KnightTallMove(string square1, string square2)
         {
             return Math.Abs(square1[1] - square2[1]) == 2;
         }
 
         // returns true if the move moves the piece to the right
-        private bool moveDirection(string square1, string square2)
+        private bool MoveDirection(string square1, string square2)
         {
             return square1[0] < square2[0];
         }
 
         // f6h f6
         // horsey bad
-        private int moveCardinalDirection(string square1, string square2)
+        private int MoveCardinalDirection(string square1, string square2)
         {
             var col1 = square1[0];
             var col2 = square2[0];
             var row1 = square1[1];
             var row2 = square2[1];
 
-            // right
-            if (col1 - col2 < 0) return 2;
-            // left
-            if (col1 - col2 > 0) return 4;
-            // up
-            if (row1 - row2 < 0) return 1;
-            // down
-            if (row1 - row2 > 0) return 3;
+            if (col1 - col2 < 0) return 2; // right
+            if (col1 - col2 > 0) return 4; // left
+            if (row1 - row2 < 0) return 1; // up
+            if (row1 - row2 > 0) return 3; // down
 
             return -1;
         }
 
         public void MoveCoreXY(string square)
         {
-            sp.Open();
-            sp.WriteLine(GRBLDict[square]);
-            sp.Close();
+            SerialPort.Open();
+            SerialPort.WriteLine(_grblDict[square]);
+            SerialPort.Close();
         }
 
         public void MoveCoreXYCoords(string coords)
         {
-            sp.Open();
-            sp.WriteLine(coords);
-            sp.Close();
+            SerialPort.Open();
+            SerialPort.WriteLine(coords);
+            SerialPort.Close();
         }
 
         public void ActivateMagnet(bool activated)
         {
-            if (activated)
-            {
-                sp.Open();
-                sp.WriteLine(GRBLDict["MAGON"]);
-                sp.Close();
-            }
-            else
-            {
-                sp.Open();
-                sp.WriteLine(GRBLDict["MAGOFF"]);
-                sp.Close();
-            }
+            SerialPort.Open();
+            SerialPort.WriteLine(activated ? _grblDict["MAGON"] : _grblDict["MAGOFF"]);
+            SerialPort.Close();
         }
 
         public void HomeCoreXY()
         {
-            sp.Open();
-            sp.WriteLine("$H");
-            sp.Close();
+            SerialPort.Open();
+            SerialPort.WriteLine("$H");
+            SerialPort.Close();
         }
     }
 }
