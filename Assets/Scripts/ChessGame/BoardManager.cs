@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoChess;
-using AutoChess.Utility.FENHandler;
 using ChessGame.ChessPieces;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
+using Utils;
 
 namespace ChessGame
 {
@@ -25,6 +23,7 @@ namespace ChessGame
         public static BoardManager Instance;
 
         // Square information
+        [Header("Squares")]
         public Square[,] Squares;
         public int horizontalSquares = 8;
         public int verticalSquares = 8;
@@ -50,13 +49,13 @@ namespace ChessGame
 
         // FEN Utilities
         public char[,] BoardState;
-        public FENHandler FenObject;
 
         // Unity events
         public UnityEvent boardUpdate = new UnityEvent();
         public UnityEvent boardRefresh = new UnityEvent();
         public PieceEvent pieceCreated = new PieceEvent();
         public PieceEvent pieceRemoved = new PieceEvent();
+        public PieceEvent pieceTaken = new PieceEvent();
         public PieceMoveEvent pieceMoved = new PieceMoveEvent();
         public PieceTryEvent pieceTryMove = new PieceTryEvent();
 
@@ -90,13 +89,13 @@ namespace ChessGame
         {
             gameManager = GameManager.Instance;
 
-            ProcessFEN(FENHandler.DEFAULT_FEN);
+            InitializeBoardState();
             
             SetupSquares();
-            
-            InitializePiecesFromArray(FenObject.GetArray());
 
-            boardRefresh.AddListener(UpdateBoardState);
+            InitializePiecesFromArray(NotationsHandler.GetArray());
+
+            boardRefresh.AddListener(UpdateBoardStateArray);
 
             verboseDebug = gameManager.verboseDebug;
             
@@ -107,11 +106,11 @@ namespace ChessGame
         {
             verboseDebug = bEnabled;
         }
-        
-        private void ProcessFEN(string FENInput)
+
+        private void InitializeBoardState(string FEN = "")
         {
-            FenObject = new FENHandler(FENInput);
-            BoardState = FenObject.GetArray();
+            NotationsHandler.ProcessFEN(FEN);
+            BoardState = NotationsHandler.GetArray();
         }
 
         // Performs a setup to create all the square objects
@@ -150,19 +149,34 @@ namespace ChessGame
         // Checks if a coordinate is within the board's bounds
         public bool IsValidCoordinate(Vector2Int pos)
         {
-            return pos.x >= 0 && pos.x < horizontalSquares && pos.y >= 0 && pos.y < verticalSquares;
+            return IsValidCoordinate(pos.x, pos.y);
+        }
+
+        public bool IsValidCoordinate(int x, int y)
+        {
+            return x >= 0 && x < horizontalSquares && y >= 0 && y < verticalSquares;
         }
 
         // Checks if a piece exists at a given coordinate
         public bool HasPieceAt(Vector2Int pos)
         {
-            return IsValidCoordinate(pos) && Squares[pos.x, pos.y].HasPiece();
+            return HasPieceAt(pos.x, pos.y);
+        }
+
+        public bool HasPieceAt(int x, int y)
+        {
+            return IsValidCoordinate(x, y) && Squares[x, y].HasPiece();
         }
 
         // Returns a chess piece at a given coordinate
         public BaseChessPiece GetPieceAt(Vector2Int pos)
         {
-            return !IsValidCoordinate(pos) ? null : Squares[pos.x, pos.y].piece;
+            return GetPieceAt(pos.x, pos.y);
+        }
+
+        public BaseChessPiece GetPieceAt(int x, int y)
+        {
+            return !IsValidCoordinate(x, y) ? null : Squares[x, y].piece;
         }
 
         // Clears the whitePieces and blackPieces lists and then loads all pieces back into them
@@ -230,6 +244,11 @@ namespace ChessGame
 
             if (verboseDebug)
                 Debug.Log("BoardManager: Piece successfully moved from: " + from + ", to: " + to + '.');
+
+            if (piece is Pawn)
+                gameManager.halfMoveClock = 0;
+
+            print(NotationsHandler.CoordinateToUCI(from) + NotationsHandler.CoordinateToUCI(to));
             
             boardUpdate.Invoke();
             
@@ -302,6 +321,8 @@ namespace ChessGame
                 RemovePiece(enPassantSquare.Item2.currentPosition);
             else
                 RemovePiece(pos);
+
+            gameManager.halfMoveClock = 0;
         }
         
         // Removes a piece by deleting it and its GameObject
@@ -346,22 +367,6 @@ namespace ChessGame
             var color = char.IsUpper(type) ? PieceColor.White : PieceColor.Black;
 
             AddPiece(pieceType, piecePos, color);
-        }
-
-        // Converts a piece at a position to it's fen character representation
-        private char ConvertPieceToFen(Vector2Int pos)
-        {
-            var type = '-';
-            var piece = GetPieceAt(pos);
-
-            if (piece == null) return type;
-
-            type = PieceTypeToChar[piece.GetType()];
-
-            if (piece.pieceColor == PieceColor.White)
-                type = char.ToUpper(type);
-
-            return type;
         }
 
         // Initializes a piece from it's GameObject, position and color
@@ -433,15 +438,46 @@ namespace ChessGame
             
             boardRefresh.Invoke();
         }
+
+        // Converts a piece at a position to it's fen character representation
+        private char GetPieceChar(Vector2Int pos)
+        {
+            return GetPieceChar(pos.x, pos.y);
+        }
+
+        // Converts a piece at a position to it's fen character representation
+        private char GetPieceChar(int x, int y)
+        {
+            var type = '-';
+            var piece = GetPieceAt(x, y);
+
+            if (piece == null) return type;
+
+            type = PieceTypeToChar[piece.GetType()];
+
+            if (piece.pieceColor == PieceColor.White)
+                type = char.ToUpper(type);
+
+            return type;
+        }
         
         // Updates the 2D board state array with new information
-        private void UpdateBoardState()
+        [Button]
+        private void UpdateBoardStateArray()
         {
             var newState = new char[8, 8];
 
             for (var y = 0; y < verticalSquares; y++)
                 for (var x = 0; x < horizontalSquares; x++)
-                    newState[x, y] = ConvertPieceToFen(new Vector2Int(x, y));
+                newState[x, y] = GetPieceChar(x, y);
+
+            // NotationsHandler.Print2DArray(newState);
+            //
+            // var str = NotationsHandler.GetPiecePlacement(newState);
+            //
+            // print(str);
+
+            BoardState = newState;
         }
 
         // Adds a piece to the board by creating a new GameObject and Initializing it

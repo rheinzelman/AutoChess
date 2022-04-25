@@ -1,11 +1,10 @@
 using System;
 using System.ComponentModel;
-using AutoChess.PlayerInput;
 using ChessGame.PlayerInputInterface;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
+using Utils;
 
 namespace ChessGame
 {
@@ -53,13 +52,13 @@ namespace ChessGame
         }
     }
 
-    [System.Serializable]
+    [Serializable]
     public class GameEndEvent : UnityEvent<EndState, PlayerColor> {}
 
-    [System.Serializable]
+    [Serializable]
     public class PlayerTurnEvent : UnityEvent<PlayerColor, BaseInputHandler> {}
     
-    [System.Serializable]
+    [Serializable]
     public class DebugChangeEvent : UnityEvent<bool> {}
 
     public class GameManager : MonoBehaviour
@@ -70,9 +69,8 @@ namespace ChessGame
         public PlayerColor playerTurn { get; private set; } = PlayerColor.White;
         public bool gameOver { get; private set; } = false;
 
-        [Header("Events")]
-        public GameEndEvent onGameOver = new GameEndEvent();
-        public PlayerTurnEvent onTurnSwapped = new PlayerTurnEvent();
+        [Header("Turn Information")] public int halfMoveClock;
+        public int fullMoveClock = 1;
 
         [Header("Internal Components")]
         [SerializeField] private BoardManager boardManager;
@@ -81,6 +79,9 @@ namespace ChessGame
 
         [Header("Debug")] 
         public bool startWithVerboseDebug = false;
+
+        [Header("Events")] public GameEndEvent onGameOver = new GameEndEvent();
+        public PlayerTurnEvent onTurnSwapped = new PlayerTurnEvent();
         
         [HideInInspector] public bool verboseDebug;
         [HideInInspector] public DebugChangeEvent onVerboseDebugChanged = new DebugChangeEvent();
@@ -155,10 +156,15 @@ namespace ChessGame
         {
             playerTurn = playerTurn == PlayerColor.White ? PlayerColor.Black : PlayerColor.White;
 
+            halfMoveClock++;
+            if (playerTurn == PlayerColor.White) fullMoveClock++;
+
             var activeInput = (playerTurn == PlayerColor.White ? whiteInputHandler : blackInputHandler);
 
             whiteInputHandler.AlternateTurn();
             blackInputHandler.AlternateTurn();
+
+            print(NotationsHandler.GenerateFEN());
 
             onTurnSwapped.Invoke(playerTurn, activeInput);
         }

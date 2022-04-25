@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using AutoChess;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -33,24 +32,31 @@ namespace ChessGame.ChessPieces
         }
 
         // Checks all positions in a line given a direction to check in
-        protected void CheckMovesInLine(Vector2Int direction)
+        protected BaseChessPiece CheckMovesInLine(Vector2Int direction)
         {
             var i = 1;
             var nextPos = currentPosition + direction;
+            BaseChessPiece chessPiece = null;
 
             while (!board.HasPieceAt(nextPos) && board.IsValidCoordinate(nextPos))
             {
                 legalPositions.Add(nextPos);
                 nextPos = currentPosition + ++i * direction;
             }
-            
-            if (board.HasPieceAt(nextPos) && board.GetPieceAt(nextPos).pieceColor != pieceColor)
+
+            if (!board.HasPieceAt(nextPos)) return chessPiece;
+
+            chessPiece = board.GetPieceAt(nextPos);
+
+            if (chessPiece.pieceColor != pieceColor)
                 legalAttacks.Add(nextPos);
+
+            return chessPiece;
         }
 
         // Checks for moves that would put the friendly king in check
         [Button]
-        private void FindBlockedMoves()
+        protected void FindBlockedMoves()
         {
             var allMoves = new List<Vector2Int>();
             allMoves.AddRange(legalPositions);
@@ -70,7 +76,7 @@ namespace ChessGame.ChessPieces
         }
 
         // When the board refreshes, clear blocked moves list and find new legal positions
-        private void OnBoardRefresh()
+        protected void OnBoardRefresh()
         {
             Debug.Log("Board refresh in " + name + " at " + currentPosition);
             

@@ -111,8 +111,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 35db507db0f7e804080b411b30c8e68f, type: 3}
   - {fileID: 21300000, guid: b10c1f2055d72324db9caa8d98adc3ba, type: 3}
   - {fileID: 21300000, guid: 9fc3428506739094f9bcf7c48e3607e3, type: 3}
-  darkColor: {r: 0.4392157, g: 0.53333336, b: 0.3019608, a: 1}
-  whiteColor: {r: 0.8980392, g: 0.89411765, b: 0.7882353, a: 1}
+  darkColor: {r: 0.54509807, g: 0.6666667, b: 0.7529412, a: 1}
+  whiteColor: {r: 0.9254902, g: 0.9411765, b: 0.94509804, a: 1}
   startWhite: 0
   distanceToTravel: 5.5
   travelSpeed: 1

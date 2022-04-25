@@ -1,11 +1,13 @@
 using System.Collections.Generic;
-using Sirenix.OdinInspector;
+using System.Linq;
 using UnityEngine;
 
 namespace ChessGame.ChessPieces
 {
     public class Knight : BaseChessPiece
     {
+        public bool hasMoved;
+        
         private List<Vector2Int> squaresToCheck = new List<Vector2Int>()
         {
             new Vector2Int(-1, 2),
@@ -20,10 +22,8 @@ namespace ChessGame.ChessPieces
 
         protected override void FindLegalPositions()
         {
-            foreach (var pos in squaresToCheck)
+            foreach (var coords in squaresToCheck.Select(pos => currentPosition + pos))
             {
-                var coords = currentPosition + pos;
-                
                 if (!board.HasPieceAt(coords) && board.IsValidCoordinate(coords))
                     legalPositions.Add(coords);
                 if (board.HasPieceAt(coords) && board.GetPieceAt(coords).pieceColor != pieceColor)

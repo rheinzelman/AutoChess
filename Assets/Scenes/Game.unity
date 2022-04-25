@@ -427,7 +427,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.254717, g: 0.254717, b: 0.254717, a: 0}
+  m_BackGroundColor: {r: 0.3254902, g: 0.36078432, b: 0.40784314, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -1048,7 +1048,7 @@ MonoBehaviour:
   tileCountX: 8
   tileCountY: 8
   whiteInput: {fileID: 811294989}
-  blackInput: {fileID: 0}
+  blackInput: {fileID: 1025094683}
   verboseDebug: 0
 --- !u!1 &991691332
 GameObject:
@@ -1865,16 +1865,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00ca20b03b1cdea468955f7c854918b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  halfMoveClock: 0
+  fullMoveClock: 1
+  boardManager: {fileID: 0}
+  whiteInputHandler: {fileID: 811294989}
+  blackInputHandler: {fileID: 1025094683}
+  startWithVerboseDebug: 1
   onGameOver:
     m_PersistentCalls:
       m_Calls: []
   onTurnSwapped:
     m_PersistentCalls:
       m_Calls: []
-  boardManager: {fileID: 0}
-  whiteInputHandler: {fileID: 811294989}
-  blackInputHandler: {fileID: 1025094683}
-  startWithVerboseDebug: 1
   verboseDebug: 1
   onVerboseDebugChanged:
     m_PersistentCalls:
@@ -1909,6 +1911,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   pieceRemoved:
+    m_PersistentCalls:
+      m_Calls: []
+  pieceTaken:
     m_PersistentCalls:
       m_Calls: []
   pieceMoved:

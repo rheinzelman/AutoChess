@@ -1,5 +1,4 @@
 using System;
-using AutoChess;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -54,9 +53,9 @@ namespace ChessGame.ChessPieces
 
         private bool CheckForEnPassantAt(Vector2Int pos)
         {
-            if (board.enPassantSquare == null || board.enPassantSquare.Item1 != pos || board.enPassantSquare.Item2.pieceColor == pieceColor) return false;
-
-            return true;
+            return board.enPassantSquare != null &&
+                   board.enPassantSquare.Item1 == pos &&
+                   board.enPassantSquare.Item2.pieceColor != pieceColor;
         }
 
         private void CheckDoubleMove()
@@ -132,6 +131,7 @@ namespace ChessGame.ChessPieces
         [Button]
         public override bool MoveToPosition(Vector2Int newPos)
         {
+            //if position does not exist in legal positions or attacks then it is not a legal move
             if (!CanMoveToPosition(newPos)) return false;
 
             if (!hasMoved && legalPositions.Count > 1 && newPos == legalPositions[1])
@@ -139,23 +139,24 @@ namespace ChessGame.ChessPieces
             else if (enPassantSquare != ErrorSquare)
                 DisableEnPassant();
 
+            hasMoved = true;
+
+            //take piece if move is an attack
             if (legalAttacks.Contains(newPos))
                 board.TakePiece(newPos);
 
+            //update piece information to new positions
             var newSquare = board.Squares[newPos.x, newPos.y];
-
             transform.parent = newSquare.transform;
-
             newSquare.piece = this;
-
             square.piece = null;
-
             square = newSquare;
-
             currentPosition = square.coordinate;
+            //board.boardUpdate.Invoke();
+            //move was successful
 
-            hasMoved = true;
-
+            OnBoardRefresh();
+            
             return true;
         }
     }

@@ -1,25 +1,23 @@
-using System.Collections.Generic;
-using UnityEngine;
 using System;
+using System.Collections.Generic;
 using System.IO.Ports;
+using UnityEngine;
 
-namespace IODriverNamespace
+namespace Utils
 {
     public class IODriver : MonoBehaviour
     {
-
         public static SerialPort sp = new SerialPort("COM7", 115200);
 
-        private string initial_state;
-        private string current_state;
+        private string _initialState;
+        private string _currentState;
 
-        private int[,] keyArray = new int[,]
+        private readonly int[,] _keyArray =
         {
-
-            { 0, 8, 16, 24, 25, 17, 9, 1 },
-            { 2, 10, 18, 26, 27, 19, 11 ,3 },
-            { 4, 12, 20, 28, 29, 21, 13, 5 },
-            { 6, 14, 22, 30, 31, 23, 15, 7 },
+            {0, 8, 16, 24, 25, 17, 9, 1},
+            {2, 10, 18, 26, 27, 19, 11, 3},
+            {4, 12, 20, 28, 29, 21, 13, 5},
+            {6, 14, 22, 30, 31, 23, 15, 7},
             { 38, 46, 54, 62, 63, 55, 47, 39 },
             { 36, 44, 52, 60, 61, 53, 45, 37 },
             { 34, 42, 50, 58, 59, 51, 43, 35 },
@@ -27,7 +25,7 @@ namespace IODriverNamespace
         };
 
         // physical board parameters
-        int overShootAmount = 5;
+        private const int OverShootAmount = 5;
 
         public Dictionary<string, string> GRBLDict = new Dictionary<string, string>();
 
@@ -124,8 +122,6 @@ namespace IODriverNamespace
             GRBLDict.Add("g7v", "X245.5Y23.5");
             GRBLDict.Add("h7v", "X281.5Y23.5");
 
-
-           
 
             // A COLS
 
@@ -313,8 +309,8 @@ namespace IODriverNamespace
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    int arrayRow = keyArray[i, j] % 8;
-                    int arrayCol = (int)Math.Floor((double)(keyArray[i, j] / 8));
+                    var arrayRow = _keyArray[i, j] % 8;
+                    var arrayCol = (int) Math.Floor((double) (_keyArray[i, j] / 8));
 
                     returnArray[arrayRow, arrayCol] = board_state[arrayIndex] - '0';
                     arrayIndex++;
@@ -638,16 +634,16 @@ namespace IODriverNamespace
 
             if(direction == 1)
             {
-                yInt -= overShootAmount;
+                yInt -= OverShootAmount;
             } else if(direction == 2)
             {
-                xInt += overShootAmount;
+                xInt += OverShootAmount;
             } else if(direction == 3)
             {
-                yInt += overShootAmount;
+                yInt += OverShootAmount;
             } else if (direction == 4)
             {
-                xInt -= overShootAmount;
+                xInt -= OverShootAmount;
             } else if (direction == -1)
             {
                 print("overShoot error");
@@ -703,38 +699,33 @@ namespace IODriverNamespace
         // horsey bad
         private int moveCardinalDirection(string square1, string square2)
         {
-            char col1 = square1[0];
-            char col2 = square2[0];
-            char row1 = square1[1];
-            char row2 = square2[1];
+            var col1 = square1[0];
+            var col2 = square2[0];
+            var row1 = square1[1];
+            var row2 = square2[1];
 
             // right
-            if ((int)col1 - (int)col2 < 0)
+            if (col1 - col2 < 0)
             {
                 return 2;
             }
             // left
-            else if ((int)col1 - (int)col2 > 0)
+            if (col1 - col2 > 0)
             {
                 return 4;
             }
             // up
-            else if (row1 - row2 < 0)
+            if (row1 - row2 < 0)
             {
                 return 1;
             }
             // down
-            else if (row1 - row2 > 0)
+            if (row1 - row2 > 0)
             {
                 return 3;
             }
-            else
-            {
-                return -1;
-            }
 
-
-
+            return -1;
         }
 
         public void moveCoreXY(string square)

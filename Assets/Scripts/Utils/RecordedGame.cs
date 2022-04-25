@@ -3,7 +3,6 @@ using UnityEngine.UI;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using IODriverNamespace;
 using StockfishHandlerNamespace;
 using AutoChess;
 
