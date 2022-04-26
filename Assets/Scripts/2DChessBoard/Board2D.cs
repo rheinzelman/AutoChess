@@ -4,6 +4,8 @@ using ChessGame;
 using ChessGame.PlayerInputInterface;
 using UI.BoardUI;
 using UnityEngine;
+using UnityEngine.Serialization;
+using Utils;
 using Object = UnityEngine.Object;
 
 public class Board2D : MonoBehaviour {
@@ -56,6 +58,10 @@ public class Board2D : MonoBehaviour {
     // Maps out the player color to the input handler responsible for handling its move
     private Dictionary<PlayerColor, BaseInputHandler> m_ColorToInputHandler;
 
+    [Header("Board Polling Settings")]
+    [SerializeField] private float pollingDelay = 500f;
+    private float _pollingDelay;
+
     [Header("Debug")] 
     [SerializeField] private bool verboseDebug;
 
@@ -105,10 +111,49 @@ public class Board2D : MonoBehaviour {
         m_BoardManager.pieceMoved.AddListener(TransferPiece);
     }
 
+    private bool Polling()
+    {
+        var finished = false;
+        
+        if (_pollingDelay <= 0f)
+        { 
+            _pollingDelay += pollingDelay / 1000f;
+            print(_pollingDelay);
+            finished = true;
+        }
+
+        _pollingDelay -= Time.deltaTime;
+        
+        return finished;
+    }
+
     //Every frame
     private void Update()
     {
         ProcessSelectionRaycast();
+        CheckForInput();
+    }
+
+    private void CheckForInput()
+    {
+        if (IODriver.Instance == null || !Polling()) return;
+        
+        print("Checking for Input...");
+
+        int[,] arr;
+        
+        try
+        {
+            arr = IODriver.Instance.BoardToArray();
+        }
+        catch
+        {
+            Debug.LogWarning("Not receiving input!");
+            return;
+        }
+        
+        UnhighlightAllTiles();
+        HighlightTilesFromArray(arr);
     }
     
     private void SetVerboseDebug(bool bEnabled)
@@ -289,6 +334,14 @@ public class Board2D : MonoBehaviour {
         m_ChessPieces[initialTile.x, initialTile.y].transform.position = new Vector3(finalTile.x - TileOffsetX, 7 - finalTile.y - TileOffsetY, 0);
         m_ChessPieces[finalTile.x, finalTile.y] = m_ChessPieces[initialTile.x, initialTile.y];
         m_ChessPieces[initialTile.x, initialTile.y] = null;
+    }
+
+    public void HighlightTilesFromArray(int[,] arr)
+    {
+        for (var y = 0; y < tileCountY; y++)
+            for (var x = 0; x < tileCountX; x++)
+                if (arr[x, y] == 1)
+                    HighlightTile(x, y);
     }
 
     // highlight a single tile

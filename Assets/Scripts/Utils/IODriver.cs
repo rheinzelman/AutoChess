@@ -7,7 +7,9 @@ namespace Utils
 {
     public class IODriver : MonoBehaviour
     {
-        private static readonly SerialPort SerialPort = new SerialPort("COM7", 115200);
+        public static IODriver Instance;
+        
+        private static readonly SerialPort SerialPort = new SerialPort("COM3", 115200);
 
         private string _initialState;
         private string _currentState;
@@ -293,6 +295,16 @@ namespace Utils
             "cap7",
             "cap8"
         };
+
+        private void Start()
+        {
+            Instance = this;
+        }
+
+        public bool IsOpen()
+        {
+            return SerialPort.IsOpen;
+        }
 
         public int[,] BoardToArray()
         {
