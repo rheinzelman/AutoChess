@@ -75,6 +75,7 @@ namespace Com.MyCompany.MyGame
 
 
             PlayerPrefs.SetString(playerNamePrefKey, value);
+            PlayerNameController.playerName = value;
         }
 
 

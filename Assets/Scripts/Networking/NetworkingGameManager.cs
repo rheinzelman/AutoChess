@@ -4,6 +4,7 @@ using System.Collections;
 
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 
 using Photon.Pun;
@@ -32,13 +33,29 @@ namespace Com.MyCompany.MyGame
 
 
         #region Public Methods
+        public string playerName;
+        public Text opponentName;
         public GameObject Board;
+        public GameObject WaitText;
         public void Update()
         {
             if (PhotonNetwork.CurrentRoom.PlayerCount != 2)
+            {
+
                 Board.SetActive(false);
+                WaitText.SetActive(true);
+            }
             else
+            {
+                WaitText.SetActive(false);
                 Board.SetActive(true);
+            }
+                
+        }
+
+        public void SetName(string name)
+        {
+            opponentName.text = name;
         }
 
         public void LeaveRoom()
@@ -70,9 +87,12 @@ namespace Com.MyCompany.MyGame
 
         public override void OnPlayerEnteredRoom(Player other)
         {
-            Debug.LogFormat("OnPlayerEnteredRoom() {0}", other.NickName); // not seen if you're the player connecting
+            playerName = other.NickName;
+            SetName(playerName);
+            Debug.Log("Player Joined " + playerName);
+           
 
-
+            /*
             if (PhotonNetwork.IsMasterClient)
             {
                 Debug.LogFormat("OnPlayerEnteredRoom IsMasterClient {0}", PhotonNetwork.IsMasterClient); // called before OnPlayerLeftRoom
@@ -80,6 +100,7 @@ namespace Com.MyCompany.MyGame
 
                 LoadArena();
             }
+            */
         }
 
 
