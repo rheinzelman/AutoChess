@@ -221,7 +221,7 @@ namespace ChessGame
         }
 
         // Attempts to move a piece at coordinate 'from' to coordinate 'to' and returns true if successful, false otherwise.
-        public bool MovePiece(Vector2Int from, Vector2Int to, MoveEventData moveData)
+        public (bool, string) MovePiece(Vector2Int from, Vector2Int to)
         {
             var piece = GetPieceAt(from);
 
@@ -231,7 +231,7 @@ namespace ChessGame
             if (!piece)
             {
                 Debug.LogError("Board Manager Error: Piece does not exist at " + from + '!');
-                return false;
+                return (false, "");
             }
 
             if (!piece.MoveToPosition(to))
@@ -239,7 +239,7 @@ namespace ChessGame
                 if (verboseDebug)
                     Debug.Log("Board Manager: " + piece.name + " at " + from + "can not move to" + to + '.');
                 
-                return false;
+                return (false, "");
             }
 
             if (verboseDebug)
@@ -256,7 +256,7 @@ namespace ChessGame
 
             boardRefresh.Invoke();
 
-            return true;
+            return (true, "");
         }
 
         // Forcefully moves a piece at coordinate 'from' to coordinate 'to'

@@ -31,24 +31,26 @@ namespace ChessGame
 
     public class MoveEventData
     {
-        [DefaultValue(null)]
         public readonly BaseInputHandler Sender;
-        [DefaultValue(PlayerColor.Unassigned)]
         public readonly PieceColor PieceColor;
-        [DefaultValue("")]
         public readonly string Args;
+        public readonly string Fen;
+        public readonly char[,] BoardState;
 
         public MoveEventData()
         {
-            this.Sender = null;
-            this.PieceColor = PieceColor.Unassigned;
-            this.Args = "";
+            Sender = null;
+            PieceColor = PieceColor.Unassigned;
+            Args = "";
+            BoardState = null;
         }
-        public MoveEventData(BaseInputHandler sender, PieceColor pieceColor, string args)
+        public MoveEventData(BaseInputHandler sender, PieceColor pieceColor, string args, string fen, char[,] boardState)
         {
             Sender = sender;
             PieceColor = pieceColor;
             Args = args;
+            Fen = fen;
+            BoardState = boardState;
         }
     }
 
@@ -106,31 +108,37 @@ namespace ChessGame
             onVerboseDebugChanged.Invoke(verboseDebug);
         }
 
-        public bool PerformMove(Vector2Int from, Vector2Int to, MoveEventData moveData)
+        public bool PerformMove(Vector2Int from, Vector2Int to, BaseInputHandler sender)
         {
-            if (moveData.Sender == null)
+            if (sender == null || !boardManager.HasPieceAt(from))
             {
-                Debug.LogError("Game Manager Error: PerformMove() called without valid sender!");
+                Debug.LogError("Game Manager Error: PerformMove() called with invalid sender or invalid position!");
                 return false;
             }
+
+            var piece = boardManager.GetPieceAt(from);
             
-            if ((int) moveData.PieceColor != (int) moveData.Sender.playerColor)
+            if ((int) piece.pieceColor != (int) sender.playerColor)
             {
                 if (verboseDebug)
                     Debug.LogError("Game Manager Error: PerformMove() called with a PieceColor of " + 
-                                   Enum.GetName(typeof(PieceColor), moveData.PieceColor) + 
+                                   Enum.GetName(typeof(PieceColor), piece.pieceColor) + 
                                    " but a PlayerColor of " + 
-                                   Enum.GetName(typeof(PlayerColor),  moveData.Sender.playerColor) + 
+                                   Enum.GetName(typeof(PlayerColor),  sender.playerColor) + 
                                    '!');
 
                 return false;
             }
             
-            if (playerTurn != moveData.Sender.playerColor || !boardManager.HasPieceAt(from)) return false;
+            if (playerTurn != sender.playerColor || !boardManager.HasPieceAt(from)) return false;
 
-            if (!boardManager.MovePiece(from, to, moveData)) return false;
+            var moveResult = boardManager.MovePiece(from, to);
+
+            if (!moveResult.Item1) return false;
 
             SwapTurns();
+
+            var moveData = new MoveEventData(sender, piece.pieceColor, moveResult.Item2, NotationsHandler.GenerateFEN(), boardManager.BoardState);
 
             switch (playerTurn)
             {

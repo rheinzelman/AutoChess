@@ -290,19 +290,21 @@ public class Board2D : MonoBehaviour {
         return -Vector2Int.one;
     }
 
-    private bool MovePiece(Vector2Int initialTile, Vector2Int finalTile,
-        PieceColor color = PieceColor.Unassigned, string moveEventArgs = "")
+    // private bool MovePiece(Vector2Int initialTile, Vector2Int finalTile,
+    //     PieceColor color = PieceColor.Unassigned, string moveEventArgs = "")
+    // {
+    //     m_ColorToInputHandler.TryGetValue(m_GameManager.playerTurn, out var inputHandler);
+    //
+    //     if (color == PieceColor.Unassigned) color = m_BoardManager.GetPieceAt(initialTile).pieceColor;
+    //     
+    //     return MovePiece(initialTile, finalTile, new MoveEventData(inputHandler, color, moveEventArgs));
+    // }
+
+    private bool MovePiece(Vector2Int initialTile, Vector2Int finalTile)
     {
         m_ColorToInputHandler.TryGetValue(m_GameManager.playerTurn, out var inputHandler);
-
-        if (color == PieceColor.Unassigned) color = m_BoardManager.GetPieceAt(initialTile).pieceColor;
         
-        return MovePiece(initialTile, finalTile, new MoveEventData(inputHandler, color, moveEventArgs));
-    }
-
-    private bool MovePiece(Vector2Int initialTile, Vector2Int finalTile, MoveEventData moveData)
-    {
-        if (moveData.Sender == null)
+        if (inputHandler == null)
         {
             if (verboseDebug) 
                 Debug.LogError("Board2D Error: MovePiece() called with null sender!");
@@ -313,7 +315,7 @@ public class Board2D : MonoBehaviour {
         if (verboseDebug)
             Debug.Log("Board2D: From: " + initialTile + ", To: " + finalTile);
 
-        if (moveData.Sender.SendMove(initialTile, finalTile, moveData)) return true;
+        if (inputHandler != null && inputHandler.SendMove(initialTile, finalTile)) return true;
         
         if (verboseDebug)
             Debug.Log("Board2D: Illegal move attempted from: " + initialTile + ", to: " + finalTile + '.');

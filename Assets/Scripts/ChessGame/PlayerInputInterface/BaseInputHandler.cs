@@ -4,7 +4,7 @@ using UnityEngine.Events;
 
 namespace ChessGame.PlayerInputInterface
 {
-    public class BaseInputHandler : MonoBehaviour, IHandleInputInterface
+    public class BaseInputHandler : MonoBehaviour//, IHandleInputInterface
     {
         [Header("Game Manager")]
         private GameManager gameManager;
@@ -58,22 +58,29 @@ namespace ChessGame.PlayerInputInterface
         }
 
         // When we want to send a move, send it to the GameManager and do something
-        public virtual bool SendMove(Vector2Int from, Vector2Int to, MoveEventData moveData)
+        public virtual bool SendMove(Vector2Int from, Vector2Int to)
         {
-            if (!gameManager.verboseDebug) return gameManager.PerformMove(@from, to, moveData);
-            
-            Debug.Log(name + " BaseInputHandler: Sending move to board from: " + @from + ", to: " + to + '.');
+            if (gameManager.verboseDebug)
+            {
+                Debug.Log(name + " BaseInputHandler: Sending move to board from: " + @from + ", to: " + to + '.');
                 
-            Debug.Log("Move data values are: Sender - " + moveData.Sender.name +
-                      ", Piece Color - " + Enum.GetName(typeof(PieceColor), moveData.PieceColor) +
-                      ", Args - " + (moveData.Args == "" ? "none" : moveData.Args));
+                // Debug.Log("Move data values are: Sender - " + moveData.Sender.name +
+                //           ", Piece Color - " + Enum.GetName(typeof(PieceColor), moveData.PieceColor) +
+                //           ", Args - " + (moveData.Args == "" ? "none" : moveData.Args));
+            }
 
-            return gameManager.PerformMove(from, to, moveData);
+            if (!gameManager.PerformMove(from, to, this)) return false;
+            
+            onMoveSent.Invoke();
+            
+            return true;
         }
 
         // When the game manager sends us a move, process it and do something
         public virtual void ReceiveMove(Vector2Int to, Vector2Int from, MoveEventData moveData)
         {
+            onMoveReceived.Invoke();
+            
             if (!gameManager.verboseDebug) return;
             
             Debug.Log(name + " BaseInputHandler: Receiving move from: " + from + ", to: " + to + '.');

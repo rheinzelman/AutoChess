@@ -1,3 +1,4 @@
+using System.IO.Ports;
 using UnityEngine;
 using Utils;
 
@@ -11,6 +12,15 @@ namespace ChessGame.PlayerInputInterface
         private void Start()
         {
             _ioDriver = _ioDriver ? _ioDriver : GetComponent<IODriver>() ?? gameObject.AddComponent<IODriver>();
+
+            IODriver.SerialPort.DataReceived += CheckInput;
+        }
+
+        private void CheckInput(object sender, SerialDataReceivedEventArgs e)
+        {
+            print("Data received!");
+            
+            NotationsHandler.Print2DArray(_ioDriver.BoardToArray());
         }
 
         // Update is called once per frame

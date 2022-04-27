@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Ports;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ namespace Utils
     {
         public static IODriver Instance;
         
-        private static readonly SerialPort SerialPort = new SerialPort("COM3", 115200);
+        public static SerialPort SerialPort;
 
         private string _initialState;
         private string _currentState;
@@ -296,14 +297,26 @@ namespace Utils
             "cap8"
         };
 
+        private bool _isConnected;
+
         private void Start()
         {
             Instance = this;
         }
 
-        public bool IsOpen()
+        private void Update()
         {
-            return SerialPort.IsOpen;
+            // if (_isConnected) return;
+            //
+            // try
+            // {
+            //     SerialPort = new SerialPort("COM3", 115200);
+            //     _isConnected = true;
+            // }
+            // catch (IOException e)
+            // {
+            //     Debug.LogError(e);
+            // }
         }
 
         public int[,] BoardToArray()
