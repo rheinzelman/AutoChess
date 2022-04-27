@@ -131,10 +131,10 @@ public class Board2D : MonoBehaviour {
     private void Update()
     {
         ProcessSelectionRaycast();
-        CheckForInput();
+        //CheckForInput();
     }
 
-    private void CheckForInput()
+    public void CheckForInput()
     {
         if (IODriver.Instance == null || !Polling()) return;
         

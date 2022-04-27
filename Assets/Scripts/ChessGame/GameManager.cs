@@ -99,6 +99,8 @@ namespace ChessGame
             boardManager = BoardManager.Instance;
             whiteInputHandler.playerColor = PlayerColor.White;
             blackInputHandler.playerColor = PlayerColor.Black;
+            whiteInputHandler.gameManager = this;
+            blackInputHandler.gameManager = this;
         }
 
         [Button]
@@ -143,10 +145,10 @@ namespace ChessGame
             switch (playerTurn)
             {
                 case PlayerColor.White:
-                    whiteInputHandler.ReceiveMove(to, @from, moveData);
+                    whiteInputHandler.ReceiveMove(from, to, moveData);
                     break;
                 case PlayerColor.Black:
-                    blackInputHandler.ReceiveMove(to, @from, moveData);
+                    blackInputHandler.ReceiveMove(from, to, moveData);
                     break;
                 case PlayerColor.Unassigned:
                     Debug.LogError("Game Manager Error: " +

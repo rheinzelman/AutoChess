@@ -7,7 +7,7 @@ namespace ChessGame.PlayerInputInterface
     public class BaseInputHandler : MonoBehaviour//, IHandleInputInterface
     {
         [Header("Game Manager")]
-        private GameManager gameManager;
+        public GameManager gameManager;
 
         [Header("Events")]
         public UnityEvent onTurnStart = new UnityEvent();
@@ -29,7 +29,7 @@ namespace ChessGame.PlayerInputInterface
 
         private void Start()
         {
-            gameManager = GameManager.Instance;
+            //gameManager = GameManager.Instance;
         }
 
         // When the turns are alternated by the GameManager, start or end turn
@@ -77,7 +77,7 @@ namespace ChessGame.PlayerInputInterface
         }
 
         // When the game manager sends us a move, process it and do something
-        public virtual void ReceiveMove(Vector2Int to, Vector2Int from, MoveEventData moveData)
+        public virtual void ReceiveMove(Vector2Int from, Vector2Int to, MoveEventData moveData)
         {
             onMoveReceived.Invoke();
             

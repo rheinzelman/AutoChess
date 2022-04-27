@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Ports;
+using ChessGame;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Utils
@@ -10,7 +12,7 @@ namespace Utils
     {
         public static IODriver Instance;
         
-        public static SerialPort SerialPort;
+        public static SerialPort SerialPort = new SerialPort("COM3", 115200);
 
         private string _initialState;
         private string _currentState;
@@ -302,6 +304,8 @@ namespace Utils
         private void Start()
         {
             Instance = this;
+            
+            //HomeCoreXY();
         }
 
         private void Update()
@@ -318,6 +322,12 @@ namespace Utils
             //     Debug.LogError(e);
             // }
         }
+
+        // [Button]
+        // private void SendStandardMove(string from, string to)
+        // {
+        //     PerformStandardMove(from, to);
+        // }
 
         public int[,] BoardToArray()
         {
@@ -378,22 +388,30 @@ namespace Utils
             return returnArray;
         }
 
-        public List<Vector2Int> GetMoveFromDifferenceArray(int[,] differenceArray)
+        public (Vector2Int, Vector2Int) GetMoveFromDifferenceArray(int[,] initial, int[,] final)
         {
-            var move = new List<Vector2Int>
-            {
-                new Vector2Int(),
-                new Vector2Int()
-            };
+            return GetMoveFromDifferenceArray(GetDifferenceArray(initial, final));
+        }
+
+        public (Vector2Int, Vector2Int) GetMoveFromDifferenceArray(int[,] differenceArray) //List<Vector2Int>
+        {
+            // var move = new List<Vector2Int>
+            // {
+            //     new Vector2Int(),
+            //     new Vector2Int()
+            // };
+
+            var initial = Constants.ErrorValue;
+            var final = Constants.ErrorValue;
 
             for (var i = 0; i < 8; i++)
             for (var j = 0; j < 8; j++)
             {
-                if (differenceArray[i, j] == -1) move[0] = new Vector2Int(i, j);
-                if (differenceArray[i, j] == 1) move[1] = new Vector2Int(i, j);
+                if (differenceArray[i, j] == -1) initial = new Vector2Int(i, j);
+                if (differenceArray[i, j] == 1) final = new Vector2Int(i, j);
             }
 
-            return move;
+            return (initial, final);
         }
 
         public static string ReadArray()
@@ -405,6 +423,7 @@ namespace Utils
             return sensor;
         }
 
+        [Button]
         public void PerformStandardMove(string square1, string square2)
         {
             MoveCoreXY(square1);
@@ -461,6 +480,7 @@ namespace Utils
             ActivateMagnet(false);
         }
 
+        [Button]
         public void PerformKnightMove(string square1, string square2)
         {
             string intermediarySquare;
@@ -648,10 +668,33 @@ namespace Utils
             return -1;
         }
 
+        [Button]
         public void MoveCoreXY(string square)
         {
+            print("_grblDict at " + square + ": " + _grblDict[square]);
+            
             SerialPort.Open();
             SerialPort.WriteLine(_grblDict[square]);
+            SerialPort.Close();
+        }
+        
+        [Button]
+        public void MoveCoreXYDirect(string square)
+        {
+            //print("_grblDict at " + square + ": " + _grblDict[square]);
+            
+            SerialPort.Open();
+            SerialPort.WriteLine(square);
+            SerialPort.Close();
+        }
+        
+        [Button]
+        public void E2(string square)
+        {
+            //print("_grblDict at " + square + ": " + _grblDict[square]);
+            
+            SerialPort.Open();
+            SerialPort.WriteLine("X172.5Y221");
             SerialPort.Close();
         }
 
@@ -669,6 +712,7 @@ namespace Utils
             SerialPort.Close();
         }
 
+        [Button]
         public void HomeCoreXY()
         {
             SerialPort.Open();
