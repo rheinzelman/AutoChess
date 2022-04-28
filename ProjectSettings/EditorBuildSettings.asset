@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/MobileMenu.unity
     guid: c930db9c2fbdd9946a16d3fd417bc1e4
+  - enabled: 1
+    path: Assets/Scenes/VSBoard.unity
+    guid: 50862c031f1f9f64ea64715bd135917c
   m_configObjects: {}
