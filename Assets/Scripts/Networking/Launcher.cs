@@ -64,13 +64,15 @@ namespace Com.MyCompany.MyGame
 
         public GameObject playButton;
 
-        void Start()
+        
+        public void Start()
         {
             PhotonNetwork.ConnectUsingSettings();
             progressLabel.SetActive(false);
             controlPanel.SetActive(true);
         }
 
+        
         #endregion
 
 
@@ -91,6 +93,7 @@ namespace Com.MyCompany.MyGame
             if (PhotonNetwork.IsConnected)
             {
                 // #Critical we need at this point to attempt joining a Random Room. If it fails, we'll get notified in OnJoinRandomFailed() and we'll create one.
+                Debug.Log("Trying to join a random room");
                 PhotonNetwork.JoinRandomRoom();
                 
             }

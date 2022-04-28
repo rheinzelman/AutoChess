@@ -6,8 +6,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using Photon.Pun;
-using Photon.Realtime;
 
 namespace AutoChess.ManagerComponents
 {
@@ -54,7 +52,6 @@ namespace AutoChess.ManagerComponents
         public PieceEvent pieceCreated = new PieceEvent();
         public PieceEvent pieceRemoved = new PieceEvent();
         public PieceMoveEvent pieceMoved = new PieceMoveEvent();
-        public PhotonView PV;
 
         public static Dictionary<string, char> pieceToChar = new Dictionary<string, char> {
             { "Pawn", 'p' },
@@ -67,7 +64,6 @@ namespace AutoChess.ManagerComponents
 
         private void Awake()
         {
-            PV = GetComponent<PhotonView>();
             ProcessFEN(DEFAULT_FEN);
         }
 
@@ -156,16 +152,8 @@ namespace AutoChess.ManagerComponents
             Debug.Log("BoardManager: MovePiece from: " + from + ", to: " + to);
 
             if (!piece || !piece.MoveToPosition(to)) return false;
-
             pieceMoved.Invoke(from, to);
-            PV.RPC("MoveOnlinePiece", RpcTarget.Others,(from, to));
             return true;
-        }
-
-        [PunRPC]
-        public void MoveOnlinePiece(Vector2Int from, Vector2Int to)
-        {
-            pieceMoved.Invoke(from, to);
         }
         
         public void ForceMovePiece(Vector2Int from, Vector2Int to)

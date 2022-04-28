@@ -56,8 +56,7 @@ namespace AutoChess
 
         private void Start()
         {
-            instance = this;  
-
+            instance = this;
             boardManager ??= GetComponent<BoardManager>();
             whiteInputHandler.gameManager = this;
             blackInputHandler.gameManager = this;
