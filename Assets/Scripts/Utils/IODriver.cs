@@ -305,7 +305,7 @@ namespace Utils
         {
             Instance = this;
             
-            //HomeCoreXY();
+            HomeCoreXY();
         }
 
         private void Update()
@@ -331,8 +331,16 @@ namespace Utils
 
         public int[,] BoardToArray()
         {
-            var boardState = ReadArray();
+            var boardState = ReadInput();
 
+            if (boardState == "" || boardState.Length < 64)
+            {
+                Debug.LogWarning("Board state string is invalid! -> " + boardState);
+                return new int[8, 8];
+            }
+
+            print(boardState);
+            
             var returnArray = new int[8, 8];
 
             var arrayIndex = 0;
@@ -354,7 +362,7 @@ namespace Utils
         // if there is a piece on the capture square, return true
         public bool CapturedPiece()
         {
-            var boardState = ReadArray();
+            var boardState = ReadInput();
 
             return boardState[64] - '0' == 1;
         }
@@ -414,10 +422,23 @@ namespace Utils
             return (initial, final);
         }
 
-        public static string ReadArray()
+        public static string ReadInput()
         {
             SerialPort.Open();
-            var sensor = SerialPort.ReadLine();
+
+            var sensor = "";
+            
+            try
+            {
+                sensor = SerialPort.ReadLine();
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning("Board could not read board state!\n" + e);
+                // ignored
+            }
+
+           
             SerialPort.Close();
 
             return sensor;
@@ -673,9 +694,9 @@ namespace Utils
         {
             print("_grblDict at " + square + ": " + _grblDict[square]);
             
-            SerialPort.Open();
-            SerialPort.WriteLine(_grblDict[square]);
-            SerialPort.Close();
+            // SerialPort.Open();
+            /*SerialPort.WriteLine*/WriteToBoard(_grblDict[square]);
+            //SerialPort.Close();
         }
         
         [Button]
@@ -683,9 +704,9 @@ namespace Utils
         {
             //print("_grblDict at " + square + ": " + _grblDict[square]);
             
-            SerialPort.Open();
-            SerialPort.WriteLine(square);
-            SerialPort.Close();
+            // SerialPort.Open();
+            /*SerialPort.WriteLine*/WriteToBoard(square);
+            //SerialPort.Close();
         }
         
         [Button]
@@ -693,31 +714,46 @@ namespace Utils
         {
             //print("_grblDict at " + square + ": " + _grblDict[square]);
             
-            SerialPort.Open();
-            SerialPort.WriteLine("X172.5Y221");
-            SerialPort.Close();
+            // SerialPort.Open();
+            /*SerialPort.WriteLine*/WriteToBoard("X172.5Y221");
+            //SerialPort.Close();
         }
 
         public void MoveCoreXYCoords(string coords)
         {
-            SerialPort.Open();
-            SerialPort.WriteLine(coords);
-            SerialPort.Close();
+            // SerialPort.Open();
+            /*SerialPort.WriteLine*/WriteToBoard(coords);
+            //SerialPort.Close();
         }
 
         public void ActivateMagnet(bool activated)
         {
-            SerialPort.Open();
-            SerialPort.WriteLine(activated ? _grblDict["MAGON"] : _grblDict["MAGOFF"]);
-            SerialPort.Close();
+            // SerialPort.Open();
+            /*SerialPort.WriteLine*/WriteToBoard(activated ? _grblDict["MAGON"] : _grblDict["MAGOFF"]);
+            //SerialPort.Close();
         }
 
         [Button]
         public void HomeCoreXY()
         {
-            SerialPort.Open();
-            SerialPort.WriteLine("$H");
-            SerialPort.Close();
+            // SerialPort.Open();
+            // SerialPort.WriteLine("$H");
+            // SerialPort.Close();
+            WriteToBoard("$H");
+        }
+
+        private void WriteToBoard(string data)
+        {
+            try
+            {
+                SerialPort.Open();
+                SerialPort.WriteLine(data);
+                SerialPort.Close();
+            }
+            catch (Exception e)
+            {
+                //Debug.LogWarning("WARNING: COM Port is Disconnected!\n" + e);
+            }
         }
     }
 }

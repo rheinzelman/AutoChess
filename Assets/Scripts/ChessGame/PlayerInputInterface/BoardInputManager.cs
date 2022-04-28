@@ -51,21 +51,28 @@ namespace ChessGame.PlayerInputInterface
         {
             //print("IO Driver Open: " + _ioDriver.IsOpen());
             
-            if (!Input.GetKeyDown(KeyCode.Space)) return;
+           //if (!Input.GetKeyDown(KeyCode.Space)) return;
 
-            if (_ioDriver is null) return;
+            if (_ioDriver is null || !TurnActive) return;
 
-            print("Pressed space!\n");
+            if (Input.GetKeyDown(KeyCode.Space)) //_ioDriver.CapturedPiece() || 
+            {
+                _initialState = GetCurrentStateInBoard();
+                print("New board state!");
+                NotationsHandler.Print2DArray(_initialState);
+            }
+
+            //print("Pressed space!\n");
 
             _finalState = GetCurrentStateInBoard();
             
-            NotationsHandler.Print2DArray(_initialState);
-            NotationsHandler.Print2DArray(_finalState);
-            NotationsHandler.Print2DArray(_ioDriver.GetDifferenceArray(_initialState, _finalState));
-
             var move = _ioDriver.GetMoveFromDifferenceArray(_initialState, _finalState);
             
-            print("Item 1: " + move.Item1 + ", Item 2: " + move.Item2);
+            // NotationsHandler.Print2DArray(_initialState);
+            // NotationsHandler.Print2DArray(_finalState);
+            // NotationsHandler.Print2DArray(_ioDriver.GetDifferenceArray(_initialState, _finalState));
+            //
+            // print("Item 1: " + move.Item1 + ", Item 2: " + move.Item2);
 
             SendMove(move.Item1, move.Item2);
         }
@@ -88,8 +95,9 @@ namespace ChessGame.PlayerInputInterface
 
         private int[,] GetCurrentStateInBoard()
         {
-            var bs = new int[8, 8];
+            var bs = _initialState;
             if (_ioDriver) bs = _ioDriver.BoardToArray();
+            //NotationsHandler.Print2DArray(bs);
             stateChange.Invoke(bs);
             return bs;
         }
@@ -116,6 +124,16 @@ namespace ChessGame.PlayerInputInterface
             print("New int array: ");
             
             NotationsHandler.Print2DArray(CharArrayToInt(moveData.BoardState));
+
+            if (moveData.Args.Contains("t"))
+            {
+                if (moveData.Args.Contains("e")) 
+                    _ioDriver.PerformCapture(NotationsHandler.CoordinateToUCI(to + Vector2Int.down));
+                else if (moveData.Args.Contains("E"))
+                    _ioDriver.PerformCapture(NotationsHandler.CoordinateToUCI(to + Vector2Int.up));
+                else
+                    _ioDriver.PerformCapture(moveTuple.Item2);
+            }
 
             if (moveData.Args.Contains("n"))
                 _ioDriver.PerformKnightMove(moveTuple.Item1, moveTuple.Item2);

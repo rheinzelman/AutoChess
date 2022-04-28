@@ -19,6 +19,12 @@ namespace ChessGame.ChessPieces
             new Vector2Int(-1, 0)
         };
 
+        public override void Initialize()
+        {
+            if (pieceColor == PieceColor.White)
+                castlingRightChar = castlingRightChar.ToUpper();
+        }
+
         protected override void FindLegalPositions()
         {
             foreach(var dir in directionsToCheck)
@@ -53,7 +59,7 @@ namespace ChessGame.ChessPieces
             hasMoved = false;
             
             board.castlingRights = board.castlingRights.Replace(castlingRightChar, "");
-            king.castlingRights = king.castlingRights.Replace(castlingRightChar, "");
+            //king.castlingRights = king.castlingRights.Replace(castlingRightChar, "");
 
             return true;
         }

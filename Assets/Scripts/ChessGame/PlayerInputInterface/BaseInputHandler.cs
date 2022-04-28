@@ -20,12 +20,7 @@ namespace ChessGame.PlayerInputInterface
 
 
         // Interface member for active turn state
-        private bool _bTurnActive;
-        public bool bTurnActive
-        {
-            get { return _bTurnActive; }
-            set { _bTurnActive = value; }
-        }
+        public bool TurnActive { get; set; }
 
         private void Start()
         {
@@ -35,9 +30,9 @@ namespace ChessGame.PlayerInputInterface
         // When the turns are alternated by the GameManager, start or end turn
         public void AlternateTurn()
         {
-            bTurnActive = !bTurnActive;
+            TurnActive = !TurnActive;
 
-            if (bTurnActive)
+            if (TurnActive)
                 StartTurn();
             else
                 EndTurn();
@@ -46,14 +41,14 @@ namespace ChessGame.PlayerInputInterface
         // When the turn starts, do something
         public virtual void StartTurn()
         {
-            bTurnActive = true;
+            TurnActive = true;
             onTurnStart.Invoke();
         }
 
         // When the turn ends, do something
         public virtual void EndTurn()
         {
-            bTurnActive = false;
+            TurnActive = false;
             onTurnFinished.Invoke();
         }
 

@@ -22,6 +22,8 @@ namespace ChessGame.ChessPieces
 
         public Square square;
 
+        public bool isTaking = false;
+
         protected static Vector2Int ErrorSquare = new Vector2Int(-1, -1);
 
         private void Start()
@@ -114,6 +116,7 @@ namespace ChessGame.ChessPieces
         {
             legalPositions.Clear();
             legalAttacks.Clear();
+            isTaking = false;
 
             if (square.piece != this) return;
 
@@ -159,12 +162,17 @@ namespace ChessGame.ChessPieces
         // Tries to move the piece to a new position and returns false on fail, true on success
         public virtual bool MoveToPosition(Vector2Int newPos)
         {
+            
+            
             //if position does not exist in legal positions or attacks then it is not a legal move
             if (!CanMoveToPosition(newPos)) return false;
 
             //take piece if move is an attack
             if (legalAttacks.Contains(newPos))
+            {
+                isTaking = true;
                 board.TakePiece(newPos);
+            }
 
             //update piece information to new positions
             var newSquare = board.Squares[newPos.x, newPos.y];

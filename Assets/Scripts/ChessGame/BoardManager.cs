@@ -330,12 +330,18 @@ namespace ChessGame
 
             #endregion
 
+            if (piece.isTaking)
+            {
+                args += "t";
+            }
+            
             switch (piece)
             {
                 case Pawn p:
+                    if (p.isEnPassanting) args += p.pieceColor == PieceColor.White ? "E" : "e";
                     gameManager.halfMoveClock = 0;
                     break;
-                case Knight p:
+                case Knight _:
                     args += "n";
                     break;
             }

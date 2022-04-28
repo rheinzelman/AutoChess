@@ -84,6 +84,9 @@ namespace ChessGame
         [SerializeField] private BoardManager boardManager;
         [SerializeField] private BaseInputHandler whiteInputHandler;
         [SerializeField] private BaseInputHandler blackInputHandler;
+        
+        [Header("Listening")]
+        [SerializeField] private bool allowListening = true;
         [SerializeField] private List<BaseInputHandler> listeners = new List<BaseInputHandler>();
 
         [Header("Debug")] 
@@ -108,6 +111,26 @@ namespace ChessGame
             blackInputHandler.playerColor = PlayerColor.Black;
             whiteInputHandler.gameManager = this;
             blackInputHandler.gameManager = this;
+
+            switch (playerTurn)
+            {
+                case PlayerColor.White:
+                    whiteInputHandler.TurnActive = true;
+                    break;
+                case PlayerColor.Black:
+                    blackInputHandler.TurnActive = true;
+                    break;
+                case PlayerColor.Unassigned:
+                    Debug.LogWarning("Player Turn is Unassigned! Setting to White.");
+                    playerTurn = PlayerColor.White;
+                    whiteInputHandler.TurnActive = true;
+                    break;
+                default:
+                    Debug.LogWarning("Player Turn is Null! Setting to White.");
+                    playerTurn = PlayerColor.White;
+                    whiteInputHandler.TurnActive = true;
+                    break;
+            }
         }
 
         [Button]
@@ -121,7 +144,12 @@ namespace ChessGame
         {
             if (sender == null || !boardManager.HasPieceAt(from))
             {
-                Debug.LogError("Game Manager Error: PerformMove() called with invalid sender or invalid position!");
+                if (verboseDebug)
+                {
+                    if (sender == null) Debug.LogError("Game Manager Error: PerformMove() called with invalid sender!");
+                    if (!boardManager.HasPieceAt(from))
+                        Debug.LogError("Game Manager Error: PerformMove() called with invalid position!");
+                }
                 return false;
             }
 
@@ -149,14 +177,18 @@ namespace ChessGame
 
             var moveData = new MoveEventData(sender, piece.pieceColor, moveResult.Item2, NotationsHandler.GenerateFEN(), boardManager.BoardState);
             
-            listeners.ForEach(p => p.ReceiveMove(from, to, moveData));
+            if (allowListening) listeners.ForEach(p => p.ReceiveMove(from, to, moveData));
 
             switch (playerTurn)
             {
                 case PlayerColor.White:
+                    blackInputHandler.TurnActive = false;
+                    whiteInputHandler.TurnActive = true;
                     whiteInputHandler.ReceiveMove(from, to, moveData);
                     break;
                 case PlayerColor.Black:
+                    whiteInputHandler.TurnActive = false;
+                    blackInputHandler.TurnActive = true;
                     blackInputHandler.ReceiveMove(from, to, moveData);
                     break;
                 case PlayerColor.Unassigned:

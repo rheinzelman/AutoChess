@@ -107,28 +107,16 @@ public class Board2D : MonoBehaviour {
 
         SetupTiles();
         CreatePieceSprites();
+        
+        // var board = FindObjectOfType<BoardInputManager>();
+        // if (board) board.stateChange.AddListener(HighlightTilesFromArray);
 
         _boardManager.pieceRemoved.AddListener(DestroyPieceObject);
         _boardManager.pieceMoved.AddListener(TransferPiece);
         _boardManager.pawnPromoted.AddListener(SetPromotion);
         //_boardManager.pieceCreated.AddListener((v, c) => CreatePieceSprite(v, c));
     }
-
-    private bool Polling()
-    {
-        var finished = false;
-        
-        if (_pollingDelay <= 0f)
-        { 
-            _pollingDelay += pollingDelay / 1000f;
-            print(_pollingDelay);
-            finished = true;
-        }
-
-        _pollingDelay -= Time.deltaTime;
-        
-        return finished;
-    }
+    
 
     //Every frame
     private void Update()
@@ -158,28 +146,6 @@ public class Board2D : MonoBehaviour {
         _promotionData = (Constants.ErrorValue, '-');
     }
 
-    public void CheckForInput()
-    {
-        if (IODriver.Instance == null || !Polling()) return;
-        
-        print("Checking for Input...");
-
-        int[,] arr;
-        
-        try
-        {
-            arr = IODriver.Instance.BoardToArray();
-        }
-        catch
-        {
-            Debug.LogWarning("Not receiving input!");
-            return;
-        }
-        
-        UnhighlightAllTiles();
-        HighlightTilesFromArray(arr);
-    }
-    
     private void SetVerboseDebug(bool bEnabled)
     {
         verboseDebug = bEnabled;
@@ -384,6 +350,8 @@ public class Board2D : MonoBehaviour {
 
     public void HighlightTilesFromArray(int[,] arr)
     {
+        UnhighlightAllTiles();
+        
         for (var y = 0; y < tileCountY; y++)
             for (var x = 0; x < tileCountX; x++)
                 if (arr[x, y] == 1)

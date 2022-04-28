@@ -9,9 +9,12 @@ namespace ChessGame.ChessPieces
         [SerializeField] private Vector2Int enPassantSquare = ErrorSquare;
         [SerializeField] private bool hasMoved;
         [SerializeField] private int rank = 2;
+        public bool isEnPassanting;
 
         protected override void FindLegalPositions()
         {
+            isEnPassanting = false;
+            
             if (!hasMoved)
                 CheckDoubleMove();
             else
@@ -134,8 +137,15 @@ namespace ChessGame.ChessPieces
         [Button]
         public override bool MoveToPosition(Vector2Int newPos)
         {
-            if (!base.MoveToPosition(newPos)) return false;
+            if (board.enPassantSquare != null && board.enPassantSquare.Item1 == newPos)
+                isEnPassanting = true;
             
+            if (!base.MoveToPosition(newPos))
+            {
+                isEnPassanting = false;
+                return false;
+            }
+
             if (!hasMoved && legalPositions.Count > 1 && newPos == legalPositions[1])
                 EnableEnPassant();
             else if (enPassantSquare != ErrorSquare)

@@ -8,6 +8,7 @@ namespace ChessGame.ChessPieces
     {
         public bool hasMoved;
         public bool inCheck;
+        public bool isCastling;
         public string castlingRights = "kq";
 
         public Rook qSideRook;
@@ -18,12 +19,16 @@ namespace ChessGame.ChessPieces
             Vector2Int.left,
             Vector2Int.left * 2
         };
-        
+
+        private Vector2Int qCastlePos;
+
         private List<Vector2Int> kSideCastleSquares = new List<Vector2Int>()
         {
             Vector2Int.right,
             Vector2Int.right * 2
         };
+        
+        private Vector2Int kCastlePos;
 
         private readonly List<Vector2Int> m_SquaresToCheck = new List<Vector2Int>
         {
@@ -44,8 +49,11 @@ namespace ChessGame.ChessPieces
             
             kSideRook = (Rook) board.GetPieceAt(currentPosition + Vector2Int.right * 3);
             kSideRook.king = this;
+            kCastlePos = currentPosition + Vector2Int.right * 2;
+            
             qSideRook = (Rook) board.GetPieceAt(currentPosition + Vector2Int.left * 4);
             qSideRook.king = this;
+            qCastlePos = currentPosition + Vector2Int.left * 2;
             
             qSideCastleSquares.ForEach(pos => pos += currentPosition);
             kSideCastleSquares.ForEach(pos => pos += currentPosition);
@@ -67,18 +75,24 @@ namespace ChessGame.ChessPieces
         {
             if (qSideRook == null || kSideRook.hasMoved) return;
 
-            
+            if (CheckMovesInLine(Vector2Int.left) == kSideRook)
+                legalPositions.Add(currentPosition + Vector2Int.left * 2);
         }
 
         private void CheckKingCastle()
         {
             if (kSideRook == null || kSideRook.hasMoved) return;
             
-            
+            if (CheckMovesInLine(Vector2Int.right) == kSideRook)
+                legalPositions.Add(currentPosition + Vector2Int.right * 2);
         }
 
         protected override void FindLegalPositions()
         {
+            isCastling = false;
+            
+            CheckCastles();
+            
             foreach (var coords in m_SquaresToCheck.Select(pos => currentPosition + pos))
             {
                 if (!board.HasPieceAt(coords) && board.IsValidCoordinate(coords))
@@ -96,6 +110,9 @@ namespace ChessGame.ChessPieces
             
             hasMoved = false;
             board.castlingRights = board.castlingRights.Replace(castlingRights, "");
+            
+            if (newPos == qCastlePos || newPos == kCastlePos)
+                isCastling = true;
 
             return true;
         }
