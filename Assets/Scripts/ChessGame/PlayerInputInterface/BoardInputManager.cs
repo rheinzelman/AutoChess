@@ -1,10 +1,13 @@
 using System.IO.Ports;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Events;
 using Utils;
 
 namespace ChessGame.PlayerInputInterface
 {
+    public class BoardStateEvent : UnityEvent<int[,]> {};
+
     public class BoardInputManager : BaseInputHandler
     {
         private int[,] _initialState =
@@ -23,7 +26,15 @@ namespace ChessGame.PlayerInputInterface
         
         private IODriver _ioDriver;
 
+        public BoardStateEvent stateChange = new BoardStateEvent();
+
         // Start is called before the first frame update
+        private void Start()
+        {
+            var board = FindObjectOfType<Board2D>();
+            if (board) stateChange.AddListener(board.HighlightTilesFromArray);
+        }
+        
         // private void Start()
         // {
         //     //_ioDriver = _ioDriver ? _ioDriver : GetComponent<IODriver>() ?? gameObject.AddComponent<IODriver>();
@@ -51,7 +62,7 @@ namespace ChessGame.PlayerInputInterface
 
             print("Pressed space!\n");
 
-            _finalState = _ioDriver.BoardToArray();
+            _finalState = GetCurrentStateInBoard();
             
             NotationsHandler.Print2DArray(_initialState);
             NotationsHandler.Print2DArray(_finalState);
@@ -64,11 +75,6 @@ namespace ChessGame.PlayerInputInterface
             SendMove(move.Item1, move.Item2);
         }
 
-        // private int[,] CharToBoardState(char[,] charArr)
-        // {
-        //     
-        // }
-
         public override bool SendMove(Vector2Int from, Vector2Int to)
         {
             if (!base.SendMove(from, to)) return false;
@@ -77,8 +83,22 @@ namespace ChessGame.PlayerInputInterface
 
             return true;
         }
-
+        
         [Button]
+        public void TestReceiveMost(Vector2Int from, Vector2Int to, PieceColor color = PieceColor.Unassigned, string args = "", string fen = "")
+        {
+            var moveData = new MoveEventData(null, color, args, "", BoardManager.Instance.BoardState);
+            ReceiveMove(from, to, moveData);
+        }
+
+        private int[,] GetCurrentStateInBoard()
+        {
+            var bs = new int[8, 8];
+            if (_ioDriver) bs = _ioDriver.BoardToArray();
+            stateChange.Invoke(bs);
+            return bs;
+        }
+
         public override void ReceiveMove(Vector2Int from, Vector2Int to, MoveEventData moveData)
         {
             // _initialState[to.y, to.x] = 1;
@@ -101,9 +121,14 @@ namespace ChessGame.PlayerInputInterface
             print("New int array: ");
             
             NotationsHandler.Print2DArray(CharArrayToInt(moveData.BoardState));
-            
-            //_ioDriver.PerformStandardMove(NotationsHandler.CoordinateToUCI(from), NotationsHandler.CoordinateToUCI(to));
-            
+
+            if (moveData.Args.Contains("n"))
+                _ioDriver.PerformKnightMove(moveTuple.Item1, moveTuple.Item2);
+            else if (moveData.Args.Contains("c"))
+                _ioDriver.PerformCastling(moveTuple.Item1, moveTuple.Item2);
+            else
+                _ioDriver.PerformStandardMove(moveTuple.Item1, moveTuple.Item2);
+
             NotationsHandler.Print2DArray(_initialState);
         }
 
