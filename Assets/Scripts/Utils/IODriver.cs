@@ -445,10 +445,10 @@ namespace Utils
                 rookSquare = ((char) (square1[0] + 3)).ToString() + square1[1];
                 rookDestination = ((char) (square1[0] + 1)).ToString() + square2[1];
 
-                intermediarySquare = ((char) (square2[0] + 1)).ToString();
+                intermediarySquare = ((char) (square2[0])).ToString();
                 intermediarySquare += square1[1] + "hh";
 
-                kingDestination = (char) (square2[0] + 1) + square2[1].ToString();
+                kingDestination = (char) (square2[0]) + square2[1].ToString();
             }
             else
             {
