@@ -31,16 +31,11 @@ namespace ChessGame.PlayerInputInterface
         // Start is called before the first frame update
         private void Start()
         {
+            _ioDriver = _ioDriver ? _ioDriver : GetComponent<IODriver>() ?? gameObject.AddComponent<IODriver>();
+            //IODriver.SerialPort.DataReceived += CheckInput;
             var board = FindObjectOfType<Board2D>();
             if (board) stateChange.AddListener(board.HighlightTilesFromArray);
         }
-        
-        // private void Start()
-        // {
-        //     //_ioDriver = _ioDriver ? _ioDriver : GetComponent<IODriver>() ?? gameObject.AddComponent<IODriver>();
-        //
-        //     //IODriver.SerialPort.DataReceived += CheckInput;
-        // }
         //
         // private void CheckInput(object sender, SerialDataReceivedEventArgs e)
         // {

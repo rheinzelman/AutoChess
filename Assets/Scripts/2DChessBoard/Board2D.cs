@@ -353,9 +353,9 @@ public class Board2D : MonoBehaviour {
         for (var y = 0; y < tileCountY; y++)
             for (var x = 0; x < tileCountX; x++)
                 if (_tiles[x, y] == mouseInfo)
-                        return new Vector2Int(x, y);
+                    return new Vector2Int(x, y);
         
-        return -Vector2Int.one;
+        return -Constants.ErrorValue;
     }
 
     // private bool MovePiece(Vector2Int initialTile, Vector2Int finalTile,
