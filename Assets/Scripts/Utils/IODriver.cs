@@ -750,8 +750,9 @@ namespace Utils
                 SerialPort.WriteLine(data);
                 SerialPort.Close();
             }
-            catch (Exception e)
+            catch (Exception)
             {
+                // Ignored
                 //Debug.LogWarning("WARNING: COM Port is Disconnected!\n" + e);
             }
         }

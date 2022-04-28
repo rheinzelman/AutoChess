@@ -124,6 +124,8 @@ namespace ChessGame.PlayerInputInterface
             print("New int array: ");
             
             NotationsHandler.Print2DArray(CharArrayToInt(moveData.BoardState));
+            
+            if (_ioDriver == null) return;
 
             if (moveData.Args.Contains("t"))
             {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using ChessGame.PlayerInputInterface;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -21,8 +22,7 @@ namespace ChessGame
     public enum EndState
     {
         Draw,
-        WhiteWin,
-        BlackWin
+        Win
     }
 
     [Serializable]
@@ -74,11 +74,12 @@ namespace ChessGame
         public static GameManager Instance;
 
         [field: Header("Game State")]
-        public PlayerColor playerTurn { get; private set; } = PlayerColor.White;
-        public bool gameOver { get; private set; } = false;
+        public PlayerColor PlayerTurn { get; private set; } = PlayerColor.White;
+        public bool GameOver { get; private set; } = false;
 
         [Header("Turn Information")] public int halfMoveClock;
         public int fullMoveClock = 1;
+        public Dictionary<string, int> pastStates = new Dictionary<string, int>();
 
         [Header("Internal Components")]
         [SerializeField] private BoardManager boardManager;
@@ -92,7 +93,8 @@ namespace ChessGame
         [Header("Debug")] 
         public bool startWithVerboseDebug = false;
 
-        [Header("Events")] public GameEndEvent onGameOver = new GameEndEvent();
+        [Header("Events")] 
+        public GameEndEvent onGameOver = new GameEndEvent();
         public PlayerTurnEvent onTurnSwapped = new PlayerTurnEvent();
         
         [HideInInspector] public bool verboseDebug;
@@ -112,7 +114,7 @@ namespace ChessGame
             whiteInputHandler.gameManager = this;
             blackInputHandler.gameManager = this;
 
-            switch (playerTurn)
+            switch (PlayerTurn)
             {
                 case PlayerColor.White:
                     whiteInputHandler.TurnActive = true;
@@ -122,12 +124,12 @@ namespace ChessGame
                     break;
                 case PlayerColor.Unassigned:
                     Debug.LogWarning("Player Turn is Unassigned! Setting to White.");
-                    playerTurn = PlayerColor.White;
+                    PlayerTurn = PlayerColor.White;
                     whiteInputHandler.TurnActive = true;
                     break;
                 default:
                     Debug.LogWarning("Player Turn is Null! Setting to White.");
-                    playerTurn = PlayerColor.White;
+                    PlayerTurn = PlayerColor.White;
                     whiteInputHandler.TurnActive = true;
                     break;
             }
@@ -142,14 +144,15 @@ namespace ChessGame
 
         public bool PerformMove(Vector2Int from, Vector2Int to, BaseInputHandler sender)
         {
+            if (GameOver) return false;
+            
             if (sender == null || !boardManager.HasPieceAt(from))
             {
-                if (verboseDebug)
-                {
+                if (!verboseDebug) return false;
                     if (sender == null) Debug.LogError("Game Manager Error: PerformMove() called with invalid sender!");
                     if (!boardManager.HasPieceAt(from))
                         Debug.LogError("Game Manager Error: PerformMove() called with invalid position!");
-                }
+                    
                 return false;
             }
 
@@ -167,7 +170,7 @@ namespace ChessGame
                 return false;
             }
             
-            if (playerTurn != sender.playerColor || !boardManager.HasPieceAt(from)) return false;
+            if (PlayerTurn != sender.playerColor || !boardManager.HasPieceAt(from)) return false;
 
             var moveResult = boardManager.MovePiece(from, to);
 
@@ -179,7 +182,7 @@ namespace ChessGame
             
             if (allowListening) listeners.ForEach(p => p.ReceiveMove(from, to, moveData));
 
-            switch (playerTurn)
+            switch (PlayerTurn)
             {
                 case PlayerColor.White:
                     blackInputHandler.TurnActive = false;
@@ -200,24 +203,73 @@ namespace ChessGame
                     break;
             }
 
+            CheckGameEnd();
+
             return true;
+        }
+
+        private void CheckGameEnd()
+        {
+            boardManager.CheckVictoryConditions();
+
+            var curState = NotationsHandler.GetPiecePlacement(boardManager.BoardState);
+
+            if (pastStates.ContainsKey(curState))
+                pastStates[curState] += 1;
+            else
+                pastStates.Add(curState, 1);
+
+            if (pastStates[curState] >= 3)
+                DeclareGameOver(EndState.Draw, PlayerColor.Unassigned);
+
+            switch (PlayerTurn)
+            {
+                case PlayerColor.White when boardManager.whiteKing.inCheck && !boardManager.whiteHasMoves:
+                    DeclareGameOver(EndState.Win, PlayerColor.Black);
+                    break;
+                case PlayerColor.White when !boardManager.whiteKing.inCheck && !boardManager.whiteHasMoves:
+                    DeclareGameOver(EndState.Draw, PlayerColor.Unassigned);
+                    return;
+                case PlayerColor.Black when boardManager.blackKing.inCheck && !boardManager.blackHasMoves:
+                    DeclareGameOver(EndState.Win, PlayerColor.Black);
+                    break;
+                case PlayerColor.Black when !boardManager.blackKing.inCheck && !boardManager.blackHasMoves:
+                    DeclareGameOver(EndState.Draw, PlayerColor.Unassigned);
+                    return;
+            }
+        }
+
+        private void DeclareGameOver(EndState endState, PlayerColor playerColor)
+        {
+            GameOver = true;
+            onGameOver.Invoke(endState, playerColor);
+            
+            switch (endState)
+            {
+                case EndState.Draw:
+                    print("Game has ended in a draw!");
+                    break;
+                case EndState.Win:
+                    print("Game has ended with a victory for" + (playerColor == PlayerColor.White ? " white" : " black") + "!");
+                    break;
+            }
         }
 
         private void SwapTurns()
         {
-            playerTurn = playerTurn == PlayerColor.White ? PlayerColor.Black : PlayerColor.White;
+            PlayerTurn = PlayerTurn == PlayerColor.White ? PlayerColor.Black : PlayerColor.White;
 
             halfMoveClock++;
-            if (playerTurn == PlayerColor.White) fullMoveClock++;
+            if (PlayerTurn == PlayerColor.White) fullMoveClock++;
 
-            var activeInput = (playerTurn == PlayerColor.White ? whiteInputHandler : blackInputHandler);
+            var activeInput = (PlayerTurn == PlayerColor.White ? whiteInputHandler : blackInputHandler);
 
             whiteInputHandler.AlternateTurn();
             blackInputHandler.AlternateTurn();
 
             print(NotationsHandler.GenerateFEN());
 
-            onTurnSwapped.Invoke(playerTurn, activeInput);
+            onTurnSwapped.Invoke(PlayerTurn, activeInput);
         }
     }
 

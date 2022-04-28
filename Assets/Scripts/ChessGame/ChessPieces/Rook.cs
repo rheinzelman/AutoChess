@@ -7,9 +7,6 @@ namespace ChessGame.ChessPieces
     {
         public bool hasMoved;
         public string castlingRightChar = "-";
-        public King king;
-        public Vector2Int availableCastle = ErrorSquare;
-        public Vector2Int castlePos = ErrorSquare;
 
         private List<Vector2Int> directionsToCheck = new List<Vector2Int>
         {
@@ -19,35 +16,10 @@ namespace ChessGame.ChessPieces
             new Vector2Int(-1, 0)
         };
 
-        public override void Initialize()
-        {
-            if (pieceColor == PieceColor.White)
-                castlingRightChar = castlingRightChar.ToUpper();
-        }
-
         protected override void FindLegalPositions()
         {
             foreach(var dir in directionsToCheck)
                 CheckMovesInLine(dir);
-
-            FindCastlePos();
-        }
-
-        private void FindCastlePos()
-        {
-            CheckCastleInDirection(Vector2Int.left);
-            CheckCastleInDirection(Vector2Int.right);
-
-            if (castlePos != ErrorSquare)
-                legalPositions.Add(castlePos);
-        }
-
-        private void CheckCastleInDirection(Vector2Int direction)
-        {
-            var chessPiece = CheckMovesInLine(direction);
-
-            if (chessPiece != null && chessPiece is King {hasMoved: false} king && king.pieceColor == pieceColor)
-                castlePos = king.currentPosition + 2 * Vector2Int.right;
         }
 
         public override bool MoveToPosition(Vector2Int newPos)
@@ -59,7 +31,6 @@ namespace ChessGame.ChessPieces
             hasMoved = false;
             
             board.castlingRights = board.castlingRights.Replace(castlingRightChar, "");
-            //king.castlingRights = king.castlingRights.Replace(castlingRightChar, "");
 
             return true;
         }

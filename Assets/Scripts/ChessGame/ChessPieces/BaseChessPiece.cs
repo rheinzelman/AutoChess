@@ -35,60 +35,67 @@ namespace ChessGame.ChessPieces
             _FindLegalPositions();
         }
 
-        public virtual void Initialize() { }
+        public virtual void Initialize()
+        {
+            ForceRefresh();
+        }
 
         // Checks all positions in a line given a direction to check in
-        protected BaseChessPiece CheckMovesInLine(Vector2Int direction)
+        protected void CheckMovesInLine(Vector2Int direction)
         {
             var i = 1;
-            var nextPos = currentPosition + direction;
-            BaseChessPiece chessPiece;
-            
+            var nextPos = currentPosition + i * direction;
+
             while (!board.HasPieceAt(nextPos) && board.IsValidCoordinate(nextPos))
             {
                 legalPositions.Add(nextPos);
                 nextPos = currentPosition + ++i * direction;
             }
             
-            if (!board.HasPieceAt(nextPos)) return null;
+            if (!board.HasPieceAt(nextPos)) return;
             
-            chessPiece = board.GetPieceAt(nextPos);
+            var chessPiece = board.GetPieceAt(nextPos);
             
             if (chessPiece.pieceColor != pieceColor)
                 legalAttacks.Add(nextPos);
+        }
+        
+        // Checks all positions in a line given a direction to check in
+        protected BaseChessPiece FindPieceInLine(Vector2Int direction)
+        {
+            var i = 1;
+            var nextPos = currentPosition + i * direction;
+
+            while (!board.HasPieceAt(nextPos) && board.IsValidCoordinate(nextPos))
+                nextPos = currentPosition + ++i * direction;
+
+            return !board.HasPieceAt(nextPos) ? null : board.GetPieceAt(nextPos);
+        }
+
+        [Button]
+        public bool LegalMoveCount()
+        {
+            var allMoves = legalPositions.Concat(legalAttacks);
+            allMoves = allMoves.Except(blockedMoves).ToList();
             
-            return chessPiece;
+            Debug.Log(name + "has legal moves: " + allMoves.Any(), this);
+
+            return allMoves.Any();
         }
 
         // Checks for moves that would put the friendly king in check
         [Button]
         protected void FindBlockedMoves()
         {
-            var allMoves = new List<Vector2Int>();
-            allMoves.AddRange(legalPositions);
-            allMoves.AddRange(legalAttacks);
+            var allMoves = legalPositions.Concat(legalAttacks);
 
             foreach (var pos in allMoves)
                 board.TryMovePiece(currentPosition, pos);
-        }
-
-        // When pieces are performing TryMovePiece calls in board manager, find legal moves
-        // When this piece is performing TryMovePiece calls, do not generate new moves
-        private void TryMoveUpdate(BaseChessPiece piece)
-        {
-            if (piece == this) return;
-
-            _FindLegalPositions();
-        }
-
-        // When the board refreshes, clear blocked moves list and find new legal positions
-        protected void OnBoardRefresh()
-        {
-            Debug.Log("Board refresh in " + name + " at " + currentPosition);
             
-            PerformRefresh();
+            //ForceUpdate();
         }
 
+        [Button]
         // Forces a refresh on the piece, checking blocked moves and legal moves
         public void ForceRefresh()
         {
@@ -103,8 +110,13 @@ namespace ChessGame.ChessPieces
             _FindLegalPositions();
 
             FindBlockedMoves();
+
+            PostRefresh();
         }
 
+        protected virtual void PostRefresh() {}
+
+        [Button]
         // Forces the piece to find new legal positions
         public void ForceUpdate()
         {
@@ -122,26 +134,13 @@ namespace ChessGame.ChessPieces
 
             FindLegalPositions();
 
-            try
-            {
-                var kingPos = legalAttacks.Find(pos => board.GetPieceAt(pos) is King);
-                ((King) board.GetPieceAt(kingPos)).inCheck = true;
-            }
-            catch (InvalidCastException e)
-            {
-                if (GameManager.Instance && GameManager.Instance.verboseDebug)
-                    Debug.LogWarning("Piece in legal attack is not a King.");
-            }
-            catch (ArgumentNullException e)
-            {
-                if (GameManager.Instance && GameManager.Instance.verboseDebug)
-                    Debug.LogWarning("King was not found in legal attack.");
-            }
-
+            PostFindLegalPositions();
         }
 
         // Unique abstract function that each piece implements to find their legal moves
         protected abstract void FindLegalPositions();
+
+        protected virtual void PostFindLegalPositions() { }
 
         // Forces the piece to move to a specific position
         public void ForceMoveToPosition(Vector2Int newPos)
@@ -162,8 +161,6 @@ namespace ChessGame.ChessPieces
         // Tries to move the piece to a new position and returns false on fail, true on success
         public virtual bool MoveToPosition(Vector2Int newPos)
         {
-            
-            
             //if position does not exist in legal positions or attacks then it is not a legal move
             if (!CanMoveToPosition(newPos)) return false;
 

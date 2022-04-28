@@ -16,8 +16,6 @@ namespace ChessGame
     public class PieceCreateEvent : UnityEvent<Vector2Int, char> { }
     [Serializable]
     public class PieceMoveEvent : UnityEvent<Vector2Int, Vector2Int> { }
-    [Serializable]
-    public class PieceTryEvent : UnityEvent<BaseChessPiece> { }
 
     public class BoardManager : MonoBehaviour
     {
@@ -39,14 +37,14 @@ namespace ChessGame
         //the functionality of these lists will be implemented and maintained by Kaleb
         public List<BaseChessPiece> whitePieces = new List<BaseChessPiece>();
         public List<BaseChessPiece> blackPieces = new List<BaseChessPiece>();
-        public List<char> graveyard = new List<char>();
 
         // Kings of both sides
-        [SerializeField] private King whiteKing;
-        [SerializeField] private King blackKing;
+        public King whiteKing;
+        public King blackKing;
 
         // End Game Conditions
-        private King kingInCheck;
+        public bool whiteHasMoves = true;
+        public bool blackHasMoves = true;
 
         // Board Managers
         public GameManager gameManager;
@@ -57,12 +55,13 @@ namespace ChessGame
         // Unity events
         public UnityEvent boardUpdate = new UnityEvent();
         public UnityEvent boardRefresh = new UnityEvent();
-        public PieceCreateEvent pieceCreated = new PieceCreateEvent();
-        public PieceCreateEvent pawnPromoted = new PieceCreateEvent();
         public PieceEvent pieceRemoved = new PieceEvent();
         public PieceEvent pieceTaken = new PieceEvent();
         public PieceMoveEvent pieceMoved = new PieceMoveEvent();
-        public PieceTryEvent pieceTryMove = new PieceTryEvent();
+        public PieceMoveEvent castle = new PieceMoveEvent();
+        public PieceCreateEvent pieceCreated = new PieceCreateEvent();
+        public PieceCreateEvent pawnPromoted = new PieceCreateEvent();
+        
 
         private static readonly Dictionary<char, Type> CharToPieceType = new Dictionary<char, Type>
         {
@@ -163,7 +162,16 @@ namespace ChessGame
 
             pieceCreated.Invoke(pos, GetPieceChar(pos));
 
-            ForceBoardUpdate();
+            BoardRefresh();
+        }
+        
+        // Adds a piece to the board by creating a new GameObject and Initializing it
+        [Button]
+        public void AddPiece(Type type, Vector2Int pos, PieceColor color)
+        {
+            if (!(Squares[pos.x, pos.y].piece is null)) return;
+
+            IntantiatePiece(new GameObject(type.Name, type), pos, color);
         }
         
         // Calls the initialize function in all pieces
@@ -282,7 +290,28 @@ namespace ChessGame
 
         public void CheckVictoryConditions()
         {
+            SetChecks();
+            CheckMoveCounts();
+        }
 
+        private void CheckMoveCounts()
+        {
+            whiteHasMoves = whitePieces.Any(p => p.LegalMoveCount());
+            blackHasMoves = blackPieces.Any(p => p.LegalMoveCount());
+        }
+
+        private void SetChecks()
+        {
+            blackKing.inCheck = false;
+            whiteKing.inCheck = false;
+            
+            foreach (var p in whitePieces)
+                if (p.legalAttacks.Except(p.blockedMoves).Contains(blackKing.currentPosition))
+                    blackKing.inCheck = true;
+            
+            foreach (var p in blackPieces)
+                if (p.legalAttacks.Except(p.blockedMoves).Contains(whiteKing.currentPosition))
+                    whiteKing.inCheck = true;
         }
 
         // Promotes pawns when they reach the end
@@ -290,6 +319,9 @@ namespace ChessGame
         {
             var pos = pawn.currentPosition;
             var color = pawn.pieceColor;
+
+            whitePieces.Remove(pawn);
+            blackPieces.Remove(pawn);
 
             RemovePiece(pos);
             AddPiece(typeof(Queen), pos, color);
@@ -344,17 +376,14 @@ namespace ChessGame
                 case Knight _:
                     args += "n";
                     break;
+                case King k:
+                    args += k.isCastling ? "c" : "";
+                    break;
             }
 
-            print(NotationsHandler.CoordinateToUCI(from) + NotationsHandler.CoordinateToUCI(to));
-
-            ForceBoardUpdate();
-
-            // boardUpdate.Invoke();
-            //
+            BoardRefresh();
+            
             pieceMoved.Invoke(from, to);
-            //
-            // boardRefresh.Invoke();
 
             return (true, args);
         }
@@ -380,7 +409,7 @@ namespace ChessGame
 
             ForceMovePiece(from, to);
 
-            ForceBoardUpdate(fromPiece);
+            BoardUpdate(fromPiece);
 
             if (CheckForCheck(fromPiece.pieceColor))
                 fromPiece.blockedMoves.Add(to);
@@ -454,8 +483,10 @@ namespace ChessGame
 
         public void PerformCastle(Rook rook, Vector2Int pos)
         {
+            castle.Invoke(rook.currentPosition, pos);
+            
             ForceMovePiece(rook.currentPosition, pos);
-            ForceUpdatePiece(rook);
+            UpdatePiece(rook);
         }
 
         // Removes a piece by deleting it and its GameObject
@@ -524,7 +555,7 @@ namespace ChessGame
 
         // Forces all pieces on the board to perform an update and find new legal positions
         // If ignorePiece is set, the piece referenced byy ignorePiece will not receive an update
-        private void ForceBoardUpdate(BaseChessPiece ignorePiece = null)
+        private void BoardUpdate(BaseChessPiece ignorePiece = null)
         {
             var allPieces = new List<BaseChessPiece>();
             allPieces.AddRange(whitePieces);
@@ -537,7 +568,7 @@ namespace ChessGame
         }
 
         // Forces all pieces on the board to perform a board refresh to find all legal positions and new blocked tiles
-        private void ForceBoardRefresh()
+        private void BoardRefresh()
         {
             var allPieces = new List<BaseChessPiece>();
             allPieces.AddRange(whitePieces);
@@ -545,21 +576,23 @@ namespace ChessGame
 
             foreach (var p in allPieces)
                 p.ForceRefresh();
+            
+            BoardUpdate();
 
             UpdateBoardStateArray();
-            // boardRefresh.Invoke();
+            boardRefresh.Invoke();
         }
         
         // Forces a singular piece to update
-        private void ForceUpdatePiece(BaseChessPiece piece)
+        private void UpdatePiece(BaseChessPiece piece)
         {
             piece.ForceUpdate();
         }
 
-        private void ForceUpdatePiece(Vector2Int pos)
+        private void UpdatePiece(Vector2Int pos)
         {
             if (!HasPieceAt(pos)) return;
-            ForceUpdatePiece(GetPieceAt(pos));
+            UpdatePiece(GetPieceAt(pos));
         }
 
         // Converts a piece at a position to it's fen character representation
@@ -573,14 +606,10 @@ namespace ChessGame
         {
             var type = '-';
             var piece = GetPieceAt(x, y);
-            
-            print("GetPieceChar Piece: " +  piece.name);
 
             if (piece == null) return type;
 
             type = PieceTypeToChar[piece.GetType()];
-            
-            print("GetPieceChar Type: " + type);
 
             if (piece.pieceColor == PieceColor.White)
                 type = char.ToUpper(type);
@@ -598,23 +627,7 @@ namespace ChessGame
             for (var x = 0; x < horizontalSquares; x++)
                 newState[x, y] = GetPieceChar(x, y);
 
-            print("New board state: ");
-            NotationsHandler.Print2DArray(newState);
-            //
-            // var str = NotationsHandler.GetPiecePlacement(newState);
-            //
-            // print(str);
-
             BoardState = newState;
-        }
-
-        // Adds a piece to the board by creating a new GameObject and Initializing it
-        [Button]
-        public void AddPiece(Type type, Vector2Int pos, PieceColor color)
-        {
-            if (!(Squares[pos.x, pos.y].piece is null)) return;
-
-            IntantiatePiece(new GameObject(type.Name, type), pos, color);
         }
 
         [Button]

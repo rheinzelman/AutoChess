@@ -154,6 +154,8 @@ namespace ChessGame.ChessPieces
             if (++rank >= 8)
                 board.Promote(this);
 
+            hasMoved = true;
+
             // //if position does not exist in legal positions or attacks then it is not a legal move
             // if (!CanMoveToPosition(newPos)) return false;
             //

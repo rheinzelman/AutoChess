@@ -161,7 +161,7 @@ namespace Utils
             var args = new[]
             {
                 /*   Piece Placement: */ GetPiecePlacement(board.BoardState),
-                /*       Player Turn: */ game.playerTurn == PlayerColor.White ? "w" : "b",
+                /*       Player Turn: */ game.PlayerTurn == PlayerColor.White ? "w" : "b",
                 /*   Castling Rights: */ board.castlingRights,
                 /* En Passant Square: */ board.enPassantSquare != null ? CoordinateToUCI(board.enPassantSquare.Item1) : "-",
                 /*   Half Move Clock: */ game.halfMoveClock.ToString(),

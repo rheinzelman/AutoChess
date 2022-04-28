@@ -59,10 +59,6 @@ public class Board2D : MonoBehaviour {
     // Maps out the player color to the input handler responsible for handling its move
     private Dictionary<PlayerColor, BaseInputHandler> _colorToInputHandler;
 
-    [Header("Board Polling Settings")]
-    [SerializeField] private float pollingDelay = 500f;
-    private float _pollingDelay;
-
     [Header("Debug")] 
     [SerializeField] private bool verboseDebug;
 
@@ -113,6 +109,7 @@ public class Board2D : MonoBehaviour {
 
         _boardManager.pieceRemoved.AddListener(DestroyPieceObject);
         _boardManager.pieceMoved.AddListener(TransferPiece);
+        _boardManager.castle.AddListener(TransferPiece);
         _boardManager.pawnPromoted.AddListener(SetPromotion);
         //_boardManager.pieceCreated.AddListener((v, c) => CreatePieceSprite(v, c));
     }
@@ -155,7 +152,7 @@ public class Board2D : MonoBehaviour {
     {
         if (!Input.GetMouseButtonDown(0)) return;
         
-        _enabledInputs.TryGetValue(GameManager.Instance.playerTurn, out var selectionAllowed);
+        _enabledInputs.TryGetValue(GameManager.Instance.PlayerTurn, out var selectionAllowed);
         
         if (!selectionAllowed)
         {
@@ -167,13 +164,22 @@ public class Board2D : MonoBehaviour {
 
         var ray = _currentCamera.ScreenPointToRay(Input.mousePosition);
         Physics.Raycast(ray, out var info, 100, LayerMask.GetMask("Tile"));
-            
-        // Get the coordinates of the tile i've hit
-        var hitPosition = GetTileIndex(info.transform.gameObject);
+
+        var hitPosition = Constants.ErrorValue;
+        
+        try
+        {
+            // Get the coordinates of the tile i've hit
+            hitPosition = GetTileIndex(info.transform.gameObject);
+        }
+        catch (Exception e)
+        {
+            return;
+        }
         
         if (_boardManager.HasPieceAt(hitPosition) && _selectedPiece == _deselectValue)
         {
-            if ((int) _boardManager.GetPieceAt(hitPosition).pieceColor != (int) _gameManager.playerTurn)
+            if ((int) _boardManager.GetPieceAt(hitPosition).pieceColor != (int) _gameManager.PlayerTurn)
             {
                 if (verboseDebug) 
                     Debug.Log("Board2D: Player has attempted to select an opponent's piece.");
@@ -214,7 +220,7 @@ public class Board2D : MonoBehaviour {
 
     private bool MovePiece(Vector2Int initialTile, Vector2Int finalTile)
     {
-        _colorToInputHandler.TryGetValue(_gameManager.playerTurn, out var inputHandler);
+        _colorToInputHandler.TryGetValue(_gameManager.PlayerTurn, out var inputHandler);
         
         if (inputHandler == null)
         {
