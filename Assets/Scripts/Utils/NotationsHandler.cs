@@ -162,7 +162,7 @@ namespace Utils
             {
                 /*   Piece Placement: */ GetPiecePlacement(board.BoardState),
                 /*       Player Turn: */ game.playerTurn == PlayerColor.White ? "w" : "b",
-                /*   Castling Rights: */ "KQkq",
+                /*   Castling Rights: */ board.castlingRights,
                 /* En Passant Square: */ board.enPassantSquare != null ? CoordinateToUCI(board.enPassantSquare.Item1) : "-",
                 /*   Half Move Clock: */ game.halfMoveClock.ToString(),
                 /*   Full Move Clock: */ game.fullMoveClock.ToString()

@@ -6,6 +6,8 @@ namespace ChessGame.ChessPieces
     public class Rook : BaseChessPiece
     {
         public bool hasMoved;
+        public string castlingRightChar = "-";
+        public King king;
         public Vector2Int availableCastle = ErrorSquare;
         public Vector2Int castlePos = ErrorSquare;
 
@@ -46,7 +48,12 @@ namespace ChessGame.ChessPieces
         {
             if (!base.MoveToPosition(newPos)) return false;
 
-            hasMoved = true;
+            if (!hasMoved) return true;
+            
+            hasMoved = false;
+            
+            board.castlingRights = board.castlingRights.Replace(castlingRightChar, "");
+            king.castlingRights = king.castlingRights.Replace(castlingRightChar, "");
 
             return true;
         }

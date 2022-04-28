@@ -16,11 +16,11 @@ namespace ChessGame.PlayerInputInterface
         public UnityEvent onMoveReceived = new UnityEvent();
 
         // Interface member for player's color
-        public PlayerColor playerColor { get; set; } = PlayerColor.Unassigned;
+        public PlayerColor playerColor = PlayerColor.Unassigned;
 
 
         // Interface member for active turn state
-        private bool _bTurnActive = false;
+        private bool _bTurnActive;
         public bool bTurnActive
         {
             get { return _bTurnActive; }

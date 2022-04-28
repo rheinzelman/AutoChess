@@ -7,7 +7,8 @@ namespace ChessGame.ChessPieces
     public class Pawn : BaseChessPiece
     {
         [SerializeField] private Vector2Int enPassantSquare = ErrorSquare;
-        [SerializeField] private bool hasMoved = false;
+        [SerializeField] private bool hasMoved;
+        [SerializeField] private int rank = 2;
 
         protected override void FindLegalPositions()
         {
@@ -116,6 +117,8 @@ namespace ChessGame.ChessPieces
 
             board.enPassantSquare = new Tuple<Vector2Int, BaseChessPiece>(enPassantSquare, this);
 
+            ++rank;
+
             //print("En Passant set at: " +  enPassantSquare);
         }
 
@@ -131,32 +134,43 @@ namespace ChessGame.ChessPieces
         [Button]
         public override bool MoveToPosition(Vector2Int newPos)
         {
-            //if position does not exist in legal positions or attacks then it is not a legal move
-            if (!CanMoveToPosition(newPos)) return false;
-
+            if (!base.MoveToPosition(newPos)) return false;
+            
             if (!hasMoved && legalPositions.Count > 1 && newPos == legalPositions[1])
                 EnableEnPassant();
             else if (enPassantSquare != ErrorSquare)
                 DisableEnPassant();
-
-            hasMoved = true;
-
-            //take piece if move is an attack
-            if (legalAttacks.Contains(newPos))
-                board.TakePiece(newPos);
-
-            //update piece information to new positions
-            var newSquare = board.Squares[newPos.x, newPos.y];
-            transform.parent = newSquare.transform;
-            newSquare.piece = this;
-            square.piece = null;
-            square = newSquare;
-            currentPosition = square.coordinate;
-            //board.boardUpdate.Invoke();
-            //move was successful
-
-            OnBoardRefresh();
             
+            if (++rank >= 8)
+                board.Promote(this);
+
+            // //if position does not exist in legal positions or attacks then it is not a legal move
+            // if (!CanMoveToPosition(newPos)) return false;
+            //
+            // if (!hasMoved && legalPositions.Count > 1 && newPos == legalPositions[1])
+            //     EnableEnPassant();
+            // else if (enPassantSquare != ErrorSquare)
+            //     DisableEnPassant();
+            //
+            // hasMoved = true;
+            //
+            // //take piece if move is an attack
+            // if (legalAttacks.Contains(newPos))
+            //     board.TakePiece(newPos);
+            //
+            // //update piece information to new positions
+            // var newSquare = board.Squares[newPos.x, newPos.y];
+            // transform.parent = newSquare.transform;
+            // newSquare.piece = this;
+            // square.piece = null;
+            // square = newSquare;
+            // currentPosition = square.coordinate;
+            // //board.boardUpdate.Invoke();
+            // //move was successful
+            //
+            // if (++rank >= 8)
+            //     board.Promote(this);
+
             return true;
         }
     }

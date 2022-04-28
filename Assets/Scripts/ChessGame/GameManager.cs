@@ -8,6 +8,7 @@ using Utils;
 
 namespace ChessGame
 {
+    [Serializable]
     public enum PlayerColor
     {
         Unassigned = -1,
@@ -15,6 +16,7 @@ namespace ChessGame
         Black = 2
     }
 
+    [Serializable]
     public enum EndState
     {
         Draw,
@@ -22,6 +24,7 @@ namespace ChessGame
         BlackWin
     }
 
+    [Serializable]
     public enum PieceColor
     {
         Unassigned = -1,
@@ -29,6 +32,7 @@ namespace ChessGame
         Black = 2
     }
 
+    [Serializable]
     public class MoveEventData
     {
         public readonly BaseInputHandler Sender;
@@ -42,6 +46,7 @@ namespace ChessGame
             Sender = null;
             PieceColor = PieceColor.Unassigned;
             Args = "";
+            Fen = "";
             BoardState = null;
         }
         public MoveEventData(BaseInputHandler sender, PieceColor pieceColor, string args, string fen, char[,] boardState)

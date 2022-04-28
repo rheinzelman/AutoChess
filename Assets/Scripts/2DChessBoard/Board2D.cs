@@ -32,31 +32,32 @@ public class Board2D : MonoBehaviour {
     private const float CoordOffsetX = 5F;
     private const float CoordOffsetY = 5F;
     private const float PieceSize = 1.75f;
-    private GameObject[,] m_Tiles;
-    private ChessPiece2D[,] m_ChessPieces;
+    private GameObject[,] _tiles;
+    private ChessPiece2D[,] _chessPieces;
 
     //Piece Movement
-    private readonly Vector2Int m_DeselectValue = Constants.ErrorValue;
-    private Vector2Int m_SelectedPiece = Constants.ErrorValue;
+    private readonly Vector2Int _deselectValue = Constants.ErrorValue;
+    private Vector2Int _selectedPiece = Constants.ErrorValue;
+    private (Vector2Int, char) _promotionData = (Constants.ErrorValue, '-');
 
     //Unity
-    private Camera m_CurrentCamera;
+    private Camera _currentCamera;
 
     [Header("Board Settings")]
 
     //Managers
-    private BoardManager m_BoardManager;
-    private GameManager m_GameManager;
+    private BoardManager _boardManager;
+    private GameManager _gameManager;
 
     // Input Handlers
     public BaseInputHandler whiteInput;
     public BaseInputHandler blackInput;
 
     // Determine if input is allowed
-    private Dictionary<PlayerColor, bool> m_EnabledInputs;
+    private Dictionary<PlayerColor, bool> _enabledInputs;
     
     // Maps out the player color to the input handler responsible for handling its move
-    private Dictionary<PlayerColor, BaseInputHandler> m_ColorToInputHandler;
+    private Dictionary<PlayerColor, BaseInputHandler> _colorToInputHandler;
 
     [Header("Board Polling Settings")]
     [SerializeField] private float pollingDelay = 500f;
@@ -67,18 +68,18 @@ public class Board2D : MonoBehaviour {
 
     private void Start()
     {
-        m_CurrentCamera ??= Camera.main;
+        _currentCamera ??= Camera.main;
         
-        m_BoardManager = BoardManager.Instance;
-        m_GameManager = GameManager.Instance;
+        _boardManager = BoardManager.Instance;
+        _gameManager = GameManager.Instance;
 
-        m_EnabledInputs = new Dictionary<PlayerColor, bool>()
+        _enabledInputs = new Dictionary<PlayerColor, bool>()
         {
             {PlayerColor.White, whiteInput != null},
             {PlayerColor.Black, blackInput != null}
         };
 
-        m_ColorToInputHandler = new Dictionary<PlayerColor, BaseInputHandler>()
+        _colorToInputHandler = new Dictionary<PlayerColor, BaseInputHandler>()
         {
             {PlayerColor.White, whiteInput},
             {PlayerColor.Black, blackInput}
@@ -92,23 +93,25 @@ public class Board2D : MonoBehaviour {
             Debug.Log("Black input is " + (whiteInput.name ?? "null") );
             Debug.Log("White input color is " + whiteInput.playerColor);
             Debug.Log("White input color is " + blackInput.playerColor);
-            Debug.Log("White input is " + (m_EnabledInputs[PlayerColor.White] ? " enabled" : " disabled"));
-            Debug.Log("Black input is " + (m_EnabledInputs[PlayerColor.Black] ? " enabled" : " disabled"));
+            Debug.Log("White input is " + (_enabledInputs[PlayerColor.White] ? " enabled" : " disabled"));
+            Debug.Log("Black input is " + (_enabledInputs[PlayerColor.Black] ? " enabled" : " disabled"));
         }
 
-        verboseDebug = m_GameManager.verboseDebug;
+        verboseDebug = _gameManager.verboseDebug;
             
-        m_GameManager.onVerboseDebugChanged.AddListener(SetVerboseDebug);
+        _gameManager.onVerboseDebugChanged.AddListener(SetVerboseDebug);
 
-        m_ChessPieces = new ChessPiece2D[tileCountY, tileCountX];
-        m_Tiles = new GameObject[tileCountY, tileCountX];
-        m_ChessPieces = new ChessPiece2D[tileCountX, tileCountY];
+        _chessPieces = new ChessPiece2D[tileCountY, tileCountX];
+        _tiles = new GameObject[tileCountY, tileCountX];
+        _chessPieces = new ChessPiece2D[tileCountX, tileCountY];
 
         SetupTiles();
         CreatePieceSprites();
 
-        m_BoardManager.pieceRemoved.AddListener(DestroyPieceObject);
-        m_BoardManager.pieceMoved.AddListener(TransferPiece);
+        _boardManager.pieceRemoved.AddListener(DestroyPieceObject);
+        _boardManager.pieceMoved.AddListener(TransferPiece);
+        _boardManager.pawnPromoted.AddListener(SetPromotion);
+        //_boardManager.pieceCreated.AddListener((v, c) => CreatePieceSprite(v, c));
     }
 
     private bool Polling()
@@ -131,7 +134,28 @@ public class Board2D : MonoBehaviour {
     private void Update()
     {
         ProcessSelectionRaycast();
+
+        CheckPromotion();
+
         //CheckForInput();
+    }
+
+    // Sets promotions for gross hacky solution
+    private void SetPromotion(Vector2Int pos, char c)
+    {
+        _promotionData = (pos, c);
+    }
+
+    // Gross hacky solution due to Unity Event timing race conditions
+    private void CheckPromotion()
+    {
+        if (_promotionData.Item1 == Constants.ErrorValue || _promotionData.Item2 == '-') return;
+        
+        //DestroyPieceObject(_promotionData.Item1);
+        
+        CreatePieceSprite(_promotionData.Item1, _promotionData.Item2);
+            
+        _promotionData = (Constants.ErrorValue, '-');
     }
 
     public void CheckForInput()
@@ -165,7 +189,7 @@ public class Board2D : MonoBehaviour {
     {
         if (!Input.GetMouseButtonDown(0)) return;
         
-        m_EnabledInputs.TryGetValue(GameManager.Instance.playerTurn, out var selectionAllowed);
+        _enabledInputs.TryGetValue(GameManager.Instance.playerTurn, out var selectionAllowed);
         
         if (!selectionAllowed)
         {
@@ -175,15 +199,15 @@ public class Board2D : MonoBehaviour {
             return;
         }
 
-        var ray = m_CurrentCamera.ScreenPointToRay(Input.mousePosition);
+        var ray = _currentCamera.ScreenPointToRay(Input.mousePosition);
         Physics.Raycast(ray, out var info, 100, LayerMask.GetMask("Tile"));
             
         // Get the coordinates of the tile i've hit
         var hitPosition = GetTileIndex(info.transform.gameObject);
         
-        if (m_BoardManager.HasPieceAt(hitPosition) && m_SelectedPiece == m_DeselectValue)
+        if (_boardManager.HasPieceAt(hitPosition) && _selectedPiece == _deselectValue)
         {
-            if ((int) m_BoardManager.GetPieceAt(hitPosition).pieceColor != (int) m_GameManager.playerTurn)
+            if ((int) _boardManager.GetPieceAt(hitPosition).pieceColor != (int) _gameManager.playerTurn)
             {
                 if (verboseDebug) 
                     Debug.Log("Board2D: Player has attempted to select an opponent's piece.");
@@ -191,34 +215,64 @@ public class Board2D : MonoBehaviour {
                 return;
             }
             
-            m_SelectedPiece = hitPosition;
-            HighlightLegalTiles(m_SelectedPiece, true);
+            _selectedPiece = hitPosition;
+            HighlightLegalTiles(_selectedPiece, true);
             HighlightTile(hitPosition.x, hitPosition.y, true);
         }
-        else if (!m_BoardManager.HasPieceAt(hitPosition) && m_SelectedPiece == m_DeselectValue)
+        else if (!_boardManager.HasPieceAt(hitPosition) && _selectedPiece == _deselectValue)
         {
             if (verboseDebug)
                 Debug.Log("Board2D: Player has attempted to select an empty square.");
         }
-        else if (hitPosition == m_SelectedPiece)
+        else if (hitPosition == _selectedPiece)
         {
-            UnhighlightLegalTiles(m_SelectedPiece);
+            UnhighlightLegalTiles(_selectedPiece);
             HighlightTile(hitPosition.x, hitPosition.y, false);
-            m_SelectedPiece = m_DeselectValue;
+            _selectedPiece = _deselectValue;
         }
-        else if (hitPosition != m_SelectedPiece && m_SelectedPiece != m_DeselectValue)
+        else if (hitPosition != _selectedPiece && _selectedPiece != _deselectValue)
         {
-            if (!MovePiece(m_SelectedPiece, hitPosition)) return;
-            UnhighlightLegalTiles(m_SelectedPiece);
-            HighlightTile(m_SelectedPiece.x, m_SelectedPiece.y, false);
-            m_SelectedPiece = m_DeselectValue;
+            if (!MovePiece(_selectedPiece, hitPosition)) return;
+            UnhighlightLegalTiles(_selectedPiece);
+            HighlightTile(_selectedPiece.x, _selectedPiece.y, false);
+            _selectedPiece = _deselectValue;
         }
+    }
+    
+    private void TransferPiece(Vector2Int initialTile, Vector2Int finalTile)
+    {
+        _chessPieces[initialTile.x, initialTile.y].transform.position = new Vector3(finalTile.x - TileOffsetX, 7 - finalTile.y - TileOffsetY, 0);
+        _chessPieces[finalTile.x, finalTile.y] = _chessPieces[initialTile.x, initialTile.y];
+        _chessPieces[initialTile.x, initialTile.y] = null;
+    }
+
+    private bool MovePiece(Vector2Int initialTile, Vector2Int finalTile)
+    {
+        _colorToInputHandler.TryGetValue(_gameManager.playerTurn, out var inputHandler);
+        
+        if (inputHandler == null)
+        {
+            if (verboseDebug) 
+                Debug.LogError("Board2D Error: MovePiece() called with null sender!");
+            
+            return false;
+        }
+        
+        if (verboseDebug)
+            Debug.Log("Board2D: From: " + initialTile + ", To: " + finalTile);
+
+        if (inputHandler != null && inputHandler.SendMove(initialTile, finalTile)) return true;
+        
+        if (verboseDebug)
+            Debug.Log("Board2D: Illegal move attempted from: " + initialTile + ", to: " + finalTile + '.');
+        
+        return false;
     }
 
     // Set up the tiles
     private void SetupTiles()
     {
-        m_Tiles = new GameObject[tileCountX, tileCountY];
+        _tiles = new GameObject[tileCountX, tileCountY];
 
         var colored = false;
 
@@ -226,7 +280,7 @@ public class Board2D : MonoBehaviour {
         {
             for (var x = 0; x < tileCountX; x++)
             {
-                m_Tiles[x, y] = CreateTile(x, y, colored);
+                _tiles[x, y] = CreateTile(x, y, colored);
                 colored = !colored;
             }
             colored = !colored;
@@ -251,20 +305,34 @@ public class Board2D : MonoBehaviour {
     private void CreatePieceSprites()
     {   
         for (var y = 0; y < tileCountY; y++)
-        {
             for (var x = 0; x < tileCountX; x++)
-            {
-                if (m_BoardManager.BoardState[x, y] == '-') continue;
-                var temp = m_BoardManager.BoardState[x, y];
-                m_ChessPieces[x,y] = CreateSprite((ChessPieceType)(int)Enum.Parse(typeof(ChessPieceType), char.ToString(char.ToLower(temp))), temp);
-                m_ChessPieces[x,y].transform.position = new Vector3(x - TileOffsetX , 7 - y - TileOffsetY, 0);
-                m_ChessPieces[x,y].row = y;
-                m_ChessPieces[x,y].col = x;
-            }
-        }
+                CreatePieceSprite(new Vector2Int(x, y), _boardManager.BoardState[x, y]);
     }
 
     // Creates a single piece sprite
+    private void CreatePieceSprite(Vector2Int pos, char ch)
+    {
+        CreatePieceSprite(pos.x, pos.y, ch);
+    }
+    
+    // Creates a single piece sprite
+    private void CreatePieceSprite(int x, int y, char ch)
+    {
+        print("Creating piece: " + ch);
+        
+        if (ch == '-') return;
+
+        var existingPiece = _chessPieces[x, y];
+
+        if (existingPiece != null)
+            existingPiece.DestroyChessPiece();
+        
+        _chessPieces[x,y] = CreateSprite((ChessPieceType)(int)Enum.Parse(typeof(ChessPieceType), char.ToString(char.ToLower(ch))), ch);
+        _chessPieces[x,y].transform.position = new Vector3(x - TileOffsetX , 7 - y - TileOffsetY, 0);
+        _chessPieces[x,y].row = y;
+        _chessPieces[x,y].col = x;
+    }
+    
     private ChessPiece2D CreateSprite(ChessPieceType type, char team)
     {
         var cp = Instantiate(prefabs[(int)type-1], transform).GetComponent<ChessPiece2D>();
@@ -284,7 +352,7 @@ public class Board2D : MonoBehaviour {
     {
         for (var y = 0; y < tileCountY; y++)
             for (var x = 0; x < tileCountX; x++)
-                if (m_Tiles[x, y] == mouseInfo)
+                if (_tiles[x, y] == mouseInfo)
                         return new Vector2Int(x, y);
         
         return -Vector2Int.one;
@@ -300,42 +368,18 @@ public class Board2D : MonoBehaviour {
     //     return MovePiece(initialTile, finalTile, new MoveEventData(inputHandler, color, moveEventArgs));
     // }
 
-    private bool MovePiece(Vector2Int initialTile, Vector2Int finalTile)
-    {
-        m_ColorToInputHandler.TryGetValue(m_GameManager.playerTurn, out var inputHandler);
-        
-        if (inputHandler == null)
-        {
-            if (verboseDebug) 
-                Debug.LogError("Board2D Error: MovePiece() called with null sender!");
-            
-            return false;
-        }
-        
-        if (verboseDebug)
-            Debug.Log("Board2D: From: " + initialTile + ", To: " + finalTile);
-
-        if (inputHandler != null && inputHandler.SendMove(initialTile, finalTile)) return true;
-        
-        if (verboseDebug)
-            Debug.Log("Board2D: Illegal move attempted from: " + initialTile + ", to: " + finalTile + '.');
-        
-        return false;
-    }
-    
     // Destroys a piece sprite at the specified tile
     private void DestroyPieceObject(Vector2Int tile)
     {
-        if (m_ChessPieces[tile.x, tile.y])
-            m_ChessPieces[tile.x, tile.y].DestroyChessPiece();
-    }
+        print("Removing piece at: " + tile);
 
-    // Transfers a piece sprite from initialTile to finalTile
-    private void TransferPiece(Vector2Int initialTile, Vector2Int finalTile)
-    {
-        m_ChessPieces[initialTile.x, initialTile.y].transform.position = new Vector3(finalTile.x - TileOffsetX, 7 - finalTile.y - TileOffsetY, 0);
-        m_ChessPieces[finalTile.x, finalTile.y] = m_ChessPieces[initialTile.x, initialTile.y];
-        m_ChessPieces[initialTile.x, initialTile.y] = null;
+        var piece = _chessPieces[tile.x, tile.y];
+
+        if (piece == null) return;
+        
+        print("Piece at " + tile + " is " + piece.name);
+        
+        _chessPieces[tile.x, tile.y].DestroyChessPiece();
     }
 
     public void HighlightTilesFromArray(int[,] arr)
@@ -349,7 +393,7 @@ public class Board2D : MonoBehaviour {
     // highlight a single tile
     public GameObject HighlightTile(int row, int col, bool color)
     {
-        var selectedTile = m_Tiles[row, col];
+        var selectedTile = _tiles[row, col];
         var selectedTileMeshRenderer = selectedTile.GetComponent<MeshRenderer>();
 
         if (color == true)
@@ -357,27 +401,27 @@ public class Board2D : MonoBehaviour {
         else
             selectedTileMeshRenderer.material = selectedTile.CompareTag("lightMat") ? lightMat : darkMat;
         
-        return m_Tiles[row, col];
+        return _tiles[row, col];
     }
     
     public GameObject UnhighlightTile(int row, int col)
     {
-        var selectedTile = m_Tiles[row, col];
+        var selectedTile = _tiles[row, col];
         var selectedTileMeshRenderer = selectedTile.GetComponent<MeshRenderer>();
         
         selectedTileMeshRenderer.material = selectedTile.CompareTag("lightMat") ? lightMat : darkMat;
         
-        return m_Tiles[row, col];
+        return _tiles[row, col];
     }
     
     public GameObject HighlightTile(int row, int col)
     {
-        var selectedTile = m_Tiles[row, col];
+        var selectedTile = _tiles[row, col];
         var selectedTileMeshRenderer = selectedTile.GetComponent<MeshRenderer>();
         
         selectedTileMeshRenderer.material = hoverMat;
 
-        return m_Tiles[row, col];
+        return _tiles[row, col];
     }
 
     // Highlight pieces specified collection of Vector2Ints
@@ -412,7 +456,7 @@ public class Board2D : MonoBehaviour {
     // add a dot highlight to squares with legal moves for the given piece
     private void HighlightLegalTiles(Vector2Int square)
     {
-        var baseChessPiece = m_BoardManager.GetPieceAt(square);
+        var baseChessPiece = _boardManager.GetPieceAt(square);
 
         if (baseChessPiece == null) return;
 
@@ -420,7 +464,7 @@ public class Board2D : MonoBehaviour {
         legalMoves.AddRange(baseChessPiece.legalPositions);
         legalMoves.AddRange(baseChessPiece.legalAttacks);
 
-        var squarePos = m_Tiles[square.x, square.y].transform.position;
+        var squarePos = _tiles[square.x, square.y].transform.position;
         var diagonalDistance = Mathf.Sqrt(2f);
             
         foreach (var pos in legalMoves)
@@ -434,10 +478,13 @@ public class Board2D : MonoBehaviour {
             var distanceDiagonal = Mathf.Abs((squarePos - dotPos).magnitude / diagonalDistance);
             var distanceLinear = Mathf.Abs((squarePos - dotPos).magnitude);
 
-            print("diagonal: " + (squarePos - dotPos).magnitude / diagonalDistance);
-            print("linear: " + (squarePos - dotPos).magnitude);
-            print("diagonal rounded: " + distanceDiagonal);
-            print("linear rounded: " + distanceLinear);
+            if (verboseDebug)
+            {
+                print("diagonal: " + (squarePos - dotPos).magnitude / diagonalDistance);
+                print("linear: " + (squarePos - dotPos).magnitude);
+                print("diagonal rounded: " + distanceDiagonal);
+                print("linear rounded: " + distanceLinear);
+            }
 
             dotAnim.DoDelayedGrowth(distanceDiagonal > 0.1f
                 ? Mathf.RoundToInt(distanceLinear)
@@ -447,7 +494,7 @@ public class Board2D : MonoBehaviour {
 
     private void UnhighlightLegalTiles(Vector2Int square)
     {
-        var squarePos = m_Tiles[square.x, square.y].transform.position;
+        var squarePos = _tiles[square.x, square.y].transform.position;
         var diagonalDistance = Mathf.Sqrt(2f);
 
         foreach (var tile in GameObject.FindGameObjectsWithTag("legalTile"))
@@ -457,8 +504,11 @@ public class Board2D : MonoBehaviour {
             var distanceDiagonal = Mathf.Abs((squarePos - dotPos).magnitude / diagonalDistance);
             var distanceLinear = (squarePos - dotPos).magnitude;
 
-            print("diagonal: " + distanceDiagonal);
-            print("linear: " + distanceLinear);
+            if (verboseDebug)
+            {
+                print("diagonal: " + distanceDiagonal);
+                print("linear: " + distanceLinear);
+            }
 
 
             dotAnim.DoDelayedShrink(distanceDiagonal > 0.1f

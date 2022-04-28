@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -24,33 +26,35 @@ namespace ChessGame.ChessPieces
 
         private void Start()
         {
-            board.boardUpdate.AddListener(_FindLegalPositions);
-            board.pieceTryMove.AddListener(TryMoveUpdate);
+            // board.boardUpdate.AddListener(_FindLegalPositions);
+            // board.pieceTryMove.AddListener(TryMoveUpdate);
             //board.boardRefresh.AddListener(OnBoardRefresh);
 
             _FindLegalPositions();
         }
+
+        public virtual void Initialize() { }
 
         // Checks all positions in a line given a direction to check in
         protected BaseChessPiece CheckMovesInLine(Vector2Int direction)
         {
             var i = 1;
             var nextPos = currentPosition + direction;
-            BaseChessPiece chessPiece = null;
-
+            BaseChessPiece chessPiece;
+            
             while (!board.HasPieceAt(nextPos) && board.IsValidCoordinate(nextPos))
             {
                 legalPositions.Add(nextPos);
                 nextPos = currentPosition + ++i * direction;
             }
-
-            if (!board.HasPieceAt(nextPos)) return chessPiece;
-
+            
+            if (!board.HasPieceAt(nextPos)) return null;
+            
             chessPiece = board.GetPieceAt(nextPos);
-
+            
             if (chessPiece.pieceColor != pieceColor)
                 legalAttacks.Add(nextPos);
-
+            
             return chessPiece;
         }
 
@@ -114,6 +118,23 @@ namespace ChessGame.ChessPieces
             if (square.piece != this) return;
 
             FindLegalPositions();
+
+            try
+            {
+                var kingPos = legalAttacks.Find(pos => board.GetPieceAt(pos) is King);
+                ((King) board.GetPieceAt(kingPos)).inCheck = true;
+            }
+            catch (InvalidCastException e)
+            {
+                if (GameManager.Instance && GameManager.Instance.verboseDebug)
+                    Debug.LogWarning("Piece in legal attack is not a King.");
+            }
+            catch (ArgumentNullException e)
+            {
+                if (GameManager.Instance && GameManager.Instance.verboseDebug)
+                    Debug.LogWarning("King was not found in legal attack.");
+            }
+
         }
 
         // Unique abstract function that each piece implements to find their legal moves
@@ -155,7 +176,7 @@ namespace ChessGame.ChessPieces
             //board.boardUpdate.Invoke();
             //move was successful
             
-            OnBoardRefresh();
+            //OnBoardRefresh();
             
             return true;
         }
