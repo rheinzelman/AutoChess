@@ -80,7 +80,7 @@ namespace ChessGame.PlayerInputInterface
         }
         
         [Button]
-        public void TestReceiveMost(Vector2Int from, Vector2Int to, PieceColor color = PieceColor.Unassigned, string args = "", string fen = "")
+        public void TestReceiveMove(Vector2Int from, Vector2Int to, PieceColor color = PieceColor.Unassigned, string args = "", string fen = "")
         {
             var moveData = new MoveEventData(null, color, args, "", BoardManager.Instance.BoardState);
             ReceiveMove(from, to, moveData);

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using ChessGame.PlayerInputInterface;
 using Sirenix.OdinInspector;
@@ -83,6 +84,7 @@ namespace ChessGame
         [SerializeField] private BoardManager boardManager;
         [SerializeField] private BaseInputHandler whiteInputHandler;
         [SerializeField] private BaseInputHandler blackInputHandler;
+        [SerializeField] private List<BaseInputHandler> listeners = new List<BaseInputHandler>();
 
         [Header("Debug")] 
         public bool startWithVerboseDebug = false;
@@ -146,6 +148,8 @@ namespace ChessGame
             SwapTurns();
 
             var moveData = new MoveEventData(sender, piece.pieceColor, moveResult.Item2, NotationsHandler.GenerateFEN(), boardManager.BoardState);
+            
+            listeners.ForEach(p => p.ReceiveMove(from, to, moveData));
 
             switch (playerTurn)
             {

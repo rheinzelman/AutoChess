@@ -336,7 +336,7 @@ namespace ChessGame
                     gameManager.halfMoveClock = 0;
                     break;
                 case Knight p:
-                    args += "n, ";
+                    args += "n";
                     break;
             }
 
