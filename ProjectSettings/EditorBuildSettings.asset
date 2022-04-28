@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/VSBoard.unity
     guid: 50862c031f1f9f64ea64715bd135917c
+  - enabled: 1
+    path: Assets/Scenes/VSbot.unity
+    guid: 31c1343430747474a818357fa4b3b177
   m_configObjects: {}

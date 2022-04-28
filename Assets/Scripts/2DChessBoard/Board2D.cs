@@ -94,7 +94,9 @@ public class Board2D : MonoBehaviour {
         }
 
         verboseDebug = _gameManager.verboseDebug;
-            
+
+        _gameManager.onTurnSwapped.AddListener(turnSwapped);
+;            
         _gameManager.onVerboseDebugChanged.AddListener(SetVerboseDebug);
 
         _chessPieces = new ChessPiece2D[tileCountY, tileCountX];
@@ -123,6 +125,11 @@ public class Board2D : MonoBehaviour {
         CheckPromotion();
 
         //CheckForInput();
+    }
+
+    private void turnSwapped(PlayerColor color, BaseInputHandler sender)
+    {
+        UnhighlightAllTiles();
     }
 
     // Sets promotions for gross hacky solution
@@ -167,16 +174,16 @@ public class Board2D : MonoBehaviour {
 
         var hitPosition = Constants.ErrorValue;
         
-        try
-        {
+        // try
+        // {
             // Get the coordinates of the tile i've hit
             hitPosition = GetTileIndex(info.transform.gameObject);
-        }
-        catch (Exception e)
-        {
-            return;
-        }
-        
+        // }
+        // catch (Exception e)
+        // {
+        //     return;
+        // }
+        //
         if (_boardManager.HasPieceAt(hitPosition) && _selectedPiece == _deselectValue)
         {
             if ((int) _boardManager.GetPieceAt(hitPosition).pieceColor != (int) _gameManager.PlayerTurn)
@@ -290,7 +297,7 @@ public class Board2D : MonoBehaviour {
     // Creates a single piece sprite
     private void CreatePieceSprite(int x, int y, char ch)
     {
-        print("Creating piece: " + ch);
+        // print("Creating piece: " + ch);
         
         if (ch == '-') return;
 

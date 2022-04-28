@@ -53,9 +53,11 @@ namespace ChessGame.PlayerInputInterface
             
            //if (!Input.GetKeyDown(KeyCode.Space)) return;
 
+           
+
             if (_ioDriver is null || !TurnActive) return;
 
-            if (Input.GetKeyDown(KeyCode.Space)) //_ioDriver.CapturedPiece() || 
+            if (Input.GetKeyDown(KeyCode.Space) || _ioDriver.CapturedPiece()) //_ioDriver.CapturedPiece() || 
             {
                 _initialState = GetCurrentStateInBoard();
                 print("New board state!");
@@ -63,8 +65,14 @@ namespace ChessGame.PlayerInputInterface
             }
 
             //print("Pressed space!\n");
+            
+            print("Initial");
+            NotationsHandler.Print2DArray(_initialState);
 
             _finalState = GetCurrentStateInBoard();
+            
+            print("Final");
+            NotationsHandler.Print2DArray(_finalState);
             
             var move = _ioDriver.GetMoveFromDifferenceArray(_initialState, _finalState);
             
