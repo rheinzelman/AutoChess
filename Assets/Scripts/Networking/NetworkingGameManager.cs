@@ -37,8 +37,8 @@ namespace ChessGame
         public GameObject Board;
         public GameObject WaitText;
         public Text roomID;
-        public GameObject[] takenWhitePieces;
-        public GameObject[] takenBlackPieces;
+        public List<GameObject> takenWhitePieces;
+        public List<GameObject> takenBlackPieces;
         //public Text MoveHistory;
         public BoardManager boardManager;
         public GameManager gameManager;
@@ -117,10 +117,20 @@ namespace ChessGame
         {
             for (int i = 0; i < WhitePieces.Count; i++)
                 if (WhitePieces[i] == destination)
+                {
                     takenWhitePieces[i].SetActive(true);
+                    takenWhitePieces.RemoveAt(i);
+                    //GameObject pos = takenWhitePieces[i];
+                    //takenWhitePieces.Remove(pos);
+                }
             for (int i = 0; i < BlackPieces.Count; i++)
                 if (BlackPieces[i] == destination)
+                {
                     takenBlackPieces[i].SetActive(true);
+                    takenBlackPieces.RemoveAt(i);
+                    //GameObject pos = takenBlackPieces[i];
+                    //takenBlackPieces.Remove(pos);
+                }
         }
 
         public bool pieceHasMoved()
