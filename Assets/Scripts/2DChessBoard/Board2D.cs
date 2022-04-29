@@ -445,6 +445,21 @@ public class Board2D : MonoBehaviour {
 
         if (!boardManager.MovePiece(initial_tile, final_tile)) return "Illegal move! - " + returnString;
 
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if(chessPieces[i,j] != null)
+                {
+                    initial_bs[i, j] = 1;
+                }
+                else
+                {
+                    initial_bs[i, j] = 0;
+                }
+            }
+        }
+
         if (physcial_move && boardConnected)
         {
 
