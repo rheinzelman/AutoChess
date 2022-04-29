@@ -10,17 +10,23 @@ using Utils;
 public class ChessEngineInput : BaseInputHandler
 {
     private string output;
+    private string fen;
     private StockfishHandler stock;
 
     private void Start()
     {
         stock = gameObject.AddComponent<StockfishHandler>();
+        fen = NotationsHandler.DEFAULT_FEN;
     }
 
     private void Update()
     {
-        if (!TurnActive || output == "" || !Input.GetKeyDown(KeyCode.Space)) return;
+        if (!Input.GetKeyDown(KeyCode.LeftShift)) return;
         
+        output = stock.GetMove(fen);
+        
+        if (!TurnActive || output == "" ) return;
+
         var move = (NotationsHandler.UCIToCoordinate("" + output[0] + output[1]),
             NotationsHandler.UCIToCoordinate("" + output[2] + output[3]));
         
@@ -33,6 +39,6 @@ public class ChessEngineInput : BaseInputHandler
 
     public override void ReceiveMove(Vector2Int from, Vector2Int to, MoveEventData moveData)
     {
-        output = stock.GetMove(moveData.Fen);
+        fen = moveData.Fen;
     }
 }

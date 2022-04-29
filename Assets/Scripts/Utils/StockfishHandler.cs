@@ -25,8 +25,6 @@ namespace StockfishHandlerNamespace
 
         public string GetMove(string FENString)
         {
-
-            
             var stockfish = new System.Diagnostics.Process();
             stockfish.StartInfo.FileName = Directory.GetCurrentDirectory() + "/Assets/stockfish/stockfish.exe";
             stockfish.StartInfo.UseShellExecute = false;

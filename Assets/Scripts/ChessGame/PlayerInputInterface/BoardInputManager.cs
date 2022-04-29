@@ -23,6 +23,9 @@ namespace ChessGame.PlayerInputInterface
         };
 
         private int[,] _finalState;
+
+        private int[,] _friendlyMask;
+        private int[,] _opponentMask;
         
         private IODriver _ioDriver;
 
@@ -57,12 +60,14 @@ namespace ChessGame.PlayerInputInterface
 
             if (_ioDriver is null || !TurnActive) return;
 
-            if (Input.GetKeyDown(KeyCode.Space) || _ioDriver.CapturedPiece()) //_ioDriver.CapturedPiece() || 
+            if (Input.GetKeyDown(KeyCode.Space))// || _ioDriver.CapturedPiece()) //_ioDriver.CapturedPiece() || 
             {
                 _initialState = GetCurrentStateInBoard();
                 print("New board state!");
                 NotationsHandler.Print2DArray(_initialState);
             }
+
+            if (!Input.GetKeyDown(KeyCode.A)) return;
 
             //print("Pressed space!\n");
             
@@ -84,6 +89,8 @@ namespace ChessGame.PlayerInputInterface
 
             SendMove(move.Item1, move.Item2);
         }
+        
+        
 
         public override bool SendMove(Vector2Int from, Vector2Int to)
         {
@@ -116,6 +123,8 @@ namespace ChessGame.PlayerInputInterface
             // _initialState[from.y, from.x] = 0;
 
             _initialState = CharArrayToInt(moveData.BoardState);
+            
+            //GenerateMasks(moveData.BoardState);
 
             var moveTuple = (NotationsHandler.CoordinateToUCI(from), NotationsHandler.CoordinateToUCI(to));
             
@@ -153,6 +162,54 @@ namespace ChessGame.PlayerInputInterface
                 _ioDriver.PerformStandardMove(moveTuple.Item1, moveTuple.Item2);
 
             NotationsHandler.Print2DArray(_initialState);
+        }
+
+        private void GenerateMasks(char[,] charArr)
+        {
+            var intArr = new int[8,8];
+
+            _initialState = new int[8, 8];
+            _friendlyMask = new int[8, 8];
+            _opponentMask = new int[8, 8];
+
+            for (var y = 0; y < 8; y++)
+                for (var x = 0; x < 8; x++)
+                {
+                    var ch = charArr[x, y];
+                    if (ch == '-')
+                        intArr[x, y] = 0;
+                    else if (char.IsUpper(ch))
+                    {
+                        _initialState[x, y] = 1;
+                        
+                        switch (playerColor)
+                        {
+                            //playerColor == PlayerColor.White ? _friendlyMask[x,y] == 1 : _opponentMask[x, y] = 1;
+                            case PlayerColor.White:
+                                _friendlyMask[x, y] = 1;
+                                break;
+                            case PlayerColor.Black:
+                                _opponentMask[x, y] = 1;
+                                break;
+                        }
+                    }
+                    else if (char.IsLower(ch))
+                    {
+                        _initialState[x, y] = 1;
+                        
+                        switch (playerColor)
+                        {
+                            //playerColor == PlayerColor.White ? _friendlyMask[x,y] == 1 : _opponentMask[x, y] = 1;
+                            case PlayerColor.Black:
+                                _friendlyMask[x, y] = 1;
+                                break;
+                            case PlayerColor.White:
+                                _opponentMask[x, y] = 1;
+                                break;
+                        }
+                    }
+                }
+                    //intArr[x, y] = charArr[x, y] == '-' ? 0 : 1;
         }
 
         private int[,] CharArrayToInt(char[,] charArr)
