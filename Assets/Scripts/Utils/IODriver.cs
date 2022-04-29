@@ -27,7 +27,7 @@ namespace IODriverNamespace
         };
 
         // physical board parameters
-        int overShootAmount = 5;
+        int overShootAmount = 3;
 
         public Dictionary<string, string> GRBLDict = new Dictionary<string, string>();
 

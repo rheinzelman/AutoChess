@@ -825,7 +825,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1256480364}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.39063337
+  m_Size: 0.39063334
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1216,10 +1216,10 @@ MonoBehaviour:
   lightMat: {fileID: 2100000, guid: 18ee2b0f9577a0742aa4b237b7b20c63, type: 2}
   darkMat: {fileID: 2100000, guid: b6a5e8d40d7cd904bb0e4dfe155dc8ff, type: 2}
   hoverMat: {fileID: 2100000, guid: c1015775fb2d34549a4b3d7a943829ed, type: 2}
-  recordedGames:
-  - {fileID: 4900000, guid: 43d04f6f59ae6bb4bba6e1df927ce041, type: 3}
+  hoverTile: {fileID: 2100000, guid: 3d569ffc127ef2842b8d450c02a9ea0e, type: 2}
   TILE_COUNT_X: 8
   TILE_COUNT_Y: 8
+  moveHistory: []
   stockfishTest: {fileID: 0}
   fenTest: {fileID: 0}
   chessManager: {fileID: 1633040981}
@@ -1350,9 +1350,10 @@ MonoBehaviour:
   lightMat: {fileID: 2100000, guid: 18ee2b0f9577a0742aa4b237b7b20c63, type: 2}
   darkMat: {fileID: 2100000, guid: b6a5e8d40d7cd904bb0e4dfe155dc8ff, type: 2}
   hoverMat: {fileID: 2100000, guid: c1015775fb2d34549a4b3d7a943829ed, type: 2}
-  recordedGames: []
+  hoverTile: {fileID: 0}
   TILE_COUNT_X: 8
   TILE_COUNT_Y: 8
+  moveHistory: []
   stockfishTest: {fileID: 0}
   fenTest: {fileID: 0}
   chessManager: {fileID: 0}
@@ -1826,8 +1827,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 294144280}
   m_HandleRect: {fileID: 294144279}
   m_Direction: 0
-  m_Value: 1
-  m_Size: 0.99999994
+  m_Value: 0
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
