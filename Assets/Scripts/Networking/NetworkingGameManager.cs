@@ -1,23 +1,30 @@
 using System;
 using System.Collections;
-using AutoChess.ManagerComponents;
+using System.Collections.Generic;
+using System.Linq;
+using AutoChess;
+using AutoChess.PlayerInput;
+using ChessGame.PlayerInputInterface;
+using System.ComponentModel;
+using Sirenix.OdinInspector;
 
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Events;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 using Photon.Pun;
 using Photon.Realtime;
 
 
-namespace Com.MyCompany.MyGame
+namespace ChessGame
 {
     public class NetworkingGameManager : MonoBehaviourPunCallbacks
     {
 
         #region Public Methods
-
+        public char[] rows = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
         public enum PlayerColor
         { 
             White,
@@ -30,8 +37,14 @@ namespace Com.MyCompany.MyGame
         public GameObject Board;
         public GameObject WaitText;
         public Text roomID;
+        public GameObject[] takenWhitePieces;
+        public GameObject[] takenBlackPieces;
+        //public Text MoveHistory;
         public BoardManager boardManager;
+        public GameManager gameManager;
         public bool gameActive;
+        public GameObject blackInput;
+        public GameObject whiteInput;
         public Vector2Int from;
         public Vector2Int to;
         public List<Vector2Int> WhitePieces = new List<Vector2Int>();
@@ -41,6 +54,8 @@ namespace Com.MyCompany.MyGame
         public void Start()
         {
             PV = GetComponent<PhotonView>();
+            gameManager = GameManager.Instance;
+            boardManager = BoardManager.Instance;
             gameActive = false;
             roomID.text = PhotonNetwork.CurrentRoom.Name;
             Board.SetActive(false);
@@ -58,18 +73,16 @@ namespace Com.MyCompany.MyGame
             if (gameActive)
                 if (pieceHasMoved())
                 {
+                    if (pieceHasBeenTaken())
+                        FindTakenPiece(to);
                     Debug.Log("Piece has moved send RPC, Piece has moved from " + from + " to " + to);
 
-                    int MoveData = from.x*1000 + from.y*100 + to.x*10 + to.y;
+                    int MoveData = from.x * 1000 + from.y * 100 + to.x * 10 + to.y;
                     Debug.Log("compressed move data " + MoveData);
                     this.PV.RPC("MovePiece", RpcTarget.Others, MoveData);
-                    //UpdateLists
+                    //MoveHistory.text = MoveHistory.text + (rows[from.x] + from.y.ToString() + rows[to.x] + to.y.ToString()); 
                     UpdateLists();
                 }
-
-            
-
-
         }
 
         [PunRPC]
@@ -81,29 +94,55 @@ namespace Com.MyCompany.MyGame
             int tox = ((moveData) / 10) % 10;
             int toy = moveData % 10;
             Debug.Log("Move piece " + fromx + fromy + " to " + tox + toy);
-            boardManager.MovePiece(new Vector2Int(fromx,fromy), new Vector2Int(tox,toy));
+            boardManager.MovePiece(new Vector2Int(fromx, fromy), new Vector2Int(tox, toy), null);
+            //swapTurns
+            gameManager.SwapTurns();
+            if (pieceHasBeenTaken())
+                FindTakenPiece(new Vector2Int(tox,toy));
+            //MoveHistory.text = MoveHistory.text + (rows[fromx] + fromy.ToString() + rows[tox] + toy.ToString());
+            UpdateLists();
+        }
+
+        public bool pieceHasBeenTaken()
+        {
+            if (WhitePieces.Contains(to) || BlackPieces.Contains(to))
+            {
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public void FindTakenPiece(Vector2Int destination)
+        {
+            for (int i = 0; i < WhitePieces.Count; i++)
+                if (WhitePieces[i] == destination)
+                    takenWhitePieces[i].SetActive(true);
+            for (int i = 0; i < BlackPieces.Count; i++)
+                if (BlackPieces[i] == destination)
+                    takenBlackPieces[i].SetActive(true);
         }
 
         public bool pieceHasMoved()
         {
-            if (WhitePieces.Count == boardManager.WhitePieces.Count)
+            if (WhitePieces.Count == boardManager.whitePieces.Count)
             {
                 for (int i = 0; i < WhitePieces.Count; i++)
-                    if (WhitePieces[i] != boardManager.WhitePieces[i].currentPosition)
+                    if (WhitePieces[i] != boardManager.whitePieces[i].currentPosition)
                     {
                         from = WhitePieces[i];
-                        to = boardManager.WhitePieces[i].currentPosition;
+                        to = boardManager.whitePieces[i].currentPosition;
                         return true;
                     }
             }
 
-            if (BlackPieces.Count == boardManager.BlackPieces.Count)
+            if (BlackPieces.Count == boardManager.blackPieces.Count)
             {
                 for (int i = 0; i < BlackPieces.Count; i++)
-                    if (BlackPieces[i] != boardManager.BlackPieces[i].currentPosition)
+                    if (BlackPieces[i] != boardManager.blackPieces[i].currentPosition)
                     {
                         from = BlackPieces[i];
-                        to = boardManager.BlackPieces[i].currentPosition;
+                        to = boardManager.blackPieces[i].currentPosition;
                         return true;
                     }
             }
@@ -114,9 +153,9 @@ namespace Com.MyCompany.MyGame
         {
             WhitePieces.Clear();
             BlackPieces.Clear();
-            foreach (AutoChess.ChessPieces.ChessPiece p in boardManager.WhitePieces)
+            foreach (ChessGame.ChessPieces.BaseChessPiece p in boardManager.whitePieces)
                 WhitePieces.Add(p.currentPosition);
-            foreach (AutoChess.ChessPieces.ChessPiece p in boardManager.BlackPieces)
+            foreach (ChessGame.ChessPieces.BaseChessPiece p in boardManager.blackPieces)
                 BlackPieces.Add(p.currentPosition);
 
         }
@@ -129,6 +168,16 @@ namespace Com.MyCompany.MyGame
             playername1.text = PhotonNetwork.PlayerList[0].NickName;
             playername2.text = PhotonNetwork.PlayerList[1].NickName;
             playername2.color = Color.black;
+            if (PhotonNetwork.IsMasterClient)
+            {
+                BaseInputHandler blackInputHandler = blackInput.GetComponent<BaseInputHandler>();
+                Destroy(blackInputHandler);
+            }
+            else
+            {
+                BaseInputHandler whiteInputHandler = whiteInput.GetComponent<BaseInputHandler>();
+                Destroy(whiteInputHandler);
+            }
             UpdateLists();
 
         }
@@ -160,6 +209,15 @@ namespace Com.MyCompany.MyGame
 
         #region Photon Callbacks
 
+        public void quit()
+        {
+            Application.Quit();
+        }
+
+        public void Resign()
+        {
+            PhotonNetwork.Disconnect();
+        }
 
         public override void OnPlayerEnteredRoom(Player other)
         {

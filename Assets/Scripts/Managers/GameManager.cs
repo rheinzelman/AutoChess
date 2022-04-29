@@ -1,91 +1,166 @@
-using AutoChess.ManagerComponents;
+using System;
+using System.ComponentModel;
 using AutoChess.PlayerInput;
-using System.Collections;
-using System.Collections.Generic;
+using ChessGame.PlayerInputInterface;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
-namespace AutoChess
+namespace ChessGame
 {
     public enum PlayerColor
     {
-        Unassigned,
-        White,
-        Black
+        Unassigned = -1,
+        White = 1,
+        Black = 2
     }
 
     public enum EndState
     {
-        Stalemate,
+        Draw,
         WhiteWin,
         BlackWin
     }
 
     public enum PieceColor
     {
+        Unassigned = -1,
         White = 1,
         Black = 2
     }
 
-
     public class MoveEventData
     {
-        public BaseInputHandler sender;
-        public string args;
+        [DefaultValue(null)]
+        public readonly BaseInputHandler Sender;
+        [DefaultValue(PlayerColor.Unassigned)]
+        public readonly PieceColor PieceColor;
+        [DefaultValue("")]
+        public readonly string Args;
+
+        public MoveEventData()
+        {
+            this.Sender = null;
+            this.PieceColor = PieceColor.Unassigned;
+            this.Args = "";
+        }
+        public MoveEventData(BaseInputHandler sender, PieceColor pieceColor, string args)
+        {
+            Sender = sender;
+            PieceColor = pieceColor;
+            Args = args;
+        }
     }
+
+    [System.Serializable]
+    public class GameEndEvent : UnityEvent<EndState, PlayerColor> { }
 
     [System.Serializable]
     public class PlayerTurnEvent : UnityEvent<PlayerColor, BaseInputHandler> { }
 
+    [System.Serializable]
+    public class DebugChangeEvent : UnityEvent<bool> { }
+
     public class GameManager : MonoBehaviour
     {
-        public static GameManager instance;
+        public static GameManager Instance;
 
-        [Header("Game State")]
-        [SerializeField] private PlayerColor playerTurn = PlayerColor.White;
-        [SerializeField] private bool gameOver = false;
+        [field: Header("Game State")]
+        public PlayerColor playerTurn { get; private set; } = PlayerColor.White;
+        public bool gameOver { get; private set; } = false;
 
         [Header("Events")]
-        public UnityEvent OnGameOver = new UnityEvent();
-        public PlayerTurnEvent OnTurnSwapped = new PlayerTurnEvent();
+        public GameEndEvent onGameOver = new GameEndEvent();
+        public PlayerTurnEvent onTurnSwapped = new PlayerTurnEvent();
 
         [Header("Internal Components")]
         [SerializeField] private BoardManager boardManager;
         [SerializeField] private BaseInputHandler whiteInputHandler;
         [SerializeField] private BaseInputHandler blackInputHandler;
 
-        private void Start()
+        [Header("Debug")]
+        public bool startWithVerboseDebug = false;
+
+        [HideInInspector] public bool verboseDebug;
+        [HideInInspector] public DebugChangeEvent onVerboseDebugChanged = new DebugChangeEvent();
+
+        private void Awake()
         {
-            instance = this;
-            boardManager ??= GetComponent<BoardManager>();
-            whiteInputHandler.gameManager = this;
-            blackInputHandler.gameManager = this;
+            Instance = this;
         }
 
-        public bool PerformMove(Vector2Int from, Vector2Int to, MoveEventData eventData)
+        private void Start()
         {
-            if (playerTurn != eventData.sender.playerColor || !boardManager.GetPieceAt(from) || boardManager.GetPieceAt(to).pieceColor != (PieceColor) eventData.sender.playerColor) return false;
+            verboseDebug = startWithVerboseDebug;
+            boardManager = BoardManager.Instance;
+            whiteInputHandler.playerColor = PlayerColor.White;
+            blackInputHandler.playerColor = PlayerColor.Black;
+        }
 
-            bool bMoveSuccess = boardManager.MovePiece(to, from, eventData.args);
+        [Button]
+        private void ToggleVerboseDebug()
+        {
+            verboseDebug = !verboseDebug;
+            onVerboseDebugChanged.Invoke(verboseDebug);
+        }
 
-            if (bMoveSuccess) SwapTurns();
+        public bool PerformMove(Vector2Int from, Vector2Int to, MoveEventData moveData)
+        {
+            if (moveData.Sender == null)
+            {
+                Debug.LogError("Game Manager Error: PerformMove() called without valid sender!");
+                return false;
+            }
 
-            return bMoveSuccess;
+            if ((int)moveData.PieceColor != (int)moveData.Sender.playerColor)
+            {
+                if (verboseDebug)
+                    Debug.LogError("Game Manager Error: PerformMove() called with a PieceColor of " +
+                                   Enum.GetName(typeof(PieceColor), moveData.PieceColor) +
+                                   " but a PlayerColor of " +
+                                   Enum.GetName(typeof(PlayerColor), moveData.Sender.playerColor) +
+                                   '!');
+
+                return false;
+            }
+
+            if (playerTurn != moveData.Sender.playerColor || !boardManager.HasPieceAt(from)) return false;
+
+            if (!boardManager.MovePiece(from, to, moveData)) return false;
+
+            SwapTurns();
+
+            switch (playerTurn)
+            {
+                case PlayerColor.White:
+                    whiteInputHandler.ReceiveMove(to, @from, moveData);
+                    break;
+                case PlayerColor.Black:
+                    blackInputHandler.ReceiveMove(to, @from, moveData);
+                    break;
+                case PlayerColor.Unassigned:
+                    Debug.LogError("Game Manager Error: " +
+                                   "PlayerColor in playerTurn is set to PlayerColor.Unassigned!");
+                    break;
+                default:
+                    Debug.LogError("Game Manager Error: Invalid PlayerColor in playerTurn!");
+                    break;
+            }
+
+            return true;
         }
 
         public void SwapTurns()
         {
-            if (playerTurn == PlayerColor.White)
-                playerTurn = PlayerColor.Black;
-            else
-                playerTurn = PlayerColor.White;
+            playerTurn = playerTurn == PlayerColor.White ? PlayerColor.Black : PlayerColor.White;
 
-            BaseInputHandler activeInput = (playerTurn == PlayerColor.White ? whiteInputHandler : blackInputHandler);
+            var activeInput = (playerTurn == PlayerColor.White ? whiteInputHandler : blackInputHandler);
 
             whiteInputHandler.AlternateTurn();
             blackInputHandler.AlternateTurn();
 
-            OnTurnSwapped.Invoke(playerTurn, activeInput);
+            onTurnSwapped.Invoke(playerTurn, activeInput);
         }
     }
 

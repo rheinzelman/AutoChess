@@ -1,28 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace AutoChess.PlayerInput
+namespace ChessGame.PlayerInputInterface
 {
     public class BaseInputHandler : MonoBehaviour, IHandleInputInterface
     {
         [Header("Game Manager")]
-        public GameManager gameManager;
+        private GameManager gameManager;
 
         [Header("Events")]
-        public UnityEvent OnTurnStart = new UnityEvent();
-        public UnityEvent OnTurnFinished = new UnityEvent();
-        public UnityEvent OnMoveSent = new UnityEvent();
-        public UnityEvent OnMoveReceived = new UnityEvent();
+        public UnityEvent onTurnStart = new UnityEvent();
+        public UnityEvent onTurnFinished = new UnityEvent();
+        public UnityEvent onMoveSent = new UnityEvent();
+        public UnityEvent onMoveReceived = new UnityEvent();
 
         // Interface member for player's color
-        private PlayerColor _playerColor = PlayerColor.Unassigned;
-        public PlayerColor playerColor 
-        { 
-            get { return _playerColor; }
-            set { _playerColor = value; } 
-        }
+        public PlayerColor playerColor { get; set; } = PlayerColor.Unassigned;
+
 
         // Interface member for active turn state
         private bool _bTurnActive = false;
@@ -30,6 +25,11 @@ namespace AutoChess.PlayerInput
         {
             get { return _bTurnActive; }
             set { _bTurnActive = value; }
+        }
+
+        private void Start()
+        {
+            gameManager = GameManager.Instance;
         }
 
         // When the turns are alternated by the GameManager, start or end turn
@@ -47,20 +47,40 @@ namespace AutoChess.PlayerInput
         public virtual void StartTurn()
         {
             bTurnActive = true;
-            OnTurnStart.Invoke();
+            onTurnStart.Invoke();
         }
 
         // When the turn ends, do something
         public virtual void EndTurn()
         {
             bTurnActive = false;
-            OnTurnFinished.Invoke();
+            onTurnFinished.Invoke();
         }
 
         // When we want to send a move, send it to the GameManager and do something
-        public virtual void SendMove(Vector2Int from, Vector2Int to) { }
+        public virtual bool SendMove(Vector2Int from, Vector2Int to, MoveEventData moveData)
+        {
+            if (!gameManager.verboseDebug) return gameManager.PerformMove(@from, to, moveData);
+
+            Debug.Log(name + " BaseInputHandler: Sending move to board from: " + @from + ", to: " + to + '.');
+
+            Debug.Log("Move data values are: Sender - " + moveData.Sender.name +
+                      ", Piece Color - " + Enum.GetName(typeof(PieceColor), moveData.PieceColor) +
+                      ", Args - " + (moveData.Args == "" ? "none" : moveData.Args));
+
+            return gameManager.PerformMove(from, to, moveData);
+        }
 
         // When the game manager sends us a move, process it and do something
-        public virtual void ReceiveMove(Vector2Int from, Vector2Int to) { }
+        public virtual void ReceiveMove(Vector2Int to, Vector2Int from, MoveEventData moveData)
+        {
+            if (!gameManager.verboseDebug) return;
+
+            Debug.Log(name + " BaseInputHandler: Receiving move from: " + from + ", to: " + to + '.');
+
+            Debug.Log("Move data values are: Sender - " + moveData.Sender.name +
+                      ", Piece Color - " + Enum.GetName(typeof(PieceColor), moveData.PieceColor) +
+                      ", Args - " + (moveData.Args == "" ? "none" : moveData.Args));
+        }
     }
 }
