@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.IO.Ports;
+using System.Linq;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Events;
@@ -22,7 +24,17 @@ namespace ChessGame.PlayerInputInterface
             { 1, 1, 0, 0, 0, 0, 1, 1 }
         };
 
-        private int[,] _finalState;
+        private int[,] _finalState =
+        {
+            { 1, 1, 0, 0, 0, 0, 1, 1 },
+            { 1, 1, 0, 0, 0, 0, 1, 1 },
+            { 1, 1, 0, 0, 0, 0, 1, 1 },
+            { 1, 1, 0, 0, 0, 0, 1, 1 },
+            { 1, 1, 0, 0, 0, 0, 1, 1 },
+            { 1, 1, 0, 0, 0, 0, 1, 1 },
+            { 1, 1, 0, 0, 0, 0, 1, 1 },
+            { 1, 1, 0, 0, 0, 0, 1, 1 }
+        };
 
         private int[,] _friendlyMask;
         private int[,] _opponentMask;
@@ -58,36 +70,42 @@ namespace ChessGame.PlayerInputInterface
 
            
 
-            if (_ioDriver is null || !TurnActive) return;
+            //if (_ioDriver is null || !TurnActive) return;
 
-            if (Input.GetKeyDown(KeyCode.Space))// || _ioDriver.CapturedPiece()) //_ioDriver.CapturedPiece() || 
+            /*if (Input.GetKeyDown(KeyCode.Space))// || _ioDriver.CapturedPiece()) //_ioDriver.CapturedPiece() || 
             {
                 _initialState = GetCurrentStateInBoard();
                 print("New board state!");
                 NotationsHandler.Print2DArray(_initialState);
-            }
+            }*/
 
-            if (!Input.GetKeyDown(KeyCode.A)) return;
+            //if (!Input.GetKeyDown(KeyCode.A)) return;
+            
+            if (!TurnActive) return;
+
+            FindMove();
 
             //print("Pressed space!\n");
-            
-            print("Initial");
-            NotationsHandler.Print2DArray(_initialState);
 
-            _finalState = GetCurrentStateInBoard();
-            
-            print("Final");
-            NotationsHandler.Print2DArray(_finalState);
-            
-            var move = _ioDriver.GetMoveFromDifferenceArray(_initialState, _finalState);
-            
+            //print("Initial");
+            //NotationsHandler.Print2DArray(_initialState);
+
+            //_finalState = GetCurrentStateInBoard();
+
+            //print("Final");
+            //NotationsHandler.Print2DArray(_finalState);
+
+            //var move = _ioDriver.GetMoveFromDifferenceArray(_initialState, _finalState);
+
+            //var move = FindMove();
+
             // NotationsHandler.Print2DArray(_initialState);
             // NotationsHandler.Print2DArray(_finalState);
             // NotationsHandler.Print2DArray(_ioDriver.GetDifferenceArray(_initialState, _finalState));
             //
             // print("Item 1: " + move.Item1 + ", Item 2: " + move.Item2);
 
-            SendMove(move.Item1, move.Item2);
+            //SendMove(move.Item1, move.Item2);
         }
         
         
@@ -96,7 +114,7 @@ namespace ChessGame.PlayerInputInterface
         {
             if (!base.SendMove(from, to)) return false;
 
-            _initialState = _finalState;
+            //_initialState = _finalState;
 
             return true;
         }
@@ -122,13 +140,15 @@ namespace ChessGame.PlayerInputInterface
             // _initialState[to.y, to.x] = 1;
             // _initialState[from.y, from.x] = 0;
 
-            _initialState = CharArrayToInt(moveData.BoardState);
-            
+            //_initialState = CharArrayToInt(moveData.BoardState);
+
+            GenerateMasks(moveData.BoardState);
+
             //GenerateMasks(moveData.BoardState);
 
             var moveTuple = (NotationsHandler.CoordinateToUCI(from), NotationsHandler.CoordinateToUCI(to));
             
-            print("Move received to board!");
+            /*print("Move received to board!");
             
             print("Move: " + from + " -> " + to);
             
@@ -140,7 +160,7 @@ namespace ChessGame.PlayerInputInterface
             
             print("New int array: ");
             
-            NotationsHandler.Print2DArray(CharArrayToInt(moveData.BoardState));
+            NotationsHandler.Print2DArray(CharArrayToInt(moveData.BoardState));*/
             
             if (_ioDriver == null) return;
 
@@ -161,14 +181,76 @@ namespace ChessGame.PlayerInputInterface
             else
                 _ioDriver.PerformStandardMove(moveTuple.Item1, moveTuple.Item2);
 
+            //NotationsHandler.Print2DArray(_initialState);
+        }
+
+        private int[,] Dif(int[,] i, int[,] j)
+        {
+            var arr = new int[8, 8];
+            
+            for (var y = 0; y < 8; y++)
+                for (var x = 0; x < 8; x++)
+                    arr[x,y] = i[x,y] - j[x,y];
+
+            return arr;
+        }
+
+        private void FindMove()
+        {
+            _finalState = GetCurrentStateInBoard();
+            //var difArray = Dif(_initialState, _finalState);
+            //NotationsHandler.Print2DArray(difArray);
+            var difArray = _ioDriver.GetDifferenceArray(_initialState, _finalState);
+            
+            var fromPositions = new List<Vector2Int>();
+            var toPositions = new List<Vector2Int>();
+
+            for (var y = 0; y < 8; y++)
+                for (var x = 0; x < 8; x++)
+                    if (difArray[x, y] != 0 && _friendlyMask[x, y] != 1)
+                        toPositions.Add(new Vector2Int(x, y));
+                    else if (difArray[x, y] != 0 && _friendlyMask[x, y] == 1)
+                        fromPositions.Add(new Vector2Int(x, y));
+
+            foreach (var from in fromPositions)
+            {
+                foreach (var to in toPositions)
+                {
+                    print("Trying: " + from + " - >" + to);
+                    SendMove(from, to);
+                }
+            }
+        }
+
+        [Button]
+        private void ModifyInitialArray(int x, int y, int val)
+        {
+            _initialState[x, y] = val;
+        }
+
+        [Button]
+        private void ModifyFinalArray(int x, int y, int val)
+        {
+            _finalState[x, y] = val;
+        }
+
+        [Button]
+        private void PrintInitial()
+        {
             NotationsHandler.Print2DArray(_initialState);
+        }
+        
+        [Button]
+        private void PrintFinal()
+        {
+            NotationsHandler.Print2DArray(_finalState);
         }
 
         private void GenerateMasks(char[,] charArr)
         {
-            var intArr = new int[8,8];
-
-            _initialState = new int[8, 8];
+            var newArr = new int[8, 8];
+            var newArr2 = new int[8, 8];
+            //_initialState = new int[8, 8];
             _friendlyMask = new int[8, 8];
             _opponentMask = new int[8, 8];
 
@@ -177,10 +259,15 @@ namespace ChessGame.PlayerInputInterface
                 {
                     var ch = charArr[x, y];
                     if (ch == '-')
-                        intArr[x, y] = 0;
+                    {
+                        newArr[x, y] = 0;
+                        newArr2[x, y] = 0;
+                        //_initialState[x, y] = 0;
+                    }
                     else if (char.IsUpper(ch))
                     {
-                        _initialState[x, y] = 1;
+                        newArr[x, y] = 1;
+                        newArr2[x, y] = 1;
                         
                         switch (playerColor)
                         {
@@ -195,7 +282,8 @@ namespace ChessGame.PlayerInputInterface
                     }
                     else if (char.IsLower(ch))
                     {
-                        _initialState[x, y] = 1;
+                        newArr[x, y] = 1;
+                        newArr2[x, y] = 1;
                         
                         switch (playerColor)
                         {
@@ -209,7 +297,9 @@ namespace ChessGame.PlayerInputInterface
                         }
                     }
                 }
-                    //intArr[x, y] = charArr[x, y] == '-' ? 0 : 1;
+
+            _initialState = newArr;
+            _finalState =  newArr2;
         }
 
         private int[,] CharArrayToInt(char[,] charArr)

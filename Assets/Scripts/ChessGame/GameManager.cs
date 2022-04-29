@@ -231,7 +231,7 @@ namespace ChessGame
                     DeclareGameOver(EndState.Draw, PlayerColor.Unassigned);
                     return;
                 case PlayerColor.Black when boardManager.blackKing.inCheck && !boardManager.blackHasMoves:
-                    DeclareGameOver(EndState.Win, PlayerColor.Black);
+                    DeclareGameOver(EndState.Win, PlayerColor.White);
                     break;
                 case PlayerColor.Black when !boardManager.blackKing.inCheck && !boardManager.blackHasMoves:
                     DeclareGameOver(EndState.Draw, PlayerColor.Unassigned);
