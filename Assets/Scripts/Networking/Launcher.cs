@@ -2,6 +2,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 
 namespace Com.MyCompany.MyGame
@@ -58,17 +59,15 @@ namespace Com.MyCompany.MyGame
         [Tooltip("The Ui Panel to let the user enter name, connect and play")]
         [SerializeField]
         private GameObject controlPanel;
-        [Tooltip("The UI Label to inform the user that the connection is in progress")]
-        [SerializeField]
-        private GameObject progressLabel;
+        public Text name;
 
         public GameObject playButton;
+        public GameObject randomButton;
 
-        
+
         public void Start()
         {
             PhotonNetwork.ConnectUsingSettings();
-            progressLabel.SetActive(false);
             controlPanel.SetActive(true);
         }
 
@@ -84,11 +83,28 @@ namespace Com.MyCompany.MyGame
         /// - If already connected, we attempt joining a random room
         /// - if not yet connected, Connect this application instance to Photon Cloud Network
         /// </summary>
+        public void CreateRoom()
+        {
+            if (name.text != "")
+            {
+                PhotonNetwork.CreateRoom(name.text, new RoomOptions { MaxPlayers = maxPlayersPerRoom });
+            }
+        }
+        
+        public override void OnCreatedRoom()
+        {
+            Debug.Log("Room was created succesfully");
+
+        }
+
+        public override void OnCreateRoomFailed(short returnCode, string message)
+        {
+            Debug.Log("Room creation failed" + message);
+        }
+        
         public void Connect()
         {
-            progressLabel.SetActive(true);
             controlPanel.SetActive(false);
-
             // we check if we are connected or not, we join if we are , else we initiate the connection to the server.
             if (PhotonNetwork.IsConnected)
             {
@@ -122,6 +138,8 @@ namespace Com.MyCompany.MyGame
             // #Critical: The first we try to do is to join a potential existing room. If there is, good, else, we'll be called back with OnJoinRandomFailed()
             Debug.Log("PUN Basics Tutorial/Launcher: OnConnectedToMaster() was called by PUN");
             playButton.SetActive(true);
+            PhotonNetwork.JoinLobby();
+
         }
 
 
